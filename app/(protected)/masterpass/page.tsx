@@ -1,34 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAppwrite } from "@/app/appwrite-provider";
-import { redirectToAuthIDM } from "@/lib/authUrl";
 import { MasterPassModal } from "@/components/overlays/MasterPassModal";
+import { openAuthPopup } from "@/lib/authUrl";
 
 export default function MasterPassPage() {
   const [showModal, setShowModal] = useState(false);
-  const { user } = useAppwrite();
+  const { user, isAuthReady } = useAppwrite();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const closeParam = searchParams.get("close");
 
-  // Redirect to IDM if not logged in
+  // Once auth is ready, determine what to show
   useEffect(() => {
-    if (user === null) {
-      redirectToAuthIDM(closeParam === "yes");
-    } else if (user) {
+    if (!isAuthReady) return;
+
+    if (user) {
+      // User is logged in, show masterpass unlock modal
       setShowModal(true);
+    } else {
+      // No user session, open auth popup
+      try {
+        openAuthPopup();
+      } catch (err) {
+        console.error("Failed to open auth popup:", err);
+      }
     }
-  }, [user, router, closeParam]);
+  }, [user, isAuthReady]);
 
   const handleModalClose = () => {
-    // If close=yes parameter was present, redirect back to IDM
-    if (closeParam === "yes") {
-      redirectToAuthIDM(true);
-    } else {
-      router.replace("/dashboard");
-    }
+    // After unlocking masterpass, go to dashboard
+    router.replace("/dashboard");
   };
 
   return <MasterPassModal isOpen={showModal} onClose={handleModalClose} />;

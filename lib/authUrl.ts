@@ -20,31 +20,29 @@ export function getAuthURL(): string {
 }
 
 /**
- * Generate the source URL for IDM redirect with optional close parameter
- * Default targets /masterpass for authenticated users
+ * Generate the source URL for IDM redirect
+ * Points to current hostname + /masterpass so IDM redirects back here after auth
  */
-export function getSourceURL(includeClose: boolean = false): string {
+export function getSourceURL(): string {
   if (typeof window !== "undefined") {
     const protocol = window.location.protocol;
     const hostname = window.location.hostname;
     const port = window.location.port ? `:${window.location.port}` : "";
-    const url = `${protocol}//${hostname}${port}/masterpass`;
-    return includeClose ? `${url}?close=yes` : url;
+    return `${protocol}//${hostname}${port}/masterpass`;
   }
 
   // Server-side fallback
   const appSubdomain = process.env.APP_SUBDOMAIN || "whisperrnote.space";
   const protocol = process.env.NODE_ENV === "development" ? "http:" : "https:";
-  const url = `${protocol}//${appSubdomain}/masterpass`;
-  return includeClose ? `${url}?close=yes` : url;
+  return `${protocol}//${appSubdomain}/masterpass`;
 }
 
 /**
- * Open the IDM authentication popup and handle outcomes
+ * Open the IDM authentication popup
  */
 export function openAuthPopup(): void {
   const authURL = getAuthURL();
-  const sourceURL = getSourceURL(true); // Include ?close=yes
+  const sourceURL = getSourceURL();
   const popup = window.open(
     `${authURL}?source=${encodeURIComponent(sourceURL)}`,
     "auth_popup",
@@ -65,8 +63,6 @@ export function openAuthPopup(): void {
     // Check if popup is closed
     if (popup.closed) {
       clearInterval(pollPopup);
-      // Redirect to IDM with close=yes parameter to indicate popup closure
-      redirectToAuthIDM(true);
       return;
     }
     
@@ -74,45 +70,8 @@ export function openAuthPopup(): void {
     if (pollCount >= maxPolls) {
       clearInterval(pollPopup);
       popup.close();
-      redirectToAuthIDM(true);
       return;
     }
   }, 1000);
-
-  // Listen for messages from popup when authentication is complete
-  const handleMessage = (event: MessageEvent) => {
-    if (event.origin !== getAuthURL()) {
-      return; // Ignore messages from other origins
-    }
-
-    if (event.data?.type === "auth_complete") {
-      clearInterval(pollPopup);
-      window.removeEventListener("message", handleMessage);
-      // Navigate to masterpass when auth is successful
-      window.location.href = "/masterpass";
-    }
-  };
-
-  window.addEventListener("message", handleMessage);
-
-  // Cleanup listener after 10 minutes (reasonable timeout for auth flow)
-  setTimeout(() => {
-    clearInterval(pollPopup);
-    window.removeEventListener("message", handleMessage);
-  }, 10 * 60 * 1000);
 }
 
-/**
- * Redirect to the IDM when not authenticated
- * This sends the user to login/register in the IDM with source parameter
- * @param withClose - Whether to include ?close=yes parameter (for popup closure detection)
- */
-export function redirectToAuthIDM(withClose: boolean = false): void {
-  const authURL = getAuthURL();
-  const sourceURL = getSourceURL(true); // Always include close parameter
-  const redirectURL = withClose 
-    ? `${authURL}?source=${encodeURIComponent(sourceURL)}&close=yes`
-    : `${authURL}?source=${encodeURIComponent(sourceURL)}`;
-  
-  window.location.href = redirectURL;
-}
