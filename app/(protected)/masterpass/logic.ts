@@ -143,6 +143,16 @@ export class MasterPassCrypto {
     }
   }
 
+  // Change master password (re-wrap MEK)
+  async changeMasterPassword(newPassword: string, userId: string): Promise<void> {
+    if (!this.masterKey) {
+      throw new Error("Vault is locked");
+    }
+    
+    // Re-wrap MEK with new password
+    await this.createKeychainEntry(this.masterKey, newPassword, userId);
+  }
+
   // Generate a random Master Encryption Key (MEK)
   private async generateRandomMEK(): Promise<CryptoKey> {
     return await crypto.subtle.generateKey(

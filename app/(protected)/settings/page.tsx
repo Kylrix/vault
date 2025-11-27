@@ -21,6 +21,7 @@ import clsx from "clsx";
 import {
   setVaultTimeout,
   getVaultTimeout,
+  masterPassCrypto,
 } from "@/app/(protected)/masterpass/logic";
 import { useAppwrite } from "@/app/appwrite-provider";
 import TwofaSetup from "@/components/overlays/twofaSetup";
@@ -309,6 +310,12 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await appwriteAccount.updatePassword(passwords.new, passwords.current);
+      
+      // Re-wrap MEK with new password
+      if (user?.$id) {
+         await masterPassCrypto.changeMasterPassword(passwords.new, user.$id);
+      }
+
       toast.success("Password updated successfully!");
       setIsChangePasswordModalOpen(false);
       setPasswords({ current: "", new: "", confirm: "" });
