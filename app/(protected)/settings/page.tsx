@@ -1,20 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import type { Folders } from "@/types/appwrite";
+import { useState, useEffect, useCallback } from "react";
 import {
   User,
   Shield,
   Palette,
-  Bell,
   Trash2,
   Download,
   Upload,
   LogOut,
   Key,
-  Smartphone,
-  Globe,
-  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -52,20 +47,6 @@ import {
 import toast from "react-hot-toast";
 import MasterPasswordVerificationDialog from "@/components/overlays/MasterPasswordVerificationDialog";
 import VaultGuard from "@/components/layout/VaultGuard";
-
-// Hook to detect if sidebar is visible (desktop) or not (mobile)
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 1024); // Tailwind 'lg' breakpoint
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-  return isMobile;
-}
-
-import ImportSection from "./ImportSection";
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
@@ -132,28 +113,29 @@ export default function SettingsPage() {
       }
     };
     loadFolders();
+  }, [user]);
+
+  const fetchTwofaStatus = useCallback(async () => {
+    try {
+      if (!user?.$id) return;
+
+      // Check MFA status directly from Appwrite
+      await listMfaFactors();
+      const account = await appwriteAccount.get();
+      const isEnforced = account.mfa || false;
+
+      setTwofaEnabled(isEnforced);
+    } catch (error) {
+      console.error("Failed to fetch 2FA status:", error);
+    }
   }, [user?.$id]);
 
-  // Fetch latest 2fa status on mount and when dialog closes
-  useEffect(() => {
-    if (user?.$id) {
-      fetchTwofaStatus();
-    }
-  }, [user?.$id, showTwofa]);
-
-  // Sync and validate MFA status between Appwrite and database on page load
-  useEffect(() => {
-    if (user?.$id) {
-      syncMfaStatus();
-    }
-  }, [user?.$id]);
-
-  const syncMfaStatus = async () => {
+  const syncMfaStatus = useCallback(async () => {
     if (!user?.$id) return;
 
     try {
       // Get MFA status directly from Appwrite (source of truth)
-      const factors = await listMfaFactors();
+      await listMfaFactors();
       const account = await appwriteAccount.get();
       const appwriteMfaEnabled = account.mfa || false;
 
@@ -197,22 +179,21 @@ export default function SettingsPage() {
       // Fallback to regular status check
       fetchTwofaStatus();
     }
-  };
+  }, [user?.$id, fetchTwofaStatus]);
 
-  const fetchTwofaStatus = async () => {
-    try {
-      if (!user?.$id) return;
-
-      // Check MFA status directly from Appwrite
-      const factors = await listMfaFactors();
-      const account = await appwriteAccount.get();
-      const isEnforced = account.mfa || false;
-
-      setTwofaEnabled(isEnforced);
-    } catch (error) {
-      console.error("Failed to fetch 2FA status:", error);
+  // Fetch latest 2fa status on mount and when dialog closes
+  useEffect(() => {
+    if (user?.$id) {
+      fetchTwofaStatus();
     }
-  };
+  }, [user?.$id, showTwofa, fetchTwofaStatus]);
+
+  // Sync and validate MFA status between Appwrite and database on page load
+  useEffect(() => {
+    if (user?.$id) {
+      syncMfaStatus();
+    }
+  }, [user?.$id, syncMfaStatus]);
 
   // Fetch passkey status
   useEffect(() => {

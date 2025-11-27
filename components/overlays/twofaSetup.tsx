@@ -351,11 +351,6 @@ export default function TwofaSetup({
     }
   };
 
-  // Legacy disable function - simplified
-  const handleDisable = () => {
-    setShowDisableConfirm(true);
-  };
-
   // Modified: Handle factor changes (enable/disable)
   const handleFactorChange = async (
     factorType: "totp" | "email",
@@ -614,6 +609,7 @@ export default function TwofaSetup({
             </p>
             {qrUrl && (
               <div className="flex justify-center mb-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={qrUrl}
                   alt="TOTP QR Code"

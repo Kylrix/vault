@@ -152,7 +152,7 @@ export function validateUrl(url: string): { valid: boolean; error?: string; sani
     }
 
     return { valid: true, sanitized: urlObj.toString() };
-  } catch (e) {
+  } catch {
     return { valid: false, error: 'Invalid URL format' };
   }
 }
@@ -341,7 +341,7 @@ export function validateCustomFields(customFields: string): { valid: boolean; er
     }
 
     return { valid: true, sanitized };
-  } catch (e) {
+  } catch {
     return { valid: false, error: 'Custom fields must be valid JSON' };
   }
 }

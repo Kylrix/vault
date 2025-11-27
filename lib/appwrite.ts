@@ -17,7 +17,6 @@ import type {
 } from "@/types/appwrite.d";
 import { AuthenticatorType } from "appwrite";
 import {
-  updateMasterpassCheckValue,
   masterPassCrypto,
 } from "@/app/(protected)/masterpass/logic";
 
@@ -536,7 +535,7 @@ export class AppwriteService {
       const doc = response.documents[0];
       if (!doc) return null;
       return doc as unknown as User;
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -1695,7 +1694,7 @@ export async function redirectIfAuthenticated(
       const nextRoute = await getAuthenticationNextRoute(user.$id);
       router.replace(nextRoute);
       return true;
-    } catch (error) {
+    } catch {
       // Fallback to original logic if there's an error
       const hasMp = await hasMasterpass(user.$id);
       if (!hasMp || !isVaultUnlocked()) {

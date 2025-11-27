@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import {
@@ -20,7 +19,6 @@ export default function PasswordGenerator() {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<{ value: string; ts: number }[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
-  const [cryptoKey, setCryptoKey] = useState<CryptoKey | null>(null);
 
   // Live update password as length changes
   useEffect(() => {
