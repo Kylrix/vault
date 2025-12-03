@@ -88,7 +88,7 @@ export function FloatingContainer({
           <div className="flex items-center gap-1" onMouseDown={(e) => e.stopPropagation()}>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               className="h-6 w-6"
               onClick={toggleMinimize}
             >
@@ -101,7 +101,7 @@ export function FloatingContainer({
             {onClose && (
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 className="h-6 w-6 hover:text-destructive"
                 onClick={onClose}
               >

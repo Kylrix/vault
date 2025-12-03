@@ -16,6 +16,7 @@ interface PasskeySetupProps {
   userId: string;
   onSuccess: () => void;
   trustUnlocked?: boolean;
+  isEnabled?: boolean;
 }
 
 // Helper to convert ArrayBuffer to Base64 string
@@ -34,6 +35,7 @@ export function PasskeySetup({
   userId,
   onSuccess,
   trustUnlocked = false,
+  isEnabled = true,
 }: PasskeySetupProps) {
   const [step, setStep] = useState(trustUnlocked && masterPassCrypto.isVaultUnlocked() ? 2 : 1);
   const [loading, setLoading] = useState(false);

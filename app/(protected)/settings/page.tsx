@@ -632,7 +632,7 @@ export default function SettingsPage() {
                             </Button>
                             <Button
                               variant="ghost"
-                              size="icon"
+                              size="sm"
                               className="h-8 w-8 text-destructive hover:text-destructive"
                               onClick={() => openDeletePasskey(pk)}
                             >
