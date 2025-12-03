@@ -17,9 +17,6 @@ import type {
   Keychain,
 } from "@/types/appwrite.d";
 import { AuthenticatorType } from "appwrite";
-import {
-  masterPassCrypto,
-} from "@/app/(protected)/masterpass/logic";
 import { sanitizeString } from "@/lib/validation";
 
 // --- Appwrite Client Setup ---
@@ -1117,36 +1114,42 @@ export class AppwriteService {
     );
   }
 
-  static async exportUserData(userId: string, options: {
-    credentials?: boolean;
-    totpSecrets?: boolean;
-    folders?: boolean;
-  } = { credentials: true, totpSecrets: true, folders: true }): Promise<{
+  static async exportUserData(
+    userId: string,
+    options: {
+      credentials?: boolean;
+      totpSecrets?: boolean;
+      folders?: boolean;
+    } = { credentials: true, totpSecrets: true, folders: true },
+  ): Promise<{
     credentials?: Credentials[];
     totpSecrets?: TotpSecrets[];
     folders?: Folders[];
     version: string;
     exportedAt: string;
   }> {
-    const promises: Promise<any>[] = [];
-    
-    if (options.credentials) promises.push(this.listAllCredentials(userId));
-    else promises.push(Promise.resolve(undefined));
+    const credentialsPromise = options.credentials
+      ? this.listAllCredentials(userId)
+      : Promise.resolve<Credentials[] | undefined>(undefined);
+    const totpPromise = options.totpSecrets
+      ? this.listTOTPSecrets(userId)
+      : Promise.resolve<TotpSecrets[] | undefined>(undefined);
+    const foldersPromise = options.folders
+      ? this.listFolders(userId)
+      : Promise.resolve<Folders[] | undefined>(undefined);
 
-    if (options.totpSecrets) promises.push(this.listTOTPSecrets(userId));
-    else promises.push(Promise.resolve(undefined));
+    const [credentials, totpSecrets, folders] = await Promise.all([
+      credentialsPromise,
+      totpPromise,
+      foldersPromise,
+    ]);
 
-    if (options.folders) promises.push(this.listFolders(userId));
-    else promises.push(Promise.resolve(undefined));
-
-    const [credentials, totpSecrets, folders] = await Promise.all(promises);
-
-    return { 
-      credentials, 
-      totpSecrets, 
+    return {
+      credentials,
+      totpSecrets,
       folders,
       version: "1.0",
-      exportedAt: new Date().toISOString()
+      exportedAt: new Date().toISOString(),
     };
   }
 }

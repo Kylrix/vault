@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
 import { ImportService, ImportProgress, ImportResult } from "@/utils/import/import-service";
 import { FloatingContainer } from "@/components/ui/FloatingContainer";
-import { X, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 interface BackgroundTaskContextType {
@@ -88,7 +88,11 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
         <FloatingContainer
           title={isImporting ? "Importing Data..." : "Import Complete"}
           onClose={closeWidget}
-          defaultPosition={{ x: window.innerWidth - 340, y: window.innerHeight - 400 }}
+          defaultPosition={
+            typeof window !== "undefined"
+              ? { x: window.innerWidth - 340, y: window.innerHeight - 400 }
+              : { x: 20, y: 20 }
+          }
         >
           <div className="space-y-4">
             {!importResult ? (

@@ -1,4 +1,4 @@
-import { logDebug, logError, logWarn } from "@/lib/logger";
+import { logDebug, logError } from "@/lib/logger";
 
 // Enhanced crypto configuration for maximum security with optimal performance
 export class MasterPassCrypto {

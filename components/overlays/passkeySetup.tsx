@@ -255,7 +255,7 @@ export function PasskeySetup({
               <div className="space-y-3">
                 <h3 className="font-medium">Step 2: Name Passkey</h3>
                 <p className="text-sm text-gray-600">
-                  Give this passkey a name to identify it later (e.g., "MacBook Pro", "iPhone").
+                  Give this passkey a name to identify it later (e.g., &ldquo;MacBook Pro&rdquo;, &ldquo;iPhone&rdquo;).
                 </p>
                 <Input
                   type="text"
@@ -285,7 +285,7 @@ export function PasskeySetup({
               <div className="space-y-3">
                 <h3 className="font-medium">Step 3: Create Passkey</h3>
                 <p className="text-sm text-gray-600">
-                  Click "Create Passkey" and follow your device's prompts.
+                  Click &ldquo;Create Passkey&rdquo; and follow your device&rsquo;s prompts.
                 </p>
                 <ul className="text-sm text-gray-600 space-y-1 ml-4">
                   <li>• Face ID / Touch ID</li>

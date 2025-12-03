@@ -74,7 +74,6 @@ export default function SettingsPage() {
     confirm: "",
   });
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [passkeyEnabled, setPasskeyEnabled] = useState(false);
   const [passkeySetupOpen, setPasskeySetupOpen] = useState(false);
   const [isResetModalOpen, setIsResetModalOpen] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
@@ -230,7 +229,7 @@ export default function SettingsPage() {
               if (params.name) name = params.name;
               if (params.created) created = params.created;
             }
-          } catch (e) {
+          } catch {
             // ignore json parse error
           }
           return {
@@ -240,9 +239,8 @@ export default function SettingsPage() {
           };
         });
       setPasskeys(passkeyEntries);
-      setPasskeyEnabled(passkeyEntries.length > 0);
-    } catch (e) {
-      console.error("Failed to load passkeys", e);
+    } catch (error) {
+      console.error("Failed to load passkeys", error);
     }
   }, [user?.$id]);
 
@@ -626,7 +624,7 @@ export default function SettingsPage() {
                           <div className="flex gap-1">
                             <Button
                               variant="ghost"
-                              size="icon"
+                              size="sm"
                               className="h-8 w-8"
                               onClick={() => openRenamePasskey(pk)}
                             >
@@ -1213,7 +1211,7 @@ export default function SettingsPage() {
             <div className="p-6">
               <h3 className="text-lg font-bold">Delete Passkey</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Are you sure you want to delete the passkey "{passkeyToDelete?.name}"?
+                Are you sure you want to delete the passkey &ldquo;{passkeyToDelete?.name}&rdquo;?
                 You will no longer be able to use it to unlock your vault.
               </p>
               <div className="mt-4 flex justify-end gap-2">
