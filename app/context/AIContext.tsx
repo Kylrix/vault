@@ -7,7 +7,7 @@ import { generateAIContent } from "@/app/actions/ai";
 import { AIModal } from "@/components/ai/AIModal";
 
 interface AIContextType {
-  analyze: (mode: AnalysisMode, data: any) => Promise<any>;
+  analyze: (mode: AnalysisMode, data: unknown) => Promise<unknown>;
   askAI: (prompt: string) => Promise<string>;
   openAIModal: () => void;
   closeAIModal: () => void;
@@ -29,7 +29,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
 
-  const analyze = async (mode: AnalysisMode, rawData: any) => {
+  const analyze = async (mode: AnalysisMode, rawData: unknown) => {
     setIsLoading(true);
     try {
       // 1. Sanitize Data on Client Side (Zero Knowledge Enforcement)

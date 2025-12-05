@@ -1,5 +1,3 @@
-import { Credentials } from "@/types/appwrite.d";
-
 export type AnalysisMode = 
   | 'URL_SAFETY'       // Context: Only URL
   | 'VAULT_ORGANIZE'   // Context: Name, URL, Category (NO Secrets)
@@ -8,7 +6,7 @@ export type AnalysisMode =
 
 export interface AIRequestPayload {
   mode: AnalysisMode;
-  data?: any; // Sanitized data
+  data?: unknown; // Sanitized data
   prompt?: string; // Optional custom prompt
 }
 

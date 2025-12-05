@@ -10,6 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "9.0.3",
     "@types/jest": "^30.0.0",

@@ -20,7 +20,7 @@ export function AIModal({ onClose }: { onClose: () => void }) {
     try {
       const result = await askAI(prompt);
       setResponse(result);
-    } catch (error) {
+    } catch {
       setResponse("Sorry, I couldn't process that request.");
     }
   };
@@ -58,7 +58,7 @@ export function AIModal({ onClose }: { onClose: () => void }) {
             disabled={isLoading}
             className="flex-1"
           />
-          <Button type="submit" size="icon" disabled={isLoading || !prompt.trim()}>
+          <Button type="submit" size="sm" disabled={isLoading || !prompt.trim()}>
             {isLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

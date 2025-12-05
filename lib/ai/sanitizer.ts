@@ -8,7 +8,7 @@ import { AnalysisMode } from "./types";
  */
 export class PrivacyFilter {
   
-  static sanitize(mode: AnalysisMode, data: any): any {
+  static sanitize(mode: AnalysisMode, data: unknown): unknown {
     if (!data) return null;
 
     switch (mode) {
@@ -16,7 +16,7 @@ export class PrivacyFilter {
         // Input: Array of credentials
         // Output: Array of { id, name, url, currentFolder }
         // ABSOLUTELY NO PASSWORDS, USERNAMES, NOTES, OR CUSTOM FIELDS
-        const list = Array.isArray(data) ? data : [data];
+        const list = Array.isArray(data) ? (data as Partial<Credentials>[]) : [(data as Partial<Credentials>)];
         return list.map((c: Partial<Credentials>) => ({
             id: c.$id,
             name: c.name,
@@ -28,7 +28,9 @@ export class PrivacyFilter {
         // Input: Single Credential or URL string
         // Output: { url }
         if (typeof data === 'string') return { url: data };
-        if (data.url) return { url: data.url };
+        if (typeof data === 'object' && data !== null && 'url' in data) {
+            return { url: (data as { url: string }).url };
+        }
         return { url: '' };
 
       case 'PASSWORD_AUDIT':
@@ -36,7 +38,9 @@ export class PrivacyFilter {
         // Output: { password } - WARNING: SENSITIVE
         // Only strictly allowed for ephemeral entropy analysis
         if (typeof data === 'string') return { password: data };
-        if (data.password) return { password: data.password };
+        if (typeof data === 'object' && data !== null && 'password' in data) {
+            return { password: (data as { password: string }).password };
+        }
         return { password: '' };
         
       case 'GENERAL_QUERY':

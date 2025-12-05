@@ -9,8 +9,11 @@ import {
   Globe,
   Calendar,
   Tag,
+  ShieldAlert,
+  ShieldCheck,
 } from "lucide-react";
 import { Credentials } from "@/types/appwrite";
+import { useAI } from "@/app/context/AIContext";
 
 export default function CredentialDetail({
   credential,
@@ -24,6 +27,31 @@ export default function CredentialDetail({
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
+  
+  const { analyze } = useAI();
+  const [urlSafety, setUrlSafety] = useState<{ safe: boolean; riskLevel: string; reason: string } | null>(null);
+  const [checkingUrl, setCheckingUrl] = useState(false);
+
+  const checkUrlSafety = useCallback(async (url: string) => {
+    setCheckingUrl(true);
+    try {
+        const result = (await analyze('URL_SAFETY', { url })) as { safe: boolean; riskLevel: string; reason: string };
+        if (result) {
+            setUrlSafety(result);
+        }
+    } catch (e) {
+        console.error("Failed to check URL safety", e);
+    } finally {
+        setCheckingUrl(false);
+    }
+  }, [analyze]);
+
+  // Check URL safety on mount if URL exists
+  useEffect(() => {
+    if (credential.url && !urlSafety && !checkingUrl) {
+        checkUrlSafety(credential.url);
+    }
+  }, [credential.url, checkUrlSafety, checkingUrl, urlSafety]);
 
   // Animation effect - show component after mount
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -242,21 +270,33 @@ export default function CredentialDetail({
                 {credential.name}
               </h1>
               {credential.url && (
-                <a
-                  href={credential.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 text-sm inline-flex items-center"
-                >
-                  <Globe className="h-3 w-3 mr-1" />
-                  {(() => {
-                    try {
-                      return new URL(credential.url).hostname;
-                    } catch {
-                      return credential.url;
-                    }
-                  })()}
-                </a>
+                <div className="flex flex-col gap-1 items-start">
+                    <a
+                    href={credential.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 text-sm inline-flex items-center"
+                    >
+                    <Globe className="h-3 w-3 mr-1" />
+                    {(() => {
+                        try {
+                        return new URL(credential.url).hostname;
+                        } catch {
+                        return credential.url;
+                        }
+                    })()}
+                    </a>
+                    {urlSafety && (
+                        <div className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 border ${
+                            urlSafety.safe 
+                            ? "bg-green-50 text-green-700 border-green-200" 
+                            : "bg-red-50 text-red-700 border-red-200"
+                        }`}>
+                            {urlSafety.safe ? <ShieldCheck className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
+                            <span>{urlSafety.riskLevel} Risk: {urlSafety.reason}</span>
+                        </div>
+                    )}
+                </div>
               )}
             </div>
           </div>

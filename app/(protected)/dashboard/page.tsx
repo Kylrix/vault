@@ -10,6 +10,8 @@ import {
   listAllCredentials,
   listFolders,
   listRecentCredentials,
+  createFolder,
+  updateCredential,
 } from "@/lib/appwrite";
 import toast from "react-hot-toast";
 import CredentialItem from "@/components/app/dashboard/CredentialItem";
@@ -22,6 +24,7 @@ import VaultGuard from "@/components/layout/VaultGuard";
 import { Dialog } from "@/components/ui/Dialog";
 import CredentialDetail from "@/components/app/dashboard/CredentialDetail";
 import MasterPasswordVerificationDialog from "@/components/overlays/MasterPasswordVerificationDialog";
+import { useAI } from "@/app/context/AIContext";
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -33,6 +36,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 export default function DashboardPage() {
   const { user } = useAppwrite();
+  const { analyze } = useAI();
   // State for all credentials, fetched once
   const [allCredentials, setAllCredentials] = useState<Credentials[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,6 +69,11 @@ export default function DashboardPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isVerificationOpen, setIsVerificationOpen] = useState(false);
 
+  // AI Organization State
+  const [organizing, setOrganizing] = useState(false);
+  // Remove unused organizationPreview state
+  // const [organizationPreview, setOrganizationPreview] = useState<{...} | null>(null);
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 900);
@@ -89,10 +98,103 @@ export default function DashboardPage() {
     }
   }, [user]);
 
+  // AI Smart Organization Handler
+  const handleSmartOrganize = async () => {
+    if (!user?.$id || organizing) return;
+    
+    setOrganizing(true);
+    const toastId = toast.loading("AI is analyzing your vault structure...");
+
+    try {
+      // 1. Get credentials that are NOT in a folder yet (or just all credentials to reorganize everything?)
+      // Let's focus on uncategorized items first for safety, or let user decide.
+      // For V1, let's reorganize everything to ensure a clean state.
+      // Passing all credentials to the sanitizer (it strips secrets).
+      
+      const analysisResult = (await analyze('VAULT_ORGANIZE', allCredentials)) as { [folderName: string]: string[] };
+      
+      // Expected result: { "Finance": ["id1", "id2"], "Social": ["id3"] }
+      if (!analysisResult || Object.keys(analysisResult).length === 0) {
+        toast.error("AI couldn't find a better organization structure.", { id: toastId });
+        return;
+      }
+
+      // setOrganizationPreview(analysisResult); 
+      toast.success("Organization plan ready! Please review.", { id: toastId });
+      // Note: We need a UI to confirm these changes. Using a simple native confirm for now or a custom modal in future.
+      // For better UX, we'll auto-apply or show a summary dialog. 
+      // Let's implement the application logic here directly for the hackathon MVP speed,
+      // but ideally this should be a "Review Changes" modal.
+      
+      // Triggering the confirmation modal
+      // (We'll reuse the delete modal state structure or add a new one if time permits, 
+      // but for now let's just use window.confirm to be safe and fast)
+      
+      const confirmMsg = `AI suggests creating/merging into ${Object.keys(analysisResult).length} folders. Proceed?`;
+      if (window.confirm(confirmMsg)) {
+         await applyOrganizationChanges(analysisResult);
+      }
+
+    } catch (error) {
+      console.error("Smart Organize Failed:", error);
+      toast.error("Failed to organize vault.", { id: toastId });
+    } finally {
+      setOrganizing(false);
+    }
+  };
+
+  const applyOrganizationChanges = async (plan: { [folderName: string]: string[] }) => {
+    const toastId = toast.loading("Applying changes...");
+    try {
+      // 1. Refresh current folders to avoid duplicates
+      const currentFolders = await listFolders(user!.$id);
+      const folderMap = new Map(currentFolders.map(f => [f.name.toLowerCase(), f.$id]));
+
+      // 2. Process each proposed folder
+      for (const [folderName, credentialIds] of Object.entries(plan)) {
+        let folderId = folderMap.get(folderName.toLowerCase());
+
+        // Create folder if it doesn't exist
+        if (!folderId) {
+          const newFolder = await createFolder({
+            name: folderName,
+            userId: user!.$id,
+            parentFolderId: null, // flattened structure for now
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            $sequence: 0,
+            $collectionId: "",
+            $databaseId: "",
+            $permissions: [],
+          });
+          folderId = newFolder.$id;
+          folderMap.set(folderName.toLowerCase(), folderId);
+        }
+
+        // 3. Move credentials to folder
+        // We do this in parallel batches to speed it up
+        await Promise.all(credentialIds.map(async (credId) => {
+            // Check if credential actually exists and needs moving
+            const cred = allCredentials.find(c => c.$id === credId);
+            if (cred && cred.folderId !== folderId) {
+                await updateCredential(credId, { folderId });
+            }
+        }));
+      }
+
+      toast.success("Vault organized successfully!", { id: toastId });
+      // Refresh UI
+      window.location.reload(); 
+    } catch (error) {
+        console.error("Failed to apply changes", error);
+        toast.error("Partial failure during organization.", { id: toastId });
+    }
+  };
+
   useEffect(() => {
     if (user?.$id) {
       loadAllCredentials();
-
+      
       listFolders(user.$id)
         .then(setFolders)
         .catch((err: unknown) => {
@@ -232,7 +334,7 @@ export default function DashboardPage() {
               Whisperrkeep
             </span>
             <div className="flex-1 bg-card rounded-full">
-              <SearchBar onSearch={handleSearch} />
+              <SearchBar onSearch={handleSearch} onSmartOrganize={handleSmartOrganize} />
             </div>
           </div>
         </div>

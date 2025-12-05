@@ -9,8 +9,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock,
+  Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { generateRandomPassword } from "@/utils/password";
+import { useAI } from "@/app/context/AIContext";
+import toast from "react-hot-toast";
 
 export default function PasswordGenerator() {
   const [length, setLength] = useState(16);
@@ -19,6 +23,30 @@ export default function PasswordGenerator() {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<{ value: string; ts: number }[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  const { analyze, isLoading: isAnalyzing } = useAI();
+
+  const handleAnalyze = async () => {
+    if (!password) return;
+    const toastId = toast.loading("Analyzing password strength...");
+    try {
+        const result = (await analyze('PASSWORD_AUDIT', password)) as { score: number; timeToCrack: string; feedback: string };
+        if (result) {
+            toast.dismiss(toastId);
+            // We could show a nice modal, but for now a detailed toast or alert is fine for V1
+            // Or better, let's just log it and show a summary toast
+            toast(() => (
+                <div className="text-sm">
+                    <div className="font-bold mb-1">Security Score: {result.score}/10</div>
+                    <div>Crack Time: {result.timeToCrack}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{result.feedback}</div>
+                </div>
+            ), { duration: 5000, icon: <ShieldCheck className="text-green-500" /> });
+        }
+    } catch {
+        toast.error("Analysis failed", { id: toastId });
+    }
+  };
 
   // Live update password as length changes
   useEffect(() => {
@@ -204,6 +232,19 @@ export default function PasswordGenerator() {
             className="w-full mt-1"
           >
             Generate
+          </Button>
+          
+          {/* AI Analysis Button */}
+          <Button
+            type="button"
+            variant="outline" 
+            size="sm"
+            onClick={handleAnalyze}
+            disabled={isAnalyzing}
+            className="w-full mt-1 border-primary/20 text-primary hover:bg-primary/5"
+          >
+            <Sparkles className="w-4 h-4 mr-2" />
+            {isAnalyzing ? "Analyzing..." : "Check Strength with AI"}
           </Button>
         </div>
         {showHistory && (

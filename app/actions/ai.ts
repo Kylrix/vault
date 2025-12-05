@@ -30,6 +30,7 @@ export async function generateAIContent(payload: AIRequestPayload): Promise<AIRe
         break;
 
       case 'PASSWORD_AUDIT':
+        const passwordData = payload.data as { password?: string };
         prompt = `
           Analyze the entropy and strength of this password string. 
           Return a JSON with: 
@@ -37,14 +38,15 @@ export async function generateAIContent(payload: AIRequestPayload): Promise<AIRe
           - timeToCrack (estimated)
           - feedback (specific suggestions to improve)
           Do not repeat the password in the response.
-          Input: "${payload.data?.password || ""}"
+          Input: "${passwordData?.password || ""}"
         `;
         break;
 
       case 'URL_SAFETY':
+        const urlData = payload.data as { url?: string };
         prompt = `
           Analyze this URL for potential phishing or security risks.
-          URL: "${payload.data?.url || ""}"
+          URL: "${urlData?.url || ""}"
           Return a JSON with:
           - safe (boolean)
           - riskLevel (Low, Medium, High)
