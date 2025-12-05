@@ -6,6 +6,9 @@
 
 ---
 
+## Socials:
+X(twitter): https://x.com/whisperrnote
+
 ## ✨ Features
 
 - 🛡️ **Zero-Knowledge Encryption:** Your data is encrypted on your device. We never see your passwords.
