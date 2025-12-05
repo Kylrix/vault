@@ -13,11 +13,13 @@ export default function CredentialDialog({
   onClose,
   initial,
   onSaved,
+  prefill, // New prop for AI pre-filling
 }: {
   open: boolean;
   onClose: () => void;
   initial?: Credentials | null;
   onSaved: () => void;
+  prefill?: { name?: string; url?: string; username?: string };
 }) {
   const { user } = useAppwrite();
   const [showPassword, setShowPassword] = useState(false);
@@ -50,16 +52,19 @@ export default function CredentialDialog({
       );
     } else {
       setForm({
-        name: "",
-        username: "",
-        password: "",
-        url: "",
+        name: prefill?.name || "",
+        username: prefill?.username || "",
+        password: "", // Always start empty or let user generate
+        url: prefill?.url || "",
         notes: "",
         tags: "",
       });
       setCustomFields([]);
+      
+      // Auto-generate password if it's a new entry triggered by AI?
+      // For now, let's just make it easier to click.
     }
-  }, [initial, open]);
+  }, [initial, open, prefill]);
 
   const handleGeneratePassword = () => {
     setForm({ ...form, password: generateRandomPassword(16) });

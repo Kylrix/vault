@@ -12,6 +12,11 @@ interface AIContextType {
   sendCommand: (prompt: string) => Promise<{ action: string; data?: unknown; response?: string }>;
   openAIModal: () => void;
   closeAIModal: () => void;
+  
+  // Global Action Handlers
+  openGlobalCreateModal: (prefill?: { name?: string; url?: string; username?: string }) => void;
+  registerCreateModal: (handler: (prefill?: { name?: string; url?: string; username?: string }) => void) => void;
+  
   isAIModalOpen: boolean;
   isLoading: boolean;
 }
@@ -29,6 +34,20 @@ export function useAI() {
 export function AIProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  const [createModalHandler, setCreateModalHandler] = useState<((prefill?: { name?: string; url?: string; username?: string }) => void) | null>(null);
+
+  // Allow components to register themselves as the "Create Modal" handler
+  const registerCreateModal = (handler: (prefill?: { name?: string; url?: string; username?: string }) => void) => {
+    setCreateModalHandler(() => handler);
+  };
+
+  const openGlobalCreateModal = (prefill?: { name?: string; url?: string; username?: string }) => {
+    if (createModalHandler) {
+        createModalHandler(prefill);
+    } else {
+        console.warn("No Create Modal Handler registered");
+    }
+  };
 
   const analyze = async (mode: AnalysisMode, rawData: unknown) => {
     setIsLoading(true);
@@ -115,6 +134,8 @@ export function AIProvider({ children }: { children: ReactNode }) {
         sendCommand,
         openAIModal,
         closeAIModal,
+        openGlobalCreateModal,
+        registerCreateModal,
         isAIModalOpen,
         isLoading,
       }}

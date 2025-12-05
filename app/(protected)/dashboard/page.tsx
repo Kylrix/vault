@@ -36,7 +36,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 export default function DashboardPage() {
   const { user } = useAppwrite();
-  const { analyze } = useAI();
+  const { analyze, registerCreateModal } = useAI();
   // State for all credentials, fetched once
   const [allCredentials, setAllCredentials] = useState<Credentials[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,8 +45,21 @@ export default function DashboardPage() {
   const [editCredential, setEditCredential] = useState<Credentials | null>(
     null,
   );
+  // Add state for prefilling dialog
+  const [dialogPrefill, setDialogPrefill] = useState<{ name?: string; url?: string } | undefined>(undefined);
+
   const [selectedCredential, setSelectedCredential] =
     useState<Credentials | null>(null);
+
+  // Register the modal opener
+  useEffect(() => {
+    registerCreateModal((prefill) => {
+        setEditCredential(null);
+        setDialogPrefill(prefill);
+        setShowDialog(true);
+    });
+  }, [registerCreateModal]);
+
   const [showDetail, setShowDetail] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const isDesktop =
@@ -492,8 +505,12 @@ export default function DashboardPage() {
 
         <CredentialDialog
           open={showDialog}
-          onClose={() => setShowDialog(false)}
+          onClose={() => {
+            setShowDialog(false);
+            setDialogPrefill(undefined);
+          }}
           initial={editCredential}
+          prefill={dialogPrefill}
           onSaved={refreshCredentials}
         />
 

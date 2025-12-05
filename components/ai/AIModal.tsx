@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export function AIModal({ onClose }: { onClose: () => void }) {
-  const { sendCommand, isLoading } = useAI();
+  const { sendCommand, isLoading, openGlobalCreateModal } = useAI();
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState<string | null>(null);
   const router = useRouter();
@@ -52,16 +52,23 @@ export function AIModal({ onClose }: { onClose: () => void }) {
         break;
 
       case "CREATE_CREDENTIAL":
-        // Navigate to new page with query params to pre-fill?
-        // Or if we are on dashboard, open modal.
-        // Simplest consistent way: Go to /credentials/new with params
-        const params = new URLSearchParams();
-        if (data?.name) params.set("name", data.name);
-        if (data?.url) params.set("url", data.url);
-        
-        router.push(`/credentials/new?${params.toString()}`);
-        onClose();
-        toast.success("Opening new credential form...");
+        // Use Global Modal if registered (Dashboard), otherwise fallback to navigation
+        // We will assume if openGlobalCreateModal is available (it always is in context), we try it.
+        // But we can check if we are on a page where it makes sense? 
+        // Actually, the context will simply warn if no handler. 
+        // Let's try to open modal first.
+        try {
+            openGlobalCreateModal({ name: data?.name, url: data?.url });
+            onClose();
+            toast.success("Opening new credential form...");
+        } catch {
+            // Fallback
+            const params = new URLSearchParams();
+            if (data?.name) params.set("name", data.name);
+            if (data?.url) params.set("url", data.url);
+            router.push(`/credentials/new?${params.toString()}`);
+            onClose();
+        }
         break;
         
       case "GENERATE_PASSWORD":
