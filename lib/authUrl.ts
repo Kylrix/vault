@@ -50,12 +50,25 @@ export function openAuthPopup(): void {
   /*
    * Add source param so IDM knows where to redirect back
    * We want to come back to /masterpass to unlock the vault
+   * 
+   * NOTE: Only for mobile devices where we want a full redirect experience.
+   * On desktop, we want an overlay/popup flow without main window redirect.
    */
   const sourceURL = getSourceURL();
-  const separator = normalizedLoginPath.includes("?") ? "&" : "?";
+
+  // Simple check for mobile devices
+  const isMobile = typeof navigator !== 'undefined' &&
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  let fullUrl = `${authURL}${normalizedLoginPath}`;
+
+  if (isMobile) {
+    const separator = normalizedLoginPath.includes("?") ? "&" : "?";
+    fullUrl = `${fullUrl}${separator}source=${encodeURIComponent(sourceURL)}`;
+  }
 
   const popup = window.open(
-    `${authURL}${normalizedLoginPath}${separator}source=${encodeURIComponent(sourceURL)}`,
+    fullUrl,
     "auth_popup",
     "width=500,height=700,resizable=yes,scrollbars=yes",
   );
