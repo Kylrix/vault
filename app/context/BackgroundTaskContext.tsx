@@ -61,7 +61,8 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
             credentialsCreated: 0, 
             totpSecretsCreated: 0, 
             errors: 1, 
-            skipped: 0 
+            skipped: 0,
+            skippedExisting: 0
         },
         errors: [(error as Error).message || "Unknown error"],
         folderMapping: new Map(),
@@ -144,6 +145,9 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                     <p>Credentials: {importResult.summary.credentialsCreated}</p>
                     <p>Folders: {importResult.summary.foldersCreated}</p>
                     <p>TOTP Secrets: {importResult.summary.totpSecretsCreated}</p>
+                    {importResult.summary.skippedExisting > 0 && (
+                        <p className="text-yellow-600 dark:text-yellow-400">Skipped (Existing): {importResult.summary.skippedExisting}</p>
+                    )}
                     {importResult.summary.errors > 0 && (
                         <p className="text-destructive font-medium">Errors: {importResult.summary.errors}</p>
                     )}
