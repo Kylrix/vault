@@ -212,9 +212,9 @@ export default function CredentialDetail({
       className={`
         ${isMobile
           ? "fixed inset-0 z-50 bg-background"
-          : "fixed top-0 right-0 h-full w-[400px] z-40 bg-background border-l border-border"
+          : "fixed top-0 right-0 h-full w-[440px] z-40 bg-background border-l-4 border-border rounded-l-[2rem]"
         }
-        shadow-2xl flex flex-col transition-transform duration-300 ease-out
+        shadow-floating flex flex-col transition-transform duration-300 ease-out shadow-ceramic
         ${isVisible
           ? "translate-x-0"
           : isMobile
@@ -224,7 +224,7 @@ export default function CredentialDetail({
       `}
     >
       {/* Header */}
-      <div className="flex items-center p-4 border-b border-border bg-card/50 backdrop-blur-sm">
+      <div className="flex items-center p-6 border-b-2 border-border bg-card/80 backdrop-blur-md rounded-tl-[2rem]">
         {isMobile ? (
           <Button
             variant="ghost"
@@ -233,7 +233,7 @@ export default function CredentialDetail({
             className="mr-3"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="ml-1">Back</span>
+            <span className="ml-1 font-mono uppercase font-bold text-xs tracking-wider">Back</span>
           </Button>
         ) : (
           <Button
@@ -246,7 +246,7 @@ export default function CredentialDetail({
           </Button>
         )}
         {!isMobile && (
-          <span className="font-semibold text-lg">Credential Details</span>
+          <span className="font-bold text-lg font-mono uppercase tracking-tight">Credential Details</span>
         )}
       </div>
 
@@ -255,10 +255,10 @@ export default function CredentialDetail({
         {/* Main Info */}
         <div className="p-6 border-b border-border">
           <div className="flex items-center mb-4">
-            <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mr-4 overflow-hidden">
+            <div className="w-14 h-14 rounded-2xl bg-card border-2 border-border flex items-center justify-center mr-4 overflow-hidden shadow-resting">
               {faviconUrl ? (
                 /* eslint-disable-next-line @next/next/no-img-element */
-                <img src={faviconUrl} alt="" className="w-8 h-8" />
+                <img src={faviconUrl} alt="" className="w-9 h-9" />
               ) : (
                 <span className="text-xl font-bold text-muted-foreground">
                   {credential.name?.charAt(0)?.toUpperCase() || "?"}
@@ -275,7 +275,7 @@ export default function CredentialDetail({
                     href={credential.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-700 text-sm inline-flex items-center"
+                    className="text-primary hover:underline text-sm inline-flex items-center font-mono font-bold"
                   >
                     <Globe className="h-3 w-3 mr-1" />
                     {(() => {
@@ -287,9 +287,9 @@ export default function CredentialDetail({
                     })()}
                   </a>
                   {urlSafety && (
-                    <div className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 border ${urlSafety.safe
-                        ? "bg-green-50 text-green-700 border-green-200"
-                        : "bg-red-50 text-red-700 border-red-200"
+                    <div className={`text-[10px] px-2 py-0.5 rounded-sm flex items-center gap-1 border-2 font-mono font-bold uppercase ${urlSafety.safe
+                      ? "bg-primary/10 text-primary border-primary/20"
+                      : "bg-destructive/10 text-destructive border-destructive/20"
                       }`}>
                       {urlSafety.safe ? <ShieldCheck className="h-3 w-3" /> : <ShieldAlert className="h-3 w-3" />}
                       <span>{urlSafety.riskLevel} Risk: {urlSafety.reason}</span>
@@ -321,10 +321,10 @@ export default function CredentialDetail({
                 )}
               </Button>
             </div>
-            <div className="bg-muted rounded-lg px-3 py-2 font-mono text-sm select-all break-all">
+            <div className="bg-card border-2 border-border rounded-xl px-4 py-3 font-mono text-sm shadow-inner shadow-ceramic select-all break-all">
               {credential.username || (
                 <span className="text-muted-foreground italic">
-                  No username
+                  VAULT_NULL
                 </span>
               )}
             </div>
@@ -374,16 +374,16 @@ export default function CredentialDetail({
                 </Button>
               </div>
             </div>
-            <div className="bg-muted rounded-lg px-3 py-2 font-mono text-sm select-all">
+            <div className="bg-card border-2 border-border rounded-xl px-4 py-3 font-mono text-sm shadow-inner shadow-ceramic select-all">
               {credential.password ? (
                 showPassword ? (
                   credential.password
                 ) : (
-                  "•".repeat(Math.min(credential.password.length, 20))
+                  "•".repeat(16)
                 )
               ) : (
                 <span className="text-muted-foreground italic">
-                  No password
+                  VAULT_NULL
                 </span>
               )}
             </div>

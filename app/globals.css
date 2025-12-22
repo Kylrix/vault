@@ -3,54 +3,116 @@
 :root {
   /* Solar (Light) Theme - Derived from the Nigerian Landscape */
   --void: 250 248 246;
-  /* #FAF8F6 */
+  /* #FAF8F6 - Brownish White */
   --matter: 234 221 211;
-  /* #EADDD3 */
+  /* #EADDD3 - Sand */
   --matter-highlight: 216 200 189;
   /* #D8C8BD */
   --tungsten: 255 193 7;
-  /* #FFC107 */
+  /* #FFC107 - Sun Yellow */
   --shadow-indigo: 26 35 126;
+  /* #1A237E - Adire Indigo */
 
   --background: var(--void);
   --foreground: 27 28 32;
-  /* #1B1C20 - Deep Ash text */
+  /* #1B1C20 - Deep Ash */
   --card: var(--matter);
   --card-foreground: 27 28 32;
   --primary: var(--tungsten);
   --primary-foreground: 27 28 32;
+  --secondary: var(--shadow-indigo);
+  --secondary-foreground: 250 248 246;
+  --muted: 141 123 109;
+  /* #8D7B6D */
+  --muted-foreground: 27 28 32 / 0.6;
+  --accent: var(--tungsten);
+  --accent-foreground: 27 28 32;
+  --destructive: 181 55 42;
+  --destructive-foreground: 250 248 246;
   --border: 26 35 126 / 0.1;
+  --input: 26 35 126 / 0.1;
   --ring: var(--tungsten);
-  --radius: 0.25rem;
 
-  --shadow-tangible: 4px 8px 16px rgba(var(--shadow-indigo), 0.15);
+  /* Organic Realism: Radii */
+  --radius-micro: 12px;
+  --radius-macro: 24px;
+  --radius-mega: 32px;
+  --radius: var(--radius-micro);
+
+  /* Organic Realism: Shadows (Dual-Layer Adire Indigo) */
+  --shadow-resting: 0px 2px 4px rgba(var(--shadow-indigo), 0.2), 0px 8px 16px rgba(var(--shadow-indigo), 0.1);
+  --shadow-hover: 0px 4px 8px rgba(var(--shadow-indigo), 0.4), 0px 12px 24px rgba(var(--shadow-indigo), 0.2);
+  --shadow-floating: 0px 8px 16px rgba(var(--shadow-indigo), 0.3), 0px 24px 48px rgba(0, 0, 0, 0.2);
+
+  /* Surface Physics: Ceramic Highlight */
+  --highlight-ceramic: inset 0px 1px 0px rgba(var(--tungsten), 0.2);
 }
 
 .dark {
   /* The Void (Dark) Theme */
   --void: 27 28 32;
-  /* #1B1C20 */
+  /* #1B1C20 - Dark Ash */
   --matter: 45 36 33;
-  /* #2D2421 */
+  /* #2D2421 - Baked Laterite */
   --matter-highlight: 72 74 59;
   /* #484A3B */
+  --tungsten: 255 193 7;
+  --shadow-indigo: 26 35 126;
+
   --background: var(--void);
   --foreground: 250 248 246;
-  /* #FAF8F6 */
+  /* #FAF8F6 - Brownish White */
   --card: var(--matter);
   --card-foreground: 250 248 246;
+  --primary: var(--tungsten);
+  --primary-foreground: 27 28 32;
+  --secondary: var(--shadow-indigo);
+  --secondary-foreground: 250 248 246;
+  --muted: 166 144 128;
+  /* #A69080 */
+  --muted-foreground: 250 248 246 / 0.6;
+  --accent: var(--tungsten);
+  --accent-foreground: 27 28 32;
+  --destructive: 181 55 42;
+  --destructive-foreground: 250 248 246;
   --border: 61 61 61;
   /* #3D3D3D */
-  --shadow-tangible: 8px 12px 20px rgba(var(--shadow-indigo), 0.4);
+  --input: 61 61 61;
+  --ring: var(--tungsten);
+
+  --shadow-resting: 0px 2px 4px rgba(0, 0, 0, 0.4), 0px 8px 16px rgba(var(--shadow-indigo), 0.2);
+  --shadow-hover: 0px 4px 8px rgba(0, 0, 0, 0.6), 0px 12px 24px rgba(var(--shadow-indigo), 0.4);
+  --shadow-floating: 0px 8px 16px rgba(0, 0, 0, 0.8), 0px 24px 48px rgba(var(--shadow-indigo), 0.6);
 }
 
 @theme inline {
   --color-background: rgb(var(--background));
   --color-foreground: rgb(var(--foreground));
   --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
   --color-primary: rgb(var(--primary));
   --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary: rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-accent: rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --color-destructive: rgb(var(--destructive));
+  --color-destructive-foreground: rgb(var(--destructive-foreground));
   --color-border: rgb(var(--border));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+
+  --radius-micro: var(--radius-micro);
+  --radius-macro: var(--radius-macro);
+  --radius-mega: var(--radius-mega);
+
+  --shadow-resting: var(--shadow-resting);
+  --shadow-hover: var(--shadow-hover);
+  --shadow-floating: var(--shadow-floating);
+  --shadow-ceramic: var(--highlight-ceramic);
+
   --font-sans: var(--font-inter);
   --font-mono: var(--font-mono);
   --font-display: var(--font-mono);

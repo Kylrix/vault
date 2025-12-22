@@ -103,11 +103,11 @@ function MobileCopyMenu({
         createPortal(
           <div
             ref={menuRef}
-            className="fixed z-[99999] bg-background border rounded-md shadow-md py-1 w-44"
+            className="fixed z-[99999] bg-card border-2 border-border rounded-xl shadow-resting py-2 w-44 font-mono shadow-ceramic"
             style={{ top: menuStyle?.top ?? 0, left: menuStyle?.left ?? 0 }}
           >
             <button
-              className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+              className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors uppercase font-bold"
               onClick={(e) => {
                 e.stopPropagation();
                 onCopy(credential.username);
@@ -239,11 +239,11 @@ function MobileMoreMenu({
         createPortal(
           <div
             ref={menuRef}
-            className="fixed z-[99999] bg-background border rounded-md shadow-md py-1 w-36"
+            className="fixed z-[99999] bg-card border-2 border-border rounded-xl shadow-resting py-2 w-36 font-mono shadow-ceramic"
             style={{ top: menuStyle?.top ?? 0, left: menuStyle?.left ?? 0 }}
           >
             <button
-              className="w-full text-left px-3 py-2 text-sm hover:bg-accent"
+              className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors uppercase font-bold"
               onClick={(e) => {
                 e.stopPropagation();
                 onEdit();
@@ -307,24 +307,23 @@ export default function CredentialItem({
   return (
     <div
       className={clsx(
-        "rounded-2xl overflow-visible mb-3 backdrop-blur-md border border-[rgba(191,174,153,0.3)] shadow-sm cursor-pointer",
-        "bg-white/55 transition-shadow hover:shadow-lg dark:bg-[rgba(141,103,72,0.14)] dark:border-none dark:shadow-none",
+        "rounded-3xl overflow-visible mb-3 backdrop-blur-md border-2 border-border shadow-resting cursor-pointer",
+        "bg-card/80 transition-all duration-300 hover:shadow-hover hover:-translate-y-1 active:translate-y-0 text-foreground shadow-ceramic",
       )}
-      style={{ boxShadow: "0 4px 12px 0 rgba(141,103,72,0.10)" }}
       onClick={onClick}
       tabIndex={onClick ? 0 : undefined}
       role={onClick ? "button" : undefined}
       onKeyDown={
         onClick
           ? (e) => {
-              if (e.key === "Enter" || e.key === " ") onClick();
-            }
+            if (e.key === "Enter" || e.key === " ") onClick();
+          }
           : undefined
       }
     >
-      <div className="flex items-center px-4 py-3">
+      <div className="flex items-center px-4 py-4">
         <div className="flex-shrink-0">
-          <div className="w-10 h-10 rounded-full bg-[rgba(191,174,153,0.7)] flex items-center justify-center overflow-hidden">
+          <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center overflow-hidden border-2 border-border shadow-resting">
             {faviconUrl ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={faviconUrl} alt="" className="w-6 h-6" />
@@ -337,10 +336,10 @@ export default function CredentialItem({
         </div>
 
         <div className="flex-1 ml-4 min-w-0">
-          <div className="font-semibold text-[rgb(141,103,72)] truncate">
+          <div className="font-bold text-foreground font-mono truncate uppercase tracking-tight">
             {credential.name}
           </div>
-          <div className="text-[13px] text-[rgb(191,174,153)] truncate">
+          <div className="text-[13px] text-muted-foreground truncate">
             {credential.username}
           </div>
           {isDesktop && (
@@ -363,7 +362,7 @@ export default function CredentialItem({
               }}
               title="Copy Username"
             >
-              <Copy className="h-6 w-6 text-[rgb(141,103,72)]" />
+              <Copy className="h-5 w-5 text-foreground" />
             </Button>
 
             <Button
@@ -376,7 +375,7 @@ export default function CredentialItem({
               }}
               title="Copy Password"
             >
-              <Copy className="h-6 w-6 text-blue-600" />
+              <Copy className="h-5 w-5 text-primary" />
             </Button>
 
             <Button
@@ -389,7 +388,7 @@ export default function CredentialItem({
               }}
               title="Edit"
             >
-              <Edit className="h-6 w-6 text-orange-600" />
+              <Edit className="h-5 w-5 text-foreground" />
             </Button>
 
             <Button
@@ -402,7 +401,7 @@ export default function CredentialItem({
               }}
               title="Delete"
             >
-              <Trash2 className="h-6 w-6 text-red-600" />
+              <Trash2 className="h-5 w-5 text-destructive" />
             </Button>
           </div>
 
