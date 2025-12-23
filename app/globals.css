@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  /* Solar (Light) Theme - Derived from the Nigerian Landscape */
+  /* Refined Realism (Light) - Premium Digital Workspace */
   --void: 250 248 246;
-  /* #FAF8F6 - Brownish White */
+  /* #FAF8F6 - Off-White */
   --matter: 234 221 211;
   /* #EADDD3 - Sand */
   --matter-highlight: 216 200 189;
   /* #D8C8BD */
   --tungsten: 255 193 7;
-  /* #FFC107 - Sun Yellow */
+  /* #FFC107 - Gold */
   --shadow-indigo: 26 35 126;
-  /* #1A237E - Adire Indigo */
+  /* #1A237E - Deep Navy */
 
   --background: var(--void);
   --foreground: 27 28 32;
-  /* #1B1C20 - Deep Ash */
+  /* #1B1C20 - Onyx */
   --card: var(--matter);
   --card-foreground: 27 28 32;
   --primary: var(--tungsten);
@@ -33,27 +33,27 @@
   --input: 26 35 126 / 0.1;
   --ring: var(--tungsten);
 
-  /* Organic Realism: Radii */
+  /* Refined Realism: Radii */
   --radius-micro: 12px;
   --radius-macro: 24px;
   --radius-mega: 32px;
   --radius: var(--radius-micro);
 
-  /* Organic Realism: Shadows (Dual-Layer Adire Indigo) */
+  /* Refined Realism: Shadows */
   --shadow-resting: 0px 2px 4px rgba(var(--shadow-indigo), 0.2), 0px 8px 16px rgba(var(--shadow-indigo), 0.1);
   --shadow-hover: 0px 4px 8px rgba(var(--shadow-indigo), 0.4), 0px 12px 24px rgba(var(--shadow-indigo), 0.2);
   --shadow-floating: 0px 8px 16px rgba(var(--shadow-indigo), 0.3), 0px 24px 48px rgba(0, 0, 0, 0.2);
 
-  /* Surface Physics: Ceramic Highlight */
+  /* Surface Physics: Premium Highlight */
   --highlight-ceramic: inset 0px 1px 0px rgba(var(--tungsten), 0.2);
 }
 
 .dark {
-  /* The Void (Dark) Theme */
+  /* Refined Realism (Dark) */
   --void: 27 28 32;
-  /* #1B1C20 - Dark Ash */
+  /* #1B1C20 - Onyx */
   --matter: 45 36 33;
-  /* #2D2421 - Baked Laterite */
+  /* #2D2421 - Terra */
   --matter-highlight: 72 74 59;
   /* #484A3B */
   --tungsten: 255 193 7;
@@ -61,7 +61,7 @@
 
   --background: var(--void);
   --foreground: 250 248 246;
-  /* #FAF8F6 - Brownish White */
+  /* #FAF8F6 - Off-White */
   --card: var(--matter);
   --card-foreground: 250 248 246;
   --primary: var(--tungsten);
@@ -115,7 +115,7 @@
 
   --font-sans: var(--font-inter);
   --font-mono: var(--font-mono);
-  --font-display: var(--font-mono);
+  --font-display: var(--font-inter);
 }
 
 h1,
@@ -124,7 +124,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-inter), sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -197,19 +197,19 @@ body {
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-/* Tangible Realism utility */
+/* Premium utility */
 .glass {
   background: rgba(var(--void), 0.8);
   backdrop-filter: blur(12px);
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-tangible);
+  box-shadow: var(--shadow-resting);
 }
 
-/* Primary Structure: Baked Laterite / Matter */
+/* Primary Structure */
 .card {
   background: rgb(var(--matter));
   border: 1px solid var(--border);
-  box-shadow: var(--shadow-tangible);
+  box-shadow: var(--shadow-resting);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 

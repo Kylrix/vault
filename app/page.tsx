@@ -69,7 +69,7 @@ export default function LandingPage() {
   const features = [
     {
       icon: Shield,
-      title: "Zero-Knowledge Encryption",
+      title: "Private Encryption",
       description:
         "Your data is encrypted on your device. We never see your passwords.",
     },
@@ -131,7 +131,7 @@ export default function LandingPage() {
     {
       question: "Is Whisperrkeep really secure?",
       answer:
-        "Yes, Whisperrkeep uses zero-knowledge encryption, meaning your data is encrypted before it leaves your device. We never have access to your master password or any of your stored credentials.",
+        "Yes, Whisperrkeep uses private encryption, meaning your data is encrypted before it leaves your device. We never have access to your master password or any of your stored credentials.",
     },
     {
       question: "What happens if I forget my master password?",
@@ -398,7 +398,7 @@ export default function LandingPage() {
               <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-5">
                 <Shield className="h-8 w-8 text-green-600 dark:text-green-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">AES-256 Encryption</h3>
+              <h3 className="text-xl font-semibold mb-2">Advanced Encryption</h3>
               <p className="text-muted-foreground">
                 Military-grade encryption that protects your data at rest and in
                 transit.
@@ -420,7 +420,7 @@ export default function LandingPage() {
               <div className="h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-5">
                 <Fingerprint className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Zero Knowledge</h3>
+              <h3 className="text-xl font-semibold mb-2">Private Access</h3>
               <p className="text-muted-foreground">
                 We never see your passwords. Your data is encrypted and
                 decrypted locally.
