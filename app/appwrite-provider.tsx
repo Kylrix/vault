@@ -26,6 +26,7 @@ import type { Models } from "appwrite";
 interface AppwriteContextType {
   user: Models.User<Models.Preferences> | null;
   loading: boolean;
+  isAuthenticating: boolean;
   isAuthenticated: boolean;
   isAuthReady: boolean;
   isVaultUnlocked: () => boolean;
@@ -52,6 +53,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     null,
   );
   const [loading, setLoading] = useState(true);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [needsMasterPassword, setNeedsMasterPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [idmWindowOpen, setIDMWindowOpen] = useState(false);
