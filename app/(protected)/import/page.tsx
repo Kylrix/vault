@@ -18,7 +18,7 @@ export default function ImportPage() {
   const [importType, setImportType] = useState<string>("bitwarden");
   const [file, setFile] = useState<File | null>(null);
   const [errorState, setErrorState] = useState<string | null>(null);
-  
+
   // Preview Modal State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewItems, setPreviewItems] = useState<ImportItem[]>([]);
@@ -31,42 +31,42 @@ export default function ImportPage() {
 
   const parseAndPreview = async (file: File) => {
     try {
-        const text = await file.text();
-        // setRawFileContent(text);
-        
-        let items: ImportItem[] = [];
+      const text = await file.text();
+      // setRawFileContent(text);
 
-        if (importType === "bitwarden") {
-            const data = JSON.parse(text);
-            if (!validateBitwardenExport(data)) throw new Error("Invalid Bitwarden format");
-            
-            // Map to our internal structure for preview
-            const mapped = analyzeBitwardenExport(data, user?.$id || "");
-            items = mapped.credentials.map(c => ({
-                ...c,
-                _status: 'new'
-            }));
-        } else if (importType === "whisperrkeep") {
-            const data = JSON.parse(text);
-             if (!data.version && !data.credentials) throw new Error("Invalid WhisperrKeep format");
-             
-             items = (data.credentials || []).map((c: unknown) => ({
-                 ...(c as Partial<ImportItem>),
-                 _status: 'new'
-             }));
-        } else {
-            throw new Error("Preview not supported for this format yet");
-        }
+      let items: ImportItem[] = [];
 
-        if (items.length === 0) {
-            throw new Error("No items found in file");
-        }
+      if (importType === "bitwarden") {
+        const data = JSON.parse(text);
+        if (!validateBitwardenExport(data)) throw new Error("Invalid Bitwarden format");
 
-        setPreviewItems(items);
-        setIsPreviewOpen(true);
+        // Map to our internal structure for preview
+        const mapped = analyzeBitwardenExport(data, user?.$id || "");
+        items = mapped.credentials.map(c => ({
+          ...c,
+          _status: 'new'
+        }));
+      } else if (importType === "whisperrkeep") {
+        const data = JSON.parse(text);
+        if (!data.version && !data.credentials) throw new Error("Invalid WhisperrKeep format");
+
+        items = (data.credentials || []).map((c: unknown) => ({
+          ...(c as Partial<ImportItem>),
+          _status: 'new'
+        }));
+      } else {
+        throw new Error("Preview not supported for this format yet");
+      }
+
+      if (items.length === 0) {
+        throw new Error("No items found in file");
+      }
+
+      setPreviewItems(items);
+      setIsPreviewOpen(true);
 
     } catch (error) {
-        throw error;
+      throw error;
     }
   };
 
@@ -82,15 +82,15 @@ export default function ImportPage() {
     }
 
     if (globalImporting) {
-        setErrorState("An import is already in progress.");
-        return;
+      setErrorState("An import is already in progress.");
+      return;
     }
 
     setErrorState(null);
 
     try {
-       // Validate first
-       await parseAndPreview(file);
+      // Validate first
+      await parseAndPreview(file);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Import failed.";
       setErrorState(errorMessage);
@@ -98,34 +98,34 @@ export default function ImportPage() {
   };
 
   const handleFinalImport = (finalItems: ImportItem[]) => {
-      console.log("[ImportPage] handleFinalImport called with", finalItems.length, "items");
-      
-      if (!masterPassCrypto.isVaultUnlocked()) {
-          setErrorState("Vault is locked. Please unlock your vault to import.");
-          setIsPreviewOpen(false);
-          return;
-      }
+    console.log("[ImportPage] handleFinalImport called with", finalItems.length, "items");
 
-      console.log("[ImportPage] First item sample:", finalItems[0]);
-      
+    if (!masterPassCrypto.isVaultUnlocked()) {
+      setErrorState("Vault is locked. Please unlock your vault to import.");
       setIsPreviewOpen(false);
-      // We need to pass the FINAL deduplicated list to the background task
-      // Currently startImport takes raw string. We might need to update startImport 
-      // OR re-serialize the finalItems to a JSON string that the importer understands.
-      
-      // Strategy: Serialize finalItems into a specialized "internal-processed" format 
-      // OR just standard WhisperrKeep format which the importer already knows!
-      
-      const processedPayload = JSON.stringify({
-          version: 1,
-          credentials: finalItems,
-          folders: [], // We are simplifying to just creds for this specific dedupe flow for now
-          totpSecrets: []
-      });
+      return;
+    }
 
-      console.log("[ImportPage] Calling startImport with payload length:", processedPayload.length);
-      // We send this as "whisperrkeep" type because it's now normalized JSON
-      startImport("whisperrkeep", processedPayload, user!.$id);
+    console.log("[ImportPage] First item sample:", finalItems[0]);
+
+    setIsPreviewOpen(false);
+    // We need to pass the FINAL deduplicated list to the background task
+    // Currently startImport takes raw string. We might need to update startImport 
+    // OR re-serialize the finalItems to a JSON string that the importer understands.
+
+    // Strategy: Serialize finalItems into a specialized "internal-processed" format 
+    // OR just standard WhisperrKeep format which the importer already knows!
+
+    const processedPayload = JSON.stringify({
+      version: 1,
+      credentials: finalItems,
+      folders: [], // We are simplifying to just creds for this specific dedupe flow for now
+      totpSecrets: []
+    });
+
+    console.log("[ImportPage] Calling startImport with payload length:", processedPayload.length);
+    // We send this as "whisperrkeep" type because it's now normalized JSON
+    startImport("whisperrkeep", processedPayload, user!.$id);
   };
 
   const isFileValid =
@@ -139,8 +139,8 @@ export default function ImportPage() {
   return (
     <div className="max-w-4xl mx-auto py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Import Data</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold mb-2 font-mono uppercase tracking-tight">Import Data</h1>
+        <p className="text-muted-foreground">
           Import your passwords and data from other password managers
         </p>
       </div>
@@ -196,11 +196,11 @@ export default function ImportPage() {
               </div>
 
               {importType === "bitwarden" && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-medium text-blue-800 mb-2">
+                <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 shadow-ceramic">
+                  <h3 className="font-bold text-secondary mb-2 uppercase tracking-wide text-xs">
                     How to export from Bitwarden:
                   </h3>
-                  <ol className="text-sm text-blue-700 space-y-1 list-decimal list-inside">
+                  <ol className="text-sm text-secondary space-y-1 list-decimal list-inside font-medium">
                     <li>Log into your Bitwarden web vault</li>
                     <li>
                       Go to <strong>Tools</strong> →{" "}
@@ -219,11 +219,11 @@ export default function ImportPage() {
               )}
 
               {importType === "whisperrkeep" && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h3 className="font-medium text-blue-800 mb-2">
+                <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 shadow-ceramic">
+                  <h3 className="font-bold text-secondary mb-2 uppercase tracking-wide text-xs">
                     Restoring from WhisperrNote:
                   </h3>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-secondary font-medium">
                     Upload a JSON file previously exported from WhisperrNote/WhisperrKeep.
                   </p>
                 </div>
@@ -233,10 +233,10 @@ export default function ImportPage() {
                 <label className="block text-sm font-medium mb-3">
                   Select File
                   {importType === "bitwarden" && (
-                    <span className="text-gray-500">(JSON format)</span>
+                    <span className="text-muted-foreground opacity-70 ml-2">(JSON format)</span>
                   )}
                   {importType === "whisperrkeep" && (
-                     <span className="text-gray-500">(JSON format)</span>
+                    <span className="text-muted-foreground opacity-70 ml-2">(JSON format)</span>
                   )}
                 </label>
                 <Input
@@ -252,7 +252,7 @@ export default function ImportPage() {
                   className="mb-2"
                 />
                 {file && (
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-muted-foreground font-mono">
                     Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
                   </div>
                 )}
@@ -265,21 +265,21 @@ export default function ImportPage() {
               >
                 {globalImporting ? "Import in Progress..." : "Preview & Import"}
               </Button>
-              
+
               {errorState && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
-                      {errorState}
-                  </div>
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
+                  {errorState}
+                </div>
               )}
             </div>
           </Card>
 
           {!globalImporting && (
             <Card className="p-6">
-              <h3 className="font-medium mb-3">⚠️ Important Notes</h3>
-              <div className="space-y-2 text-sm text-gray-600">
+              <h3 className="font-bold text-sm uppercase tracking-wider mb-3">⚠️ Important Notes</h3>
+              <div className="space-y-2 text-sm text-muted-foreground">
                 <p>
-                  • <strong>Please stay connected</strong> to the internet.
+                  • <strong className="text-foreground">Please stay connected</strong> to the internet.
                 </p>
                 <p>• A floating widget will show progress.</p>
                 <p>• You can navigate to other pages while importing.</p>
@@ -298,7 +298,7 @@ export default function ImportPage() {
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
                   <div className="font-medium">Login Credentials</div>
-                  <div className="text-gray-600">
+                  <div className="text-muted-foreground">
                     Usernames, passwords, URLs, and notes
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export default function ImportPage() {
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
                   <div className="font-medium">TOTP Secrets</div>
-                  <div className="text-gray-600">
+                  <div className="text-muted-foreground">
                     Two-factor authentication codes (automatically separated)
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default function ImportPage() {
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
                   <div className="font-medium">Folders & Organization</div>
-                  <div className="text-gray-600">
+                  <div className="text-muted-foreground">
                     Folder structure and item organization
                   </div>
                 </div>
@@ -325,7 +325,7 @@ export default function ImportPage() {
                 <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
                 <div>
                   <div className="font-medium">Custom Fields</div>
-                  <div className="text-gray-600">
+                  <div className="text-muted-foreground">
                     Additional fields and metadata
                   </div>
                 </div>
@@ -334,8 +334,8 @@ export default function ImportPage() {
           </Card>
         </div>
       </div>
-      
-      <ImportPreviewModal 
+
+      <ImportPreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
         rawItems={previewItems}

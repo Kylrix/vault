@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/Button";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-background p-6">
       <div className="max-w-xl w-full text-center">
-        <h1 className="text-4xl font-semibold text-gray-900 mb-4">
-          Page not found
+        <h1 className="text-4xl font-bold text-primary mb-4 font-mono uppercase tracking-tight">
+          Sovereign Error: 404
         </h1>
-        <p className="text-gray-600 mb-6">
-          We couldn’t find the page you’re looking for. Try one of the links
-          below.
+        <p className="text-muted-foreground mb-6 font-medium">
+          The requested coordinate does not exist within the Whisperr Vault.
+          Return to territory.
         </p>
         <div className="flex gap-3 justify-center">
           <Link href="/" passHref>

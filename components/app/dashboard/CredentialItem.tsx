@@ -96,7 +96,7 @@ function MobileCopyMenu({
         onClick={toggle}
         title="Copy"
       >
-        <Copy className="h-6 w-6 text-[rgb(141,103,72)]" />
+        <Copy className="h-6 w-6 text-primary" />
       </Button>
       {open &&
         typeof document !== "undefined" &&
@@ -223,7 +223,7 @@ function MobileMoreMenu({
         title="More"
       >
         <svg
-          className="h-6 w-6 text-[rgb(141,103,72)]"
+          className="h-6 w-6 text-primary"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -328,7 +328,7 @@ export default function CredentialItem({
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={faviconUrl} alt="" className="w-6 h-6" />
             ) : (
-              <span className="text-[rgb(141,103,72)] font-bold text-sm">
+              <span className="text-primary font-bold text-sm">
                 {credential.name?.charAt(0)?.toUpperCase() || "?"}
               </span>
             )}
@@ -343,7 +343,7 @@ export default function CredentialItem({
             {credential.username}
           </div>
           {isDesktop && (
-            <div className="text-[11px] text-[rgb(191,174,153)] font-mono mt-1">
+            <div className="text-[11px] text-muted-foreground font-mono mt-1 opacity-50">
               ••••••••••••
             </div>
           )}

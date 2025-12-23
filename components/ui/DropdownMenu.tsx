@@ -81,10 +81,10 @@ export function DropdownMenu({
       {/* Dropdown content */}
       {isOpen && (
         <div
-          className={`absolute z-50 mt-2 left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 bg-white dark:bg-neutral-900 border border-border rounded-md shadow-md overflow-hidden w-[95vw] max-w-[400px] mx-2 sm:mx-0`}
+          className={`absolute z-50 mt-2 left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 bg-card border-2 border-border rounded-xl shadow-resting overflow-hidden w-[95vw] max-w-[400px] mx-2 sm:mx-0 shadow-ceramic`}
           role="menu"
         >
-          <div className="py-1 text-popover-foreground">{children}</div>
+          <div className="py-1 text-foreground">{children}</div>
         </div>
       )}
     </div>
@@ -105,9 +105,8 @@ export function DropdownMenuItem({
 }) {
   return (
     <div
-      className={`px-4 py-2 cursor-pointer hover:bg-accent text-sm ${
-        disabled ? "opacity-50 cursor-not-allowed" : ""
-      } ${className}`}
+      className={`px-4 py-2 cursor-pointer hover:bg-accent text-sm ${disabled ? "opacity-50 cursor-not-allowed" : ""
+        } ${className}`}
       onClick={disabled ? undefined : onClick}
       role="menuitem"
       tabIndex={disabled ? -1 : 0}

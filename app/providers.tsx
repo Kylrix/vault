@@ -70,9 +70,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
               <Toaster
                 position="bottom-right"
                 toastOptions={{
+                  className: "font-mono border-2 border-border shadow-floating rounded-xl",
                   style: {
-                    background: "#333",
-                    color: "#fff",
+                    background: "var(--card)",
+                    color: "var(--foreground)",
                   },
                 }}
               />

@@ -28,7 +28,7 @@ import { useSudo } from "@/app/context/SudoContext";
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-[22px] font-bold text-[rgb(141,103,72)] dark:text-primary mb-2 drop-shadow-sm">
+    <h2 className="text-[22px] font-bold text-primary mb-2 drop-shadow-sm font-mono uppercase tracking-tight">
       {children}
     </h2>
   );
@@ -343,7 +343,7 @@ export default function DashboardPage() {
         {/* Desktop AppBar */}
         <div className="hidden md:block">
           <div className="h-20 px-8 flex items-center bg-card rounded-b-3xl shadow-md">
-            <span className="font-bold text-[32px] tracking-wider text-[rgb(141,103,72)] dark:text-primary drop-shadow-md mr-8">
+            <span className="font-bold text-[32px] tracking-wider text-primary drop-shadow-md mr-8 font-mono">
               Whisperrkeep
             </span>
             <div className="flex-1 bg-card rounded-full">
@@ -355,7 +355,7 @@ export default function DashboardPage() {
         {/* Mobile AppBar */}
         <div className="md:hidden">
           <div className="h-[70px] flex items-center justify-between bg-card shadow-md relative px-4">
-            <span className="font-bold text-[26px] tracking-wider text-[rgb(141,103,72)] dark:text-primary drop-shadow-md">
+            <span className="font-bold text-[26px] tracking-wider text-primary drop-shadow-md font-mono">
               Whisperrkeep
             </span>
             <div className="absolute left-0 right-0 bottom-0 px-2 pb-2 bg-card rounded-full">
@@ -370,14 +370,14 @@ export default function DashboardPage() {
           <div className="flex flex-wrap items-center py-4">
             <DropdownMenu
               trigger={
-                <div className="flex items-center px-4 py-2 bg-[rgb(141,103,72)] rounded-full shadow-sm mr-3 mb-2 dark:bg-neutral-800 dark:border dark:border-neutral-700 cursor-pointer">
-                  <Folder className="h-5 w-5 text-white dark:text-primary" />
-                  <span className="ml-2 font-semibold text-[15px] text-white dark:text-primary">
+                <div className="flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-full shadow-resting mr-3 mb-2 cursor-pointer transition-all hover:shadow-hover hover:-translate-y-0.5 active:translate-y-0 shadow-ceramic">
+                  <Folder className="h-5 w-5" />
+                  <span className="ml-2 font-semibold text-[15px]">
                     {selectedFolder
                       ? folders.find((f) => f.$id === selectedFolder)?.name
                       : "All Folders"}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-white dark:text-primary ml-1" />
+                  <ChevronDown className="h-4 w-4 ml-1" />
                 </div>
               }
             >
