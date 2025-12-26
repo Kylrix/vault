@@ -1,13 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { useState, useEffect } from "react";
+import {
+  Box,
+  Typography,
+  Button,
+  Slider,
+  TextField,
+  IconButton,
+  Stack,
+  Switch,
+  FormControlLabel,
+  Paper,
+  alpha,
+  CircularProgress,
+  List,
+  ListItem,
+  Tooltip,
+} from "@mui/material";
 import {
   Copy,
   RefreshCw,
-  ChevronLeft,
-  ChevronRight,
   Clock,
   Sparkles,
   ShieldCheck,
@@ -22,7 +35,6 @@ export default function PasswordGenerator() {
   const [copied, setCopied] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<{ value: string; ts: number }[]>([]);
-  const inputRef = useRef<HTMLInputElement>(null);
   
   const { analyze, isLoading: isAnalyzing } = useAI();
 
@@ -33,40 +45,39 @@ export default function PasswordGenerator() {
         const result = (await analyze('PASSWORD_AUDIT', password)) as { score: number; timeToCrack: string; feedback: string };
         if (result) {
             toast.dismiss(toastId);
-            // We could show a nice modal, but for now a detailed toast or alert is fine for V1
-            // Or better, let's just log it and show a summary toast
             toast(() => (
-                <div className="text-sm">
-                    <div className="font-bold mb-1">Security Score: {result.score}/10</div>
-                    <div>Crack Time: {result.timeToCrack}</div>
-                    <div className="mt-1 text-xs text-muted-foreground">{result.feedback}</div>
-                </div>
-            ), { duration: 5000, icon: <ShieldCheck className="text-green-500" /> });
+                <Box sx={{ color: 'white' }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5 }}>Security Score: {result.score}/10</Typography>
+                    <Typography variant="body2">Crack Time: {result.timeToCrack}</Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5, display: 'block' }}>{result.feedback}</Typography>
+                </Box>
+            ), { 
+              duration: 5000, 
+              icon: <ShieldCheck size={20} color="#00F5FF" />,
+              style: {
+                background: 'rgba(10, 10, 10, 0.95)',
+                backdropFilter: 'blur(25px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                color: 'white'
+              }
+            });
         }
     } catch {
         toast.error("Analysis failed", { id: toastId });
     }
   };
 
-  // Live update password as length changes
   useEffect(() => {
     const newPassword = generateRandomPassword(length);
     setPassword(newPassword);
-    // Don't add to history on slider move, only on explicit generate
   }, [length]);
-
-  // Do not persist history to storage to avoid leaking plaintext
-  // If persistence is needed, implement secure, per-session encryption.
-  useEffect(() => {
-    // Intentionally left blank
-  }, [history]);
 
   const handleGenerate = () => {
     const newPassword = generateRandomPassword(length);
     setPassword(newPassword);
     setCopied(false);
-    // Add to history (store plaintext, encrypt during save)
-    setHistory((prev: { value: string; ts: number }[]) => {
+    setHistory((prev) => {
       const next = [{ value: newPassword, ts: Date.now() }, ...prev];
       return next.slice(0, 20);
     });
@@ -76,219 +87,197 @@ export default function PasswordGenerator() {
     await navigator.clipboard.writeText(password);
     setCopied(true);
     setTimeout(() => setCopied(false), 1200);
+    toast.success("Copied to clipboard", {
+      style: {
+        background: 'rgba(10, 10, 10, 0.95)',
+        backdropFilter: 'blur(25px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        borderRadius: '12px',
+        color: 'white'
+      }
+    });
   };
 
-  const handleLengthChange = (val: number) => {
-    if (val < 8) val = 8;
-    if (val > 64) val = 64;
-    setLength(val);
+  const handleLengthChange = (_: any, val: number | number[]) => {
+    setLength(val as number);
   };
 
   return (
-    <div className="w-full sm:max-w-[380px] max-w-xs p-2 bg-card rounded-md shadow-md">
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-semibold text-base">Password Generator</span>
-          {/* mobile-only showHistory folded down */}
-          <label className="hidden sm:flex items-center gap-1 text-xs cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={showHistory}
-              onChange={(e) => setShowHistory(e.target.checked)}
-              className="accent-primary"
-            />
-            <span className="sm:inline hidden">Show history</span>
-          </label>
-        </div>
-        {/* mobile: folded showHistory below title */}
-        <div className="sm:hidden">
-          <label className="flex items-center gap-2 text-xs cursor-pointer mt-1">
-            <input
-              type="checkbox"
-              checked={showHistory}
-              onChange={(e) => setShowHistory(e.target.checked)}
-              className="accent-primary"
-            />
-            <span>Show history</span>
-          </label>
-        </div>
-        <div>
-          {/* Mobile: vertical layout */}
-          <div className="sm:hidden flex flex-col gap-2 items-stretch w-full">
-            <div className="flex items-center gap-2">
-              <textarea
-                className="font-mono text-base flex-1 bg-muted/50 cursor-default select-all rounded px-2 py-1 min-h-[2.5rem] resize-none text-left"
-                value={password}
-                readOnly
-                rows={2}
-                aria-label="Generated password"
-                style={{ wordBreak: "break-word" }}
+    <Paper sx={{ 
+      p: 3, 
+      width: '100%', 
+      maxWidth: 400, 
+      bgcolor: 'rgba(10, 10, 10, 0.95)', 
+      backdropFilter: 'blur(25px) saturate(180%)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRadius: '24px',
+      backgroundImage: 'none'
+    }}>
+      <Stack spacing={3}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+            Password Generator
+          </Typography>
+          <FormControlLabel
+            control={
+              <Switch 
+                size="small" 
+                checked={showHistory} 
+                onChange={(e) => setShowHistory(e.target.checked)}
+                sx={{
+                  '& .MuiSwitch-switchBase.Mui-checked': { color: '#00F5FF' },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#00F5FF' }
+                }}
               />
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleCopy}
-                title="Copy password"
-                className="p-1 h-8 w-8 flex-shrink-0"
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleGenerate}
-                title="Rotate password"
-                className="p-1 h-8 w-8"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          {/* Desktop: horizontal layout as before */}
-          <div className="hidden sm:flex flex-row gap-2 w-full items-center">
-            <div className="flex-1 relative items-center">
-              <Input
-                ref={inputRef}
-                type="text"
-                value={password}
-                readOnly
-                className="font-mono text-base w-full bg-muted/50 cursor-default select-all"
-                aria-label="Generated password"
-              />
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCopy}
-                  title="Copy password"
-                  className="p-1 h-7 w-7"
-                >
-                  <Copy className="h-4 w-4" />
-                  {copied && <span className="ml-1 text-xs">Copied!</span>}
-                </Button>
-              </div>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGenerate}
-              title="Generate new password"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <span className="text-xs">Length</span>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={() => handleLengthChange(length - 1)}
-              disabled={length <= 8}
-              className="px-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Input
-              type="number"
-              min={8}
-              max={64}
-              value={length}
-              onChange={(e) => handleLengthChange(Number(e.target.value))}
-              className="w-16 text-center font-mono text-base px-1 py-1 h-8"
-              style={{ minWidth: 0 }}
-            />
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              onClick={() => handleLengthChange(length + 1)}
-              disabled={length >= 64}
-              className="px-2"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          <input
-            id="password-length"
-            type="range"
+            }
+            label={<Typography variant="caption" sx={{ fontWeight: 600, color: 'rgba(255, 255, 255, 0.5)' }}>History</Typography>}
+            labelPlacement="start"
+          />
+        </Box>
+
+        <Box sx={{ position: 'relative' }}>
+          <TextField
+            fullWidth
+            value={password}
+            variant="outlined"
+            InputProps={{
+              readOnly: true,
+              sx: {
+                fontFamily: 'var(--font-mono)',
+                fontSize: '1.1rem',
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '16px',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                '&.Mui-focused fieldset': { borderColor: '#00F5FF' },
+                pr: 10
+              }
+            }}
+          />
+          <Stack direction="row" spacing={0.5} sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)' }}>
+            <Tooltip title="Copy">
+              <IconButton onClick={handleCopy} size="small" sx={{ color: copied ? '#00F5FF' : 'rgba(255, 255, 255, 0.4)' }}>
+                <Copy size={18} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Regenerate">
+              <IconButton onClick={handleGenerate} size="small" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>
+                <RefreshCw size={18} />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Box>
+
+        <Box>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Typography variant="caption" sx={{ fontWeight: 700, color: 'rgba(255, 255, 255, 0.5)' }}>LENGTH</Typography>
+            <Typography variant="caption" sx={{ fontWeight: 900, color: '#00F5FF' }}>{length} characters</Typography>
+          </Box>
+          <Slider
+            value={length}
             min={8}
             max={64}
-            value={length}
-            onChange={(e) => handleLengthChange(Number(e.target.value))}
-            className="w-full accent-primary"
+            onChange={handleLengthChange}
+            sx={{
+              color: '#00F5FF',
+              height: 6,
+              '& .MuiSlider-thumb': {
+                width: 18,
+                height: 18,
+                bgcolor: '#00F5FF',
+                '&:hover, &.Mui-focusVisible': { boxShadow: '0 0 0 8px rgba(0, 245, 255, 0.16)' }
+              },
+              '& .MuiSlider-track': { border: 'none' },
+              '& .MuiSlider-rail': { opacity: 0.1, bgcolor: 'white' }
+            }}
           />
+        </Box>
+
+        <Stack spacing={1.5}>
           <Button
-            type="button"
+            fullWidth
+            variant="contained"
             onClick={handleGenerate}
-            className="w-full mt-1"
+            sx={{
+              bgcolor: '#00F5FF',
+              color: '#000',
+              fontWeight: 800,
+              borderRadius: '14px',
+              py: 1.5,
+              '&:hover': { bgcolor: '#00D1DA' }
+            }}
           >
-            Generate
+            Generate Password
           </Button>
           
-          {/* AI Analysis Button */}
           <Button
-            type="button"
-            variant="outline" 
-            size="sm"
+            fullWidth
+            variant="outlined"
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="w-full mt-1 border-primary/20 text-primary hover:bg-primary/5"
+            startIcon={isAnalyzing ? <CircularProgress size={16} color="inherit" /> : <Sparkles size={16} />}
+            sx={{
+              borderColor: alpha('#00F5FF', 0.2),
+              color: '#00F5FF',
+              fontWeight: 700,
+              borderRadius: '14px',
+              py: 1.2,
+              '&:hover': { borderColor: '#00F5FF', bgcolor: alpha('#00F5FF', 0.05) }
+            }}
           >
-            <Sparkles className="w-4 h-4 mr-2" />
             {isAnalyzing ? "Analyzing..." : "Check Strength with AI"}
           </Button>
-        </div>
+        </Stack>
+
         {showHistory && (
-          <div className="mt-2 max-h-40 overflow-y-auto border-t pt-2">
-            <div className="flex items-center gap-1 mb-1 text-xs text-muted-foreground font-semibold">
-              <Clock className="h-3 w-3" /> Last 20 passwords
-            </div>
+          <Box sx={{ mt: 2, pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+              <Clock size={14} color="rgba(255, 255, 255, 0.4)" />
+              <Typography variant="caption" sx={{ fontWeight: 700, color: 'rgba(255, 255, 255, 0.4)' }}>RECENT PASSWORDS</Typography>
+            </Stack>
             {history.length === 0 ? (
-              <div className="text-xs text-muted-foreground">
-                No history yet.
-              </div>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontStyle: 'italic' }}>No history yet.</Typography>
             ) : (
-              <ul className="space-y-1">
-                {history.map(
-                  (item: { value: string; ts: number }, i: number) => (
-                    <li
-                      key={i}
-                      className="flex items-center gap-2 text-xs font-mono bg-muted/30 rounded px-2 py-1"
-                    >
-                      <span className="truncate flex-1" title={item.value}>
+              <List sx={{ p: 0, maxHeight: 160, overflowY: 'auto' }}>
+                {history.map((item, i) => (
+                  <ListItem
+                    key={i}
+                    sx={{
+                      px: 1.5,
+                      py: 1,
+                      borderRadius: '10px',
+                      mb: 0.5,
+                      bgcolor: 'rgba(255, 255, 255, 0.02)',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                    }}
+                  >
+                    <Box sx={{ overflow: 'hidden' }}>
+                      <Typography variant="body2" sx={{ fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {item.value}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontSize: '0.65rem' }}>
                         {new Date(item.ts).toLocaleTimeString()}
-                      </span>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          navigator.clipboard.writeText(item.value);
-                        }}
-                        title="Copy"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </li>
-                  ),
-                )}
-              </ul>
+                      </Typography>
+                    </Box>
+                    <IconButton 
+                      size="small" 
+                      onClick={() => {
+                        navigator.clipboard.writeText(item.value);
+                        toast.success("Copied from history");
+                      }}
+                      sx={{ color: 'rgba(255, 255, 255, 0.3)' }}
+                    >
+                      <Copy size={14} />
+                    </IconButton>
+                  </ListItem>
+                ))}
+              </List>
             )}
-          </div>
+          </Box>
         )}
-      </div>
-    </div>
+      </Stack>
+    </Paper>
   );
 }

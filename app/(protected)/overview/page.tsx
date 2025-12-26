@@ -2,9 +2,19 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Key, Shield, Clock, AlertTriangle, Files } from "lucide-react";
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Grid, 
+  Paper, 
+  Stack, 
+  IconButton, 
+  alpha, 
+  CircularProgress,
+  Avatar
+} from "@mui/material";
+import { Key, Shield, Clock, AlertTriangle, Files, Plus, Download, ChevronRight } from "lucide-react";
 import { useAppwrite } from "@/app/appwrite-provider";
 import {
   appwriteDatabases,
@@ -32,9 +42,7 @@ export default function OverviewPage() {
     let cancelled = false;
     const run = async () => {
       if (!user) return;
-      // Ensure vault is unlocked; do not decrypt twice – listDocuments is already wrapped to decrypt via masterPassCrypto
       try {
-        // Credentials
         const credsResp = (await AppwriteService.listCredentials(
           user.$id,
           1,
@@ -42,7 +50,6 @@ export default function OverviewPage() {
           [Query.orderDesc("$updatedAt")],
         )) as { total: number; documents: Array<Record<string, unknown>> };
 
-        // TOTP
         let totpCount = 0;
         try {
           const totpResp = (await appwriteDatabases.listDocuments(
@@ -58,7 +65,6 @@ export default function OverviewPage() {
               }
             ).total ?? totpResp.documents.length;
         } catch {
-          // TOTP collection may not exist in some envs; ignore
         }
 
         const totalCreds =
@@ -71,8 +77,6 @@ export default function OverviewPage() {
           credsResp.documents?.length ??
           0;
 
-        // Duplicate detection using minimal data and service decryption only
-        // Strategy: fetch a small window of recent decrypted items and compute signature over stable fields
         let dupGroupsLocal: Array<{
           key: string;
           count: number;
@@ -88,7 +92,6 @@ export default function OverviewPage() {
             [Query.orderDesc("$updatedAt")],
           )) as { documents?: Array<Record<string, unknown>> };
           const items = recentWindow.documents || [];
-          // Determine comparable fields: prefer encrypted content fields + url; exclude non-content/meta fields
           const fieldCandidates = [
             "username",
             "password",
@@ -118,7 +121,6 @@ export default function OverviewPage() {
             const sigObj: Record<string, unknown> = {};
             for (const f of fieldsPresent)
               sigObj[f] = normalize((it as Record<string, unknown>)[f]);
-            // Do not include name in signature, per requirement
             const signature = JSON.stringify(sigObj);
             const entry = groups.get(signature) || { ids: [] };
             entry.ids.push(String((it as Record<string, unknown>)["$id"]));
@@ -135,14 +137,12 @@ export default function OverviewPage() {
             }));
         } catch {}
 
-        // Recent items (already decrypted by secure wrapper; do not decrypt again)
         let recentItems: Array<{
           $id: string;
           name: string;
           username?: string;
         }> = [];
         try {
-          // Use service that returns decrypted recent credentials
           const recentDocs = (await AppwriteService.listRecentCredentials(
             user.$id,
             5,
@@ -153,7 +153,6 @@ export default function OverviewPage() {
             username: d.username as string | undefined,
           }));
         } catch {
-          // Fallback to what's available from credsResp (may be undecrypted if vault locked)
           recentItems = (credsResp.documents || [])
             .slice(0, 5)
             .map((d) => ({
@@ -184,201 +183,299 @@ export default function OverviewPage() {
     };
   }, [
     user,
-    locked, /* keep locked out of deps to avoid unnecessary refetch on timer */
+    locked,
   ]);
-
-
 
   if (!user) return null;
 
   return (
-    <div className="w-full min-h-screen bg-background flex items-start justify-center">
-      <div className="w-full max-w-6xl space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Overview</h1>
-            <p className="text-muted-foreground text-sm">
-              A quick snapshot of your vault.
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href="/credentials/new">
-              <Button size="sm">Add Credential</Button>
-            </Link>
-            <Link href="/import">
-              <Button size="sm" variant="outline">
-                Import
-              </Button>
-            </Link>
-          </div>
-        </div>
+    <Box sx={{ 
+      width: '100%', 
+      minHeight: '100vh', 
+      bgcolor: 'transparent',
+      display: 'flex',
+      justifyContent: 'center',
+      p: { xs: 2, md: 4 }
+    }}>
+      <Box sx={{ width: '100%', maxWidth: '1100px' }}>
+        {/* Header */}
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          justifyContent="space-between" 
+          alignItems={{ xs: 'flex-start', sm: 'center' }} 
+          spacing={2}
+          sx={{ mb: 5 }}
+        >
+          <Box>
+            <Typography variant="h4" sx={{ 
+              fontWeight: 900, 
+              fontFamily: 'var(--font-space-grotesk)',
+              letterSpacing: '-0.03em',
+              mb: 0.5
+            }}>
+              Overview
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
+              A quick snapshot of your secure vault.
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1.5}>
+            <Button 
+              component={Link}
+              href="/credentials/new"
+              variant="contained" 
+              startIcon={<Plus size={18} />}
+              sx={{ 
+                borderRadius: '14px', 
+                px: 3, 
+                py: 1.2, 
+                fontWeight: 800,
+                bgcolor: '#00F5FF',
+                color: '#000',
+                '&:hover': { bgcolor: '#00D1DA' }
+              }}
+            >
+              Add Credential
+            </Button>
+            <Button 
+              component={Link}
+              href="/import"
+              variant="outlined" 
+              startIcon={<Download size={18} />}
+              sx={{ 
+                borderRadius: '14px', 
+                px: 3, 
+                py: 1.2, 
+                fontWeight: 700,
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                color: '#fff',
+                '&:hover': { borderColor: 'rgba(255, 255, 255, 0.2)', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+              }}
+            >
+              Import
+            </Button>
+          </Stack>
+        </Stack>
 
         {locked && (
-          <Card>
-            <CardContent className="p-4 flex items-center gap-3 text-amber-600">
-              <AlertTriangle className="h-5 w-5" />
-              <p className="text-sm">
-                Your vault appears locked. Some data may not be visible. Unlock
-                to view full overview.
-              </p>
-            </CardContent>
-          </Card>
+          <Paper sx={{ 
+            p: 2.5, 
+            mb: 4, 
+            borderRadius: '20px', 
+            bgcolor: alpha('#FFB000', 0.05),
+            border: '1px solid',
+            borderColor: alpha('#FFB000', 0.2),
+            display: 'flex',
+            alignItems: 'center',
+            gap: 2
+          }}>
+            <AlertTriangle size={24} color="#FFB000" />
+            <Typography variant="body2" sx={{ color: '#FFB000', fontWeight: 600 }}>
+              Your vault is locked. Unlock to view full statistics and recent activity.
+            </Typography>
+          </Paper>
         )}
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Total Credentials
-                </p>
-                <p className="text-xl font-bold">
-                  {loading ? "--" : stats.totalCreds}
-                </p>
-              </div>
-              <Key className="h-6 w-6 text-blue-500" />
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  TOTP Codes
-                </p>
-                <p className="text-xl font-bold">
-                  {loading ? "--" : stats.totpCount}
-                </p>
-              </div>
-              <Shield className="h-6 w-6 text-green-500" />
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Recent Activity
-                </p>
-                <p className="text-xl font-bold">
-                  {loading ? "--" : Math.min(stats.totalCreds, 5)}
-                </p>
-              </div>
-              <Clock className="h-6 w-6 text-orange-500" />
-            </div>
-          </Card>
-          <Card className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Security Alerts
-                </p>
-                <p className="text-xl font-bold">0</p>
-              </div>
-              <AlertTriangle className="h-6 w-6 text-red-500" />
-            </div>
-          </Card>
-        </div>
+        {/* Stats Grid */}
+        <Grid container spacing={3} sx={{ mb: 4 }}>
+          {[
+            { label: 'Total Credentials', value: stats.totalCreds, icon: Key, color: '#3B82F6' },
+            { label: 'TOTP Codes', value: stats.totpCount, icon: Shield, color: '#10B981' },
+            { label: 'Recent Activity', value: Math.min(stats.totalCreds, 5), icon: Clock, color: '#F59E0B' },
+            { label: 'Security Alerts', value: 0, icon: AlertTriangle, color: '#EF4444' }
+          ].map((stat, i) => (
+            <Grid item xs={6} md={3} key={i}>
+              <Paper sx={{ 
+                p: 3, 
+                borderRadius: '24px', 
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}>
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    {stat.label}
+                  </Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5, fontFamily: 'var(--font-space-grotesk)' }}>
+                    {loading ? <CircularProgress size={20} thickness={6} sx={{ color: 'rgba(255, 255, 255, 0.2)' }} /> : stat.value}
+                  </Typography>
+                </Box>
+                <Box sx={{ 
+                  width: 40, 
+                  height: 40, 
+                  borderRadius: '12px', 
+                  bgcolor: alpha(stat.color, 0.1), 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center' 
+                }}>
+                  <stat.icon size={20} color={stat.color} />
+                </Box>
+              </Paper>
+            </Grid>
+          ))}
+        </Grid>
 
-        <Card>
-          <CardContent className="p-4">
-            <h3 className="text-sm font-semibold mb-3">Recent Items</h3>
-            <div className="space-y-2">
-              {loading ? (
-                <div className="text-sm text-muted-foreground">Loading…</div>
-              ) : recent.length === 0 ? (
-                <div className="text-sm text-muted-foreground">
-                  No items yet.
-                </div>
-              ) : (
-                recent.map((item) => (
-                  <Link
-                    key={item.$id}
-                    href={`/dashboard?focus=${item.$id}`}
-                    className="block"
-                  >
-                    <div className="flex items-center justify-between p-2 rounded-md hover:bg-accent/50 cursor-pointer">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-md bg-muted flex items-center justify-center">
-                          {item.name?.[0] ?? "?"}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium">{item.name}</p>
+        <Grid container spacing={3}>
+          {/* Recent Items */}
+          <Grid item xs={12} md={7}>
+            <Paper sx={{ 
+              p: 4, 
+              borderRadius: '28px', 
+              bgcolor: 'rgba(10, 10, 10, 0.9)',
+              backdropFilter: 'blur(25px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              height: '100%'
+            }}>
+              <Typography variant="h6" sx={{ fontWeight: 900, mb: 3, fontFamily: 'var(--font-space-grotesk)' }}>
+                Recent Items
+              </Typography>
+              <Stack spacing={1.5}>
+                {loading ? (
+                  <Box sx={{ py: 4, textAlign: 'center' }}>
+                    <CircularProgress size={32} sx={{ color: '#00F5FF' }} />
+                  </Box>
+                ) : recent.length === 0 ? (
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.3)', py: 4, textAlign: 'center' }}>
+                    No items found in your vault.
+                  </Typography>
+                ) : (
+                  recent.map((item) => (
+                    <Box 
+                      key={item.$id}
+                      component={Link}
+                      href={`/dashboard?focus=${item.$id}`}
+                      sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between',
+                        p: 2,
+                        borderRadius: '18px',
+                        bgcolor: 'rgba(255, 255, 255, 0.02)',
+                        border: '1px solid transparent',
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          bgcolor: 'rgba(255, 255, 255, 0.05)',
+                          borderColor: 'rgba(255, 255, 255, 0.1)',
+                          transform: 'translateX(4px)'
+                        }
+                      }}
+                    >
+                      <Stack direction="row" spacing={2} alignItems="center">
+                        <Avatar sx={{ 
+                          width: 40, 
+                          height: 40, 
+                          borderRadius: '12px', 
+                          bgcolor: 'rgba(255, 255, 255, 0.05)',
+                          fontSize: '1rem',
+                          fontWeight: 800,
+                          color: '#00F5FF'
+                        }}>
+                          {item.name?.[0]?.toUpperCase() ?? "?"}
+                        </Avatar>
+                        <Box>
+                          <Typography variant="body1" sx={{ fontWeight: 700 }}>{item.name}</Typography>
                           {item.username && (
-                            <p className="text-xs text-muted-foreground">
+                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 500 }}>
                               {item.username}
-                            </p>
+                            </Typography>
                           )}
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" className="h-7">
-                        Open
+                        </Box>
+                      </Stack>
+                      <ChevronRight size={18} color="rgba(255, 255, 255, 0.3)" />
+                    </Box>
+                  ))
+                )}
+              </Stack>
+            </Paper>
+          </Grid>
+
+          {/* Duplicate Items */}
+          <Grid item xs={12} md={5}>
+            <Paper sx={{ 
+              p: 4, 
+              borderRadius: '28px', 
+              bgcolor: 'rgba(10, 10, 10, 0.9)',
+              backdropFilter: 'blur(25px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              height: '100%'
+            }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)' }}>
+                  Duplicates
+                </Typography>
+                <Box sx={{ 
+                  px: 1.5, 
+                  py: 0.5, 
+                  borderRadius: '10px', 
+                  bgcolor: alpha('#00F5FF', 0.1),
+                  color: '#00F5FF',
+                  fontSize: '0.75rem',
+                  fontWeight: 800
+                }}>
+                  {dupGroups.length} GROUPS
+                </Box>
+              </Stack>
+
+              <Stack spacing={2}>
+                {loading ? (
+                  <Box sx={{ py: 4, textAlign: 'center' }}>
+                    <CircularProgress size={32} sx={{ color: '#00F5FF' }} />
+                  </Box>
+                ) : dupGroups.length === 0 ? (
+                  <Box sx={{ textAlign: 'center', py: 4 }}>
+                    <Shield size={40} color="rgba(255, 255, 255, 0.1)" style={{ marginBottom: '12px' }} />
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
+                      No duplicates detected.
+                    </Typography>
+                  </Box>
+                ) : (
+                  dupGroups.map((g, idx) => (
+                    <Paper key={g.key} sx={{ 
+                      p: 2.5, 
+                      borderRadius: '20px', 
+                      bgcolor: 'rgba(255, 255, 255, 0.02)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)'
+                    }}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800 }}>
+                          Group #{idx + 1}
+                        </Typography>
+                        <Typography variant="caption" sx={{ color: '#00F5FF', fontWeight: 700 }}>
+                          {g.count} matches
+                        </Typography>
+                      </Stack>
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', mb: 2 }}>
+                        Matching: {g.fields.join(", ")}
+                      </Typography>
+                      <Button 
+                        component={Link}
+                        href={`/dashboard?focus=${g.ids[0]}`}
+                        fullWidth 
+                        variant="outlined" 
+                        size="small"
+                        sx={{ 
+                          borderRadius: '12px', 
+                          fontWeight: 700,
+                          borderColor: 'rgba(255, 255, 255, 0.1)',
+                          color: '#fff'
+                        }}
+                      >
+                        Review Group
                       </Button>
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold">Duplicate Items</h3>
-              <div className="text-xs text-muted-foreground flex items-center gap-2">
-                <Files className="h-4 w-4" />
-                <span>
-                  {loading ? "--" : dupGroups.length} duplicate group
-                  {dupGroups.length === 1 ? "" : "s"}
-                </span>
-              </div>
-            </div>
-
-            {loading ? (
-              <div className="text-sm text-muted-foreground">Scanning…</div>
-            ) : dupGroups.length === 0 ? (
-              <div className="text-sm text-muted-foreground">
-                No duplicates detected in recent items window.
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {dupGroups.map((g, idx) => (
-                  <div key={g.key} className="border rounded-md p-3">
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm font-medium">
-                        Group #{idx + 1} • {g.count} matches
-                      </div>
-                      <Link href={`/dashboard?focus=${g.ids[0]}`}>
-                        <Button size="sm" variant="outline">
-                          Review
-                        </Button>
-                      </Link>
-                    </div>
-                    <div className="mt-2 text-xs text-muted-foreground">
-                      Matching fields:
-                      <code className="ml-1 px-1 py-0.5 bg-muted rounded">
-                        {g.fields.join(", ") || "(none)"}
-                      </code>
-                    </div>
-                    <div className="mt-2 text-xs">
-                      Suggestions: consider keeping the most recently updated
-                      item and deleting older duplicates.
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {g.ids.map((id) => (
-                        <Link key={id} href={`/dashboard?focus=${id}`}>
-                          <span className="text-xs px-2 py-1 bg-accent/50 rounded hover:bg-accent cursor-pointer">
-                            {id.slice(0, 8)}…
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+                    </Paper>
+                  ))
+                )}
+              </Stack>
+            </Paper>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 }

@@ -1,10 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Grid, 
+  Paper, 
+  Stack, 
+  IconButton, 
+  alpha, 
+  CircularProgress,
+  ToggleButton,
+  ToggleButtonGroup,
+  Alert,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText
+} from "@mui/material";
+import { Upload, FileJson, Shield, Info, CheckCircle2, AlertCircle, ChevronRight } from "lucide-react";
+import { useAppwrite } from "@/app-provider";
 import { validateBitwardenExport } from "@/utils/import/bitwarden-mapper";
 import { useBackgroundTask } from "@/app/context/BackgroundTaskContext";
 import { ImportPreviewModal } from "@/components/import/ImportPreviewModal";
@@ -19,10 +35,8 @@ export default function ImportPage() {
   const [file, setFile] = useState<File | null>(null);
   const [errorState, setErrorState] = useState<string | null>(null);
 
-  // Preview Modal State
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewItems, setPreviewItems] = useState<ImportItem[]>([]);
-  // const [rawFileContent, setRawFileContent] = useState<string>(""); // Unused
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] || null);
@@ -32,15 +46,11 @@ export default function ImportPage() {
   const parseAndPreview = async (file: File) => {
     try {
       const text = await file.text();
-      // setRawFileContent(text);
-
       let items: ImportItem[] = [];
 
       if (importType === "bitwarden") {
         const data = JSON.parse(text);
         if (!validateBitwardenExport(data)) throw new Error("Invalid Bitwarden format");
-
-        // Map to our internal structure for preview
         const mapped = analyzeBitwardenExport(data, user?.$id || "");
         items = mapped.credentials.map(c => ({
           ...c,
@@ -49,7 +59,6 @@ export default function ImportPage() {
       } else if (importType === "whisperrkeep") {
         const data = JSON.parse(text);
         if (!data.version && !data.credentials) throw new Error("Invalid WhisperrKeep format");
-
         items = (data.credentials || []).map((c: unknown) => ({
           ...(c as Partial<ImportItem>),
           _status: 'new'
@@ -64,7 +73,6 @@ export default function ImportPage() {
 
       setPreviewItems(items);
       setIsPreviewOpen(true);
-
     } catch (error) {
       throw error;
     }
@@ -75,21 +83,16 @@ export default function ImportPage() {
       setErrorState("You must be logged in to import data.");
       return;
     }
-
     if (!file) {
       setErrorState("Please select a file to import.");
       return;
     }
-
     if (globalImporting) {
       setErrorState("An import is already in progress.");
       return;
     }
-
     setErrorState(null);
-
     try {
-      // Validate first
       await parseAndPreview(file);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Import failed.";
@@ -98,33 +101,18 @@ export default function ImportPage() {
   };
 
   const handleFinalImport = (finalItems: ImportItem[]) => {
-    console.log("[ImportPage] handleFinalImport called with", finalItems.length, "items");
-
     if (!masterPassCrypto.isVaultUnlocked()) {
       setErrorState("Vault is locked. Please unlock your vault to import.");
       setIsPreviewOpen(false);
       return;
     }
-
-    console.log("[ImportPage] First item sample:", finalItems[0]);
-
     setIsPreviewOpen(false);
-    // We need to pass the FINAL deduplicated list to the background task
-    // Currently startImport takes raw string. We might need to update startImport 
-    // OR re-serialize the finalItems to a JSON string that the importer understands.
-
-    // Strategy: Serialize finalItems into a specialized "internal-processed" format 
-    // OR just standard WhisperrKeep format which the importer already knows!
-
     const processedPayload = JSON.stringify({
       version: 1,
       credentials: finalItems,
-      folders: [], // We are simplifying to just creds for this specific dedupe flow for now
+      folders: [],
       totpSecrets: []
     });
-
-    console.log("[ImportPage] Calling startImport with payload length:", processedPayload.length);
-    // We send this as "whisperrkeep" type because it's now normalized JSON
     startImport("whisperrkeep", processedPayload, user!.$id);
   };
 
@@ -137,203 +125,221 @@ export default function ImportPage() {
         file.name.endsWith(".csv")));
 
   return (
-    <div className="max-w-4xl mx-auto py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2 font-mono uppercase tracking-tight">Import Data</h1>
-        <p className="text-muted-foreground">
-          Import your passwords and data from other password managers
-        </p>
-      </div>
+    <Box sx={{ maxWidth: '1100px', mx: 'auto', p: { xs: 2, md: 4 } }}>
+      <Box sx={{ mb: 5 }}>
+        <Typography variant="h4" sx={{ 
+          fontWeight: 900, 
+          fontFamily: 'var(--font-space-grotesk)',
+          letterSpacing: '-0.03em',
+          mb: 1
+        }}>
+          Import Data
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
+          Migrate your passwords and data from other password managers securely.
+        </Typography>
+      </Box>
 
-      <div className="grid lg:grid-cols-2 gap-8">
-        <div className="space-y-6">
-          <Card className="p-6">
-            <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium mb-3">
-                  Select Password Manager
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant={importType === "bitwarden" ? "default" : "outline"}
-                    onClick={() => setImportType("bitwarden")}
-                    className="justify-start"
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={7}>
+          <Stack spacing={3}>
+            <Paper sx={{ 
+              p: 4, 
+              borderRadius: '28px', 
+              bgcolor: 'rgba(10, 10, 10, 0.9)',
+              backdropFilter: 'blur(25px) saturate(180%)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backgroundImage: 'none'
+            }}>
+              <Stack spacing={4}>
+                <Box>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 2, display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Source Manager
+                  </Typography>
+                  <ToggleButtonGroup
+                    value={importType}
+                    exclusive
+                    onChange={(_, val) => val && setImportType(val)}
+                    sx={{ 
+                      width: '100%',
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: 1.5,
+                      '& .MuiToggleButton-root': {
+                        borderRadius: '14px !important',
+                        py: 1.5,
+                        border: '1px solid rgba(255, 255, 255, 0.1) !important',
+                        color: 'rgba(255, 255, 255, 0.5)',
+                        fontWeight: 700,
+                        '&.Mui-selected': {
+                          bgcolor: 'rgba(0, 245, 255, 0.1)',
+                          color: '#00F5FF',
+                          borderColor: '#00F5FF !important',
+                        }
+                      }
+                    }}
                   >
-                    Bitwarden
-                  </Button>
-                  <Button
-                    variant={importType === "whisperrkeep" ? "default" : "outline"}
-                    onClick={() => setImportType("whisperrkeep")}
-                    className="justify-start"
-                  >
-                    WhisperrNote Backup
-                  </Button>
-                  <Button
-                    variant={importType === "zoho" ? "default" : "outline"}
-                    onClick={() => setImportType("zoho")}
-                    className="justify-start"
-                    disabled
-                  >
-                    Zoho Vault
-                  </Button>
-                  <Button
-                    variant={importType === "proton" ? "default" : "outline"}
-                    onClick={() => setImportType("proton")}
-                    className="justify-start"
-                    disabled
-                  >
-                    Proton Pass
-                  </Button>
-                  <Button
-                    variant={importType === "json" ? "default" : "outline"}
-                    onClick={() => setImportType("json")}
-                    className="justify-start"
-                    disabled
-                  >
-                    Custom JSON
-                  </Button>
-                </div>
-              </div>
+                    <ToggleButton value="bitwarden">Bitwarden</ToggleButton>
+                    <ToggleButton value="whisperrkeep">WhisperrNote</ToggleButton>
+                    <ToggleButton value="zoho" disabled>Zoho Vault</ToggleButton>
+                    <ToggleButton value="proton" disabled>Proton Pass</ToggleButton>
+                  </ToggleButtonGroup>
+                </Box>
 
-              {importType === "bitwarden" && (
-                <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 shadow-ceramic">
-                  <h3 className="font-bold text-secondary mb-2 uppercase tracking-wide text-xs">
-                    How to export from Bitwarden:
-                  </h3>
-                  <ol className="text-sm text-secondary space-y-1 list-decimal list-inside font-medium">
-                    <li>Log into your Bitwarden web vault</li>
-                    <li>
-                      Go to <strong>Tools</strong> →{" "}
-                      <strong>Export Vault</strong>
-                    </li>
-                    <li>
-                      Select <strong>JSON (.json)</strong> format
-                    </li>
-                    <li>
-                      Enter your master password and click{" "}
-                      <strong>Export Vault</strong>
-                    </li>
-                    <li>Save the file and upload it here</li>
-                  </ol>
-                </div>
-              )}
+                <Box sx={{ 
+                  p: 3, 
+                  borderRadius: '20px', 
+                  bgcolor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.05)'
+                }}>
+                  <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 2 }}>
+                    <Info size={20} color="#00F5FF" />
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                      {importType === "bitwarden" ? "How to export from Bitwarden" : "Restoring from WhisperrNote"}
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)', lineHeight: 1.6 }}>
+                    {importType === "bitwarden" ? (
+                      "Log into your Bitwarden web vault, go to Tools → Export Vault, select JSON format, and download the file."
+                    ) : (
+                      "Upload a JSON backup file previously exported from WhisperrNote or WhisperrKeep."
+                    )}
+                  </Typography>
+                </Box>
 
-              {importType === "whisperrkeep" && (
-                <div className="bg-secondary/10 border border-secondary/20 rounded-xl p-4 shadow-ceramic">
-                  <h3 className="font-bold text-secondary mb-2 uppercase tracking-wide text-xs">
-                    Restoring from WhisperrNote:
-                  </h3>
-                  <p className="text-sm text-secondary font-medium">
-                    Upload a JSON file previously exported from WhisperrNote/WhisperrKeep.
-                  </p>
-                </div>
-              )}
+                <Box>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 2, display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Select File
+                  </Typography>
+                  <Box 
+                    component="label"
+                    sx={{ 
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      p: 4,
+                      borderRadius: '20px',
+                      border: '2px dashed rgba(255, 255, 255, 0.1)',
+                      bgcolor: 'rgba(255, 255, 255, 0.01)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.03)',
+                        borderColor: 'rgba(0, 245, 255, 0.3)'
+                      }
+                    }}
+                  >
+                    <input type="file" hidden onChange={handleFileChange} accept=".json" />
+                    <Upload size={32} color="rgba(255, 255, 255, 0.2)" style={{ marginBottom: '12px' }} />
+                    <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
+                      {file ? file.name : "Click to upload or drag and drop"}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>
+                      {file ? `${(file.size / 1024).toFixed(1)} KB` : "JSON files only"}
+                    </Typography>
+                  </Box>
+                </Box>
 
-              <div>
-                <label className="block text-sm font-medium mb-3">
-                  Select File
-                  {importType === "bitwarden" && (
-                    <span className="text-muted-foreground opacity-70 ml-2">(JSON format)</span>
-                  )}
-                  {importType === "whisperrkeep" && (
-                    <span className="text-muted-foreground opacity-70 ml-2">(JSON format)</span>
-                  )}
-                </label>
-                <Input
-                  type="file"
-                  accept={
-                    (importType === "bitwarden" || importType === "whisperrkeep")
-                      ? ".json"
-                      : importType === "json"
-                        ? ".json"
-                        : ".csv"
-                  }
-                  onChange={handleFileChange}
-                  className="mb-2"
-                />
-                {file && (
-                  <div className="text-sm text-muted-foreground font-mono">
-                    Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
-                  </div>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  onClick={handleImportClick}
+                  disabled={globalImporting || !isFileValid}
+                  sx={{ 
+                    borderRadius: '16px', 
+                    py: 2, 
+                    fontWeight: 800,
+                    bgcolor: '#00F5FF',
+                    color: '#000',
+                    '&:hover': { bgcolor: '#00D1DA' },
+                    '&.Mui-disabled': { bgcolor: 'rgba(0, 245, 255, 0.3)' }
+                  }}
+                >
+                  {globalImporting ? "Import in Progress..." : "Preview & Import"}
+                </Button>
+
+                {errorState && (
+                  <Alert severity="error" sx={{ borderRadius: '16px', bgcolor: alpha('#f44336', 0.1), color: '#ffcdd2' }}>
+                    {errorState}
+                  </Alert>
                 )}
-              </div>
+              </Stack>
+            </Paper>
 
-              <Button
-                onClick={handleImportClick}
-                disabled={globalImporting || !isFileValid}
-                className="w-full"
-              >
-                {globalImporting ? "Import in Progress..." : "Preview & Import"}
-              </Button>
+            {!globalImporting && (
+              <Paper sx={{ 
+                p: 3, 
+                borderRadius: '24px', 
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                border: '1px solid rgba(255, 255, 255, 0.08)'
+              }}>
+                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                  <AlertCircle size={18} color="#FFB000" />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Important Notes</Typography>
+                </Stack>
+                <Stack spacing={1}>
+                  {[
+                    "Please stay connected to the internet during import.",
+                    "A floating widget will show real-time progress.",
+                    "Your data is encrypted locally with your master password.",
+                    "Folders and organization will be preserved."
+                  ].map((note, i) => (
+                    <Stack key={i} direction="row" spacing={1.5} alignItems="flex-start">
+                      <Box sx={{ width: 4, height: 4, borderRadius: '50%', bgcolor: 'rgba(255, 255, 255, 0.3)', mt: 1 }} />
+                      <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>{note}</Typography>
+                    </Stack>
+                  ))}
+                </Stack>
+              </Paper>
+            )}
+          </Stack>
+        </Grid>
 
-              {errorState && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
-                  {errorState}
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {!globalImporting && (
-            <Card className="p-6">
-              <h3 className="font-bold text-sm uppercase tracking-wider mb-3">⚠️ Important Notes</h3>
-              <div className="space-y-2 text-sm text-muted-foreground">
-                <p>
-                  • <strong className="text-foreground">Please stay connected</strong> to the internet.
-                </p>
-                <p>• A floating widget will show progress.</p>
-                <p>• You can navigate to other pages while importing.</p>
-                <p>• Your data will be encrypted with your master password</p>
-                <p>• Folders and organization will be preserved</p>
-              </div>
-            </Card>
-          )}
-        </div>
-
-        <div className="space-y-6">
-          <Card className="p-6">
-            <h3 className="font-medium mb-3">What gets imported?</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <div className="font-medium">Login Credentials</div>
-                  <div className="text-muted-foreground">
-                    Usernames, passwords, URLs, and notes
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <div className="font-medium">TOTP Secrets</div>
-                  <div className="text-muted-foreground">
-                    Two-factor authentication codes (automatically separated)
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <div className="font-medium">Folders & Organization</div>
-                  <div className="text-muted-foreground">
-                    Folder structure and item organization
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div>
-                  <div className="font-medium">Custom Fields</div>
-                  <div className="text-muted-foreground">
-                    Additional fields and metadata
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+        <Grid item xs={12} md={5}>
+          <Paper sx={{ 
+            p: 4, 
+            borderRadius: '28px', 
+            bgcolor: 'rgba(10, 10, 10, 0.9)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            height: '100%'
+          }}>
+            <Typography variant="h6" sx={{ fontWeight: 900, mb: 4, fontFamily: 'var(--font-space-grotesk)' }}>
+              What gets imported?
+            </Typography>
+            <List sx={{ p: 0 }}>
+              {[
+                { title: "Login Credentials", desc: "Usernames, passwords, URLs, and notes", icon: Key },
+                { title: "TOTP Secrets", desc: "Two-factor authentication codes", icon: Shield },
+                { title: "Folders", desc: "Your existing organization structure", icon: Folder },
+                { title: "Custom Fields", desc: "Additional metadata and fields", icon: FileJson }
+              ].map((item, i) => (
+                <ListItem key={i} sx={{ px: 0, py: 2.5 }}>
+                  <ListItemIcon sx={{ minWidth: 48 }}>
+                    <Box sx={{ 
+                      width: 36, 
+                      height: 36, 
+                      borderRadius: '10px', 
+                      bgcolor: 'rgba(0, 245, 255, 0.05)', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center' 
+                    }}>
+                      <item.icon size={18} color="#00F5FF" />
+                    </Box>
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={<Typography variant="body2" sx={{ fontWeight: 800 }}>{item.title}</Typography>}
+                    secondary={<Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>{item.desc}</Typography>}
+                  />
+                  <CheckCircle2 size={16} color="#10B981" />
+                </ListItem>
+              ))}
+            </List>
+          </Paper>
+        </Grid>
+      </Grid>
 
       <ImportPreviewModal
         isOpen={isPreviewOpen}
@@ -341,6 +347,6 @@ export default function ImportPage() {
         rawItems={previewItems}
         onConfirm={handleFinalImport}
       />
-    </div>
+    </Box>
   );
 }

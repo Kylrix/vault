@@ -1,10 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  IconButton,
+  CircularProgress,
+  Stack,
+  Fade,
+  alpha,
+  InputAdornment,
+} from "@mui/material";
 import { Lock, Fingerprint, X, ShieldCheck } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { unlockWithPasskey } from "@/app/(protected)/settings/passkey";
 import { useAppwrite } from "@/app/appwrite-provider";
@@ -28,11 +40,6 @@ export default function SudoModal({
     const [passkeyLoading, setPasskeyLoading] = useState(false);
     const [hasPasskey, setHasPasskey] = useState(false);
     const [mode, setMode] = useState<"passkey" | "password">("password");
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     // Check if user has passkey set up
     useEffect(() => {
@@ -42,13 +49,11 @@ export default function SudoModal({
             setPassword("");
             setLoading(false);
             setPasskeyLoading(false);
-            // Default to password for now, unless we want to auto-trigger passkey
             setMode("password");
         }
     }, [isOpen, user]);
 
-    // Auto-trigger passkey if available and it's the preferred method?
-    // Use a more "native" feel: if passkey exists, show that primary UI.
+    // Auto-trigger passkey if available
     useEffect(() => {
         if (isOpen && hasPasskey) {
             setMode("passkey");
@@ -81,150 +86,250 @@ export default function SudoModal({
         if (!user?.$id) return;
         setPasskeyLoading(true);
         try {
-            // unlockWithPasskey essentially verifies and re-imports keys. 
-            // If it returns true, we trust the authentication.
             const success = await unlockWithPasskey(user.$id);
             if (success) {
                 onSuccess();
             }
         } catch (error) {
             console.error(error);
-            // Don't toast here as unlockWithPasskey already toasts errors
         } finally {
             setPasskeyLoading(false);
         }
     };
 
-    if (!isOpen || !mounted) return null;
+    return (
+        <Dialog
+            open={isOpen}
+            onClose={onCancel}
+            maxWidth="xs"
+            fullWidth
+            TransitionComponent={Fade}
+            PaperProps={{
+                sx: {
+                    borderRadius: '28px',
+                    bgcolor: 'rgba(10, 10, 10, 0.95)',
+                    backdropFilter: 'blur(25px) saturate(180%)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    backgroundImage: 'none',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                    overflow: 'hidden'
+                }
+            }}
+        >
+            <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 1, position: 'relative' }}>
+                <IconButton
+                    onClick={onCancel}
+                    sx={{
+                        position: 'absolute',
+                        right: 16,
+                        top: 16,
+                        color: 'rgba(255, 255, 255, 0.3)',
+                        '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                    }}
+                >
+                    <X size={20} />
+                </IconButton>
 
-    const content = (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-            <div
-                className="bg-background w-full max-w-sm rounded-2xl shadow-2xl border border-border overflow-hidden transform transition-all scale-100"
-                role="dialog"
-                aria-modal="true"
-            >
-                {/* Header */}
-                <div className="p-6 pb-2 text-center relative">
-                    <button
-                        onClick={onCancel}
-                        className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors p-1 rounded-full hover:bg-accent"
-                    >
-                        <X className="h-4 w-4" />
-                    </button>
+                <Box sx={{ 
+                    display: 'inline-flex', 
+                    p: 1.5, 
+                    borderRadius: '16px', 
+                    bgcolor: alpha('#00F5FF', 0.1),
+                    color: '#00F5FF',
+                    mb: 2
+                }}>
+                    <ShieldCheck size={32} />
+                </Box>
+                <Typography variant="h5" sx={{ 
+                    fontWeight: 900, 
+                    letterSpacing: '-0.03em',
+                    fontFamily: 'var(--font-space-grotesk)',
+                    color: 'white'
+                }}>
+                    Security Check
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}>
+                    Please verify your identity to continue
+                </Typography>
+            </DialogTitle>
 
-                    <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                        <ShieldCheck className="h-6 w-6 text-primary" />
-                    </div>
+            <DialogContent sx={{ pb: 4 }}>
+                {mode === "passkey" ? (
+                    <Stack spacing={3} sx={{ mt: 2, alignItems: 'center' }}>
+                        <Box
+                            onClick={handlePasskeyVerify}
+                            sx={{
+                                width: 80,
+                                height: 80,
+                                borderRadius: '50%',
+                                border: '2px dashed',
+                                borderColor: passkeyLoading ? '#00F5FF' : 'rgba(255, 255, 255, 0.2)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                animation: passkeyLoading ? 'pulse 2s infinite' : 'none',
+                                '&:hover': {
+                                    borderColor: '#00F5FF',
+                                    bgcolor: alpha('#00F5FF', 0.05)
+                                },
+                                '@keyframes pulse': {
+                                    '0%': { boxShadow: '0 0 0 0 rgba(0, 245, 255, 0.4)' },
+                                    '70%': { boxShadow: '0 0 0 15px rgba(0, 245, 255, 0)' },
+                                    '100%': { boxShadow: '0 0 0 0 rgba(0, 245, 255, 0)' }
+                                }
+                            }}
+                        >
+                            <Fingerprint size={40} color={passkeyLoading ? '#00F5FF' : 'rgba(255, 255, 255, 0.4)'} />
+                        </Box>
+                        
+                        <Box sx={{ textAlign: 'center' }}>
+                            <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
+                                Use Face ID / Touch ID
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+                                Authenticate with your device security
+                            </Typography>
+                        </Box>
 
-                    <h2 className="text-lg font-semibold tracking-tight">Security Check</h2>
-                    <p className="text-xs text-muted-foreground mt-1">
-                        Please verify your identity to continue.
-                    </p>
-                </div>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={handlePasskeyVerify}
+                            disabled={passkeyLoading}
+                            sx={{
+                                py: 1.5,
+                                borderRadius: '14px',
+                                bgcolor: '#00F5FF',
+                                color: '#000',
+                                fontWeight: 700,
+                                '&:hover': {
+                                    bgcolor: '#00D1DA',
+                                    transform: 'translateY(-1px)',
+                                    boxShadow: '0 8px 20px rgba(0, 245, 255, 0.3)'
+                                }
+                            }}
+                        >
+                            {passkeyLoading ? <CircularProgress size={24} color="inherit" /> : "Verify with Passkey"}
+                        </Button>
 
-                {/* Body */}
-                <div className="p-6 pt-2">
-                    {mode === "passkey" ? (
-                        <div className="space-y-4">
-                            <div className="text-center py-4">
-                                <div
-                                    className={`mx-auto h-20 w-20 rounded-full border-2 border-dashed flex items-center justify-center mb-4 cursor-pointer transition-colors ${passkeyLoading ? 'border-primary animate-pulse' : 'border-muted hover:border-primary/50'}`}
-                                    onClick={handlePasskeyVerify}
-                                >
-                                    <Fingerprint className={`h-10 w-10 ${passkeyLoading ? 'text-primary' : 'text-muted-foreground'}`} />
-                                </div>
-                                <p className="text-sm font-medium">Use Face ID / Touch ID</p>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                    Authenticate with your device
-                                </p>
-                            </div>
+                        <Box sx={{ width: '100%', position: 'relative', py: 1 }}>
+                            <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+                            <Typography variant="caption" sx={{ 
+                                position: 'relative', 
+                                bgcolor: 'rgba(10, 10, 10, 1)', 
+                                px: 2, 
+                                mx: 'auto', 
+                                display: 'table',
+                                color: 'rgba(255, 255, 255, 0.3)',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em'
+                            }}>
+                                Or
+                            </Typography>
+                        </Box>
 
-                            <Button
-                                onClick={handlePasskeyVerify}
-                                className="w-full"
-                                disabled={passkeyLoading}
-                            >
-                                {passkeyLoading ? "Verifying..." : "Verify with Passkey"}
-                            </Button>
-
-                            <div className="relative">
-                                <div className="absolute inset-0 flex items-center">
-                                    <span className="w-full border-t" />
-                                </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-background px-2 text-muted-foreground">
-                                        Or
-                                    </span>
-                                </div>
-                            </div>
-
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="w-full text-xs"
-                                onClick={() => setMode("password")}
-                            >
-                                Use Master Password
-                            </Button>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <form onSubmit={handlePasswordVerify} className="space-y-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-muted-foreground">Master Password</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                        <Input
-                                            type="password"
-                                            placeholder="Enter password..."
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="pl-9"
-                                            autoFocus
-                                        />
-                                    </div>
-                                </div>
+                        <Button
+                            fullWidth
+                            variant="text"
+                            size="small"
+                            onClick={() => setMode("password")}
+                            sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                        >
+                            Use Master Password
+                        </Button>
+                    </Stack>
+                ) : (
+                    <Stack spacing={3} sx={{ mt: 2 }}>
+                        <form onSubmit={handlePasswordVerify}>
+                            <Stack spacing={2.5}>
+                                <Box>
+                                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, mb: 1, display: 'block' }}>
+                                        MASTER PASSWORD
+                                    </Typography>
+                                    <TextField
+                                        fullWidth
+                                        type="password"
+                                        placeholder="Enter your master password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        autoFocus
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Lock size={18} color="rgba(255, 255, 255, 0.3)" />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: '14px',
+                                                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                                                '&.Mui-focused fieldset': { borderColor: '#00F5FF' },
+                                            },
+                                            '& .MuiInputBase-input': { color: 'white' }
+                                        }}
+                                    />
+                                </Box>
 
                                 <Button
+                                    fullWidth
                                     type="submit"
-                                    className="w-full"
+                                    variant="contained"
                                     disabled={loading || !password}
+                                    sx={{
+                                        py: 1.5,
+                                        borderRadius: '14px',
+                                        bgcolor: '#00F5FF',
+                                        color: '#000',
+                                        fontWeight: 700,
+                                        '&:hover': {
+                                            bgcolor: '#00D1DA',
+                                            transform: 'translateY(-1px)',
+                                            boxShadow: '0 8px 20px rgba(0, 245, 255, 0.3)'
+                                        }
+                                    }}
                                 >
-                                    {loading ? "Verifying..." : "Confirm Password"}
+                                    {loading ? <CircularProgress size={24} color="inherit" /> : "Confirm Password"}
                                 </Button>
-                            </form>
+                            </Stack>
+                        </form>
 
-                            {hasPasskey && (
-                                <>
-                                    <div className="relative">
-                                        <div className="absolute inset-0 flex items-center">
-                                            <span className="w-full border-t" />
-                                        </div>
-                                        <div className="relative flex justify-center text-xs uppercase">
-                                            <span className="bg-background px-2 text-muted-foreground">
-                                                Or
-                                            </span>
-                                        </div>
-                                    </div>
+                        {hasPasskey && (
+                            <>
+                                <Box sx={{ width: '100%', position: 'relative', py: 1 }}>
+                                    <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+                                    <Typography variant="caption" sx={{ 
+                                        position: 'relative', 
+                                        bgcolor: 'rgba(10, 10, 10, 1)', 
+                                        px: 2, 
+                                        mx: 'auto', 
+                                        display: 'table',
+                                        color: 'rgba(255, 255, 255, 0.3)',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.1em'
+                                    }}>
+                                        Or
+                                    </Typography>
+                                </Box>
 
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="w-full text-xs gap-2"
-                                        onClick={() => setMode("passkey")}
-                                    >
-                                        <Fingerprint className="h-3 w-3" />
-                                        Use Passkey
-                                    </Button>
-                                </>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+                                <Button
+                                    fullWidth
+                                    variant="text"
+                                    startIcon={<Fingerprint size={18} />}
+                                    onClick={() => setMode("passkey")}
+                                    sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                                >
+                                    Use Passkey
+                                </Button>
+                            </>
+                        )}
+                    </Stack>
+                )}
+            </DialogContent>
+        </Dialog>
     );
-
-    return createPortal(content, document.body);
 }

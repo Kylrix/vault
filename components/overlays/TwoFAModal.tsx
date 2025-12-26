@@ -2,10 +2,28 @@
 
 import { useState, useEffect } from "react";
 import { useFinalizeAuth } from "@/lib/finalizeAuth";
-import { createPortal } from "react-dom";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  Button,
+  TextField,
+  Box,
+  IconButton,
+  CircularProgress,
+  Stack,
+  Fade,
+  alpha,
+} from "@mui/material";
+import {
+  Smartphone,
+  Mail,
+  Phone,
+  Key,
+  ChevronLeft,
+  ShieldCheck,
+} from "lucide-react";
 import {
   listMfaFactors,
   createMfaChallenge,
@@ -19,7 +37,6 @@ interface TwoFAModalProps {
 }
 
 export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
-  const [mounted, setMounted] = useState(false);
   const [factors, setFactors] = useState<{
     totp: boolean;
     email: boolean;
@@ -32,10 +49,6 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -62,12 +75,7 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
   ) => {
     setLoading(true);
     try {
-      let factorEnum: "totp" | "email" | "phone" | "recoverycode" = factor;
-      if (factor === "totp") factorEnum = "totp";
-      else if (factor === "email") factorEnum = "email";
-      else if (factor === "phone") factorEnum = "phone";
-      else if (factor === "recoverycode") factorEnum = "recoverycode";
-      const challenge = await createMfaChallenge(factorEnum);
+      const challenge = await createMfaChallenge(factor);
       setChallengeId(challenge.$id);
       setSelectedFactor(factor);
     } catch (e: unknown) {
@@ -94,150 +102,250 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
     setLoading(false);
   };
 
-  if (!isOpen || !mounted) return null;
+  const resetChallenge = () => {
+    setChallengeId(null);
+    setCode("");
+  };
 
-  if (!factors) {
-    const loadingContent = (
-      <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="text-lg text-muted-foreground">Loading...</div>
-          </div>
-        </div>
-      </div>
-    );
-    return createPortal(loadingContent, document.body);
-  }
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: '28px',
+          bgcolor: 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundImage: 'none',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          overflow: 'hidden'
+        }
+      }}
+    >
+      <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 1 }}>
+        <Box sx={{ 
+          display: 'inline-flex', 
+          p: 1.5, 
+          borderRadius: '16px', 
+          bgcolor: alpha('#00F5FF', 0.1),
+          color: '#00F5FF',
+          mb: 2
+        }}>
+          <ShieldCheck size={32} />
+        </Box>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 900, 
+          letterSpacing: '-0.03em',
+          fontFamily: 'var(--font-space-grotesk)',
+          color: 'white'
+        }}>
+          Two-Factor Authentication
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}>
+          Additional verification required to access your vault
+        </Typography>
+      </DialogTitle>
 
-  const modalContent = (
-    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <Card className="w-full max-w-md shadow-2xl relative bg-background">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">
-              Two-Factor Authentication
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Additional verification required
-            </p>
-          </CardHeader>
-          <CardContent>
-            {!challengeId ? (
-              // Factor selection
-              <div className="space-y-4">
-                <p className="text-sm">Choose your verification method:</p>
+      <DialogContent sx={{ pb: 4 }}>
+        {!factors ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress size={32} sx={{ color: '#00F5FF' }} />
+          </Box>
+        ) : !challengeId ? (
+          <Stack spacing={2} sx={{ mt: 2 }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+              Choose Verification Method
+            </Typography>
 
-                {factors.totp && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => handleCreateChallenge("totp")}
-                    disabled={loading}
-                  >
-                    📱 Authenticator App
-                  </Button>
-                )}
+            {factors.totp && (
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Smartphone size={20} />}
+                onClick={() => handleCreateChallenge("totp")}
+                disabled={loading}
+                sx={{
+                  justifyContent: 'flex-start',
+                  py: 1.5,
+                  px: 2,
+                  borderRadius: '14px',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'white',
+                  '&:hover': {
+                    borderColor: '#00F5FF',
+                    bgcolor: alpha('#00F5FF', 0.05)
+                  }
+                }}
+              >
+                Authenticator App
+              </Button>
+            )}
 
-                {factors.email && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => handleCreateChallenge("email")}
-                    disabled={loading}
-                  >
-                    ✉️ Email Code
-                  </Button>
-                )}
+            {factors.email && (
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Mail size={20} />}
+                onClick={() => handleCreateChallenge("email")}
+                disabled={loading}
+                sx={{
+                  justifyContent: 'flex-start',
+                  py: 1.5,
+                  px: 2,
+                  borderRadius: '14px',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'white',
+                  '&:hover': {
+                    borderColor: '#00F5FF',
+                    bgcolor: alpha('#00F5FF', 0.05)
+                  }
+                }}
+              >
+                Email Code
+              </Button>
+            )}
 
-                {factors.phone && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => handleCreateChallenge("phone")}
-                    disabled={loading}
-                  >
-                    📞 SMS Code
-                  </Button>
-                )}
+            {factors.phone && (
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<Phone size={20} />}
+                onClick={() => handleCreateChallenge("phone")}
+                disabled={loading}
+                sx={{
+                  justifyContent: 'flex-start',
+                  py: 1.5,
+                  px: 2,
+                  borderRadius: '14px',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  color: 'white',
+                  '&:hover': {
+                    borderColor: '#00F5FF',
+                    bgcolor: alpha('#00F5FF', 0.05)
+                  }
+                }}
+              >
+                SMS Code
+              </Button>
+            )}
 
-                <div className="pt-4 border-t">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setShowRecovery(!showRecovery)}
-                  >
-                    Use recovery code instead
-                  </Button>
+            <Box sx={{ pt: 2, borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+              <Button
+                fullWidth
+                variant="text"
+                size="small"
+                onClick={() => setShowRecovery(!showRecovery)}
+                sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+              >
+                {showRecovery ? "Hide recovery options" : "Use recovery code instead"}
+              </Button>
 
-                  {showRecovery && (
-                    <div className="mt-2">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start"
-                        onClick={() => handleCreateChallenge("recoverycode")}
-                        disabled={loading}
-                      >
-                        🔑 Recovery Code
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              // Code entry
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm mb-2">
-                    {selectedFactor === "totp" &&
-                      "Enter the code from your authenticator app:"}
-                    {selectedFactor === "email" &&
-                      "Enter the code sent to your email:"}
-                    {selectedFactor === "phone" &&
-                      "Enter the code sent to your phone:"}
-                    {selectedFactor === "recoverycode" &&
-                      "Enter your recovery code:"}
-                  </p>
-                  <Input
-                    placeholder={
-                      selectedFactor === "recoverycode"
-                        ? "Recovery code"
-                        : "6-digit code"
+              {showRecovery && (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Key size={20} />}
+                  onClick={() => handleCreateChallenge("recoverycode")}
+                  disabled={loading}
+                  sx={{
+                    mt: 1,
+                    justifyContent: 'flex-start',
+                    py: 1.5,
+                    px: 2,
+                    borderRadius: '14px',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                    '&:hover': {
+                      borderColor: '#00F5FF',
+                      bgcolor: alpha('#00F5FF', 0.05)
                     }
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    maxLength={selectedFactor === "recoverycode" ? 10 : 6}
-                  />
-                </div>
-
-                <Button
-                  onClick={handleCompleteChallenge}
-                  disabled={loading || !code}
-                  className="w-full"
-                >
-                  {loading ? "Verifying..." : "Verify"}
-                </Button>
-
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="w-full"
-                  onClick={() => {
-                    setChallengeId(null);
-                    setCode("");
                   }}
                 >
-                  Choose different method
+                  Recovery Code
                 </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        </div>
-      </div>
-    </div>
-  );
+              )}
+            </Box>
+          </Stack>
+        ) : (
+          <Stack spacing={3} sx={{ mt: 2 }}>
+            <Box>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.7)', mb: 2 }}>
+                {selectedFactor === "totp" && "Enter the 6-digit code from your authenticator app:"}
+                {selectedFactor === "email" && "Enter the verification code sent to your email:"}
+                {selectedFactor === "phone" && "Enter the verification code sent to your phone:"}
+                {selectedFactor === "recoverycode" && "Enter your 10-character recovery code:"}
+              </Typography>
+              
+              <TextField
+                fullWidth
+                autoFocus
+                placeholder={selectedFactor === "recoverycode" ? "XXXXX-XXXXX" : "000000"}
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                inputProps={{ 
+                  maxLength: selectedFactor === "recoverycode" ? 11 : 6,
+                  style: { 
+                    textAlign: 'center', 
+                    fontSize: '1.5rem', 
+                    letterSpacing: '0.2em',
+                    fontFamily: 'monospace'
+                  }
+                }}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '16px',
+                    bgcolor: 'rgba(255, 255, 255, 0.03)',
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                    '&.Mui-focused fieldset': { borderColor: '#00F5FF' },
+                  },
+                  '& .MuiInputBase-input': { color: 'white' }
+                }}
+              />
+            </Box>
 
-  return createPortal(modalContent, document.body);
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={handleCompleteChallenge}
+              disabled={loading || !code}
+              sx={{
+                py: 1.5,
+                borderRadius: '14px',
+                bgcolor: '#00F5FF',
+                color: '#000',
+                fontWeight: 700,
+                '&:hover': {
+                  bgcolor: '#00D1DA',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 8px 20px rgba(0, 245, 255, 0.3)'
+                },
+                '&.Mui-disabled': {
+                  bgcolor: 'rgba(0, 245, 255, 0.1)',
+                  color: 'rgba(0, 0, 0, 0.3)'
+                },
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : "Verify & Continue"}
+            </Button>
+
+            <Button
+              fullWidth
+              variant="text"
+              startIcon={<ChevronLeft size={18} />}
+              onClick={resetChallenge}
+              sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+            >
+              Choose different method
+            </Button>
+          </Stack>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
 }

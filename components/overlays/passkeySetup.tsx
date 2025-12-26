@@ -1,13 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog } from "@/components/ui/Dialog";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  IconButton,
+  Typography,
+  Box,
+  Stack,
+  CircularProgress,
+  alpha,
+  useTheme
+} from "@mui/material";
 import { startRegistration } from "@simplewebauthn/browser";
 import { AppwriteService } from "@/lib/appwrite";
 import toast from "react-hot-toast";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, CheckCircle2, Fingerprint } from "lucide-react";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 
 interface PasskeySetupProps {
@@ -36,6 +48,7 @@ export function PasskeySetup({
   onSuccess,
   trustUnlocked = false,
 }: PasskeySetupProps) {
+  const muiTheme = useTheme();
   const [step, setStep] = useState(trustUnlocked && masterPassCrypto.isVaultUnlocked() ? 2 : 1);
   const [loading, setLoading] = useState(false);
   const [masterPassword, setMasterPassword] = useState("");
@@ -88,7 +101,6 @@ export function PasskeySetup({
       let masterKey = masterPassCrypto.getMasterKey();
       
       if (!masterKey && masterPassword) {
-          // Ensure we are unlocked if we have the password
           await masterPassCrypto.unlock(masterPassword, userId);
           masterKey = masterPassCrypto.getMasterKey();
       }
@@ -97,7 +109,6 @@ export function PasskeySetup({
           throw new Error("Vault is locked. Please enter master password.");
       }
 
-      // 1. Generate WebAuthn registration first to get credential data
       const challenge = crypto.getRandomValues(new Uint8Array(32));
       const challengeBase64 = arrayBufferToBase64(challenge.buffer);
 
@@ -123,10 +134,8 @@ export function PasskeySetup({
         attestation: "none" as const,
       };
 
-      // 2. Start WebAuthn registration
       const regResp = await startRegistration(registrationOptions);
 
-      // 3. Derive Kwrap from WebAuthn credential data
       const encoder = new TextEncoder();
       const credentialData = encoder.encode(regResp.id + userId);
       const kwrapSeed = await crypto.subtle.digest("SHA-256", credentialData);
@@ -138,7 +147,6 @@ export function PasskeySetup({
         ["encrypt", "decrypt"],
       );
 
-      // 4. Export master key and encrypt it with Kwrap
       const rawMasterKey = await crypto.subtle.exportKey("raw", masterKey);
       const iv = crypto.getRandomValues(new Uint8Array(12));
       const encryptedMasterKey = await crypto.subtle.encrypt(
@@ -147,7 +155,6 @@ export function PasskeySetup({
         rawMasterKey,
       );
 
-      // 5. Combine IV + encrypted key for passkeyBlob
       const combined = new Uint8Array(
         iv.length + encryptedMasterKey.byteLength,
       );
@@ -155,9 +162,6 @@ export function PasskeySetup({
       combined.set(new Uint8Array(encryptedMasterKey), iv.length);
       const passkeyBlob = arrayBufferToBase64(combined.buffer);
 
-      // 6. Store credential and encrypted blob
-      // Note: We do NOT delete existing passkeys anymore.
-      
       await AppwriteService.createKeychainEntry({
         userId,
         type: 'passkey',
@@ -174,10 +178,9 @@ export function PasskeySetup({
         isBackup: false
       });
 
-      // Update user doc flags for UI consistency
       await AppwriteService.syncPasskeyStatus(userId);
 
-      setStep(4); // Success step
+      setStep(4);
     } catch (error: unknown) {
       console.error("Passkey setup failed:", error);
       const err = error as { name?: string; message?: string };
@@ -204,136 +207,216 @@ export function PasskeySetup({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose}>
-      <div className="p-6 w-96">
-        <h2 className="text-lg font-semibold mb-4">Add New Passkey</h2>
-        <div className="space-y-4">
+    <Dialog 
+      open={isOpen} 
+      onClose={handleClose}
+      PaperProps={{
+        sx: {
+          borderRadius: '28px',
+          bgcolor: 'rgba(10, 10, 10, 0.9)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundImage: 'none',
+          width: '100%',
+          maxWidth: '400px'
+        }
+      }}
+    >
+      <DialogTitle sx={{ 
+        fontWeight: 900, 
+        fontFamily: 'var(--font-space-grotesk)', 
+        textAlign: 'center',
+        pt: 4,
+        pb: 1
+      }}>
+        Add New Passkey
+      </DialogTitle>
+      <DialogContent>
+        <Box sx={{ py: 2 }}>
           {step === 1 && (
-            <>
-              <div className="space-y-3">
-                <h3 className="font-medium">Step 1: Verify Master Password</h3>
-                <p className="text-sm text-gray-600">
+            <Stack spacing={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                  Step 1: Verify Master Password
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   Please verify your master password to continue.
-                </p>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Master Password"
-                    value={masterPassword}
-                    onChange={(e) => setMasterPassword(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleContinueToName()}
-                    className="pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <Button variant="outline" onClick={handleClose}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleContinueToName}
-                  disabled={!masterPassword.trim() || verifyingPassword}
-                >
-                  {verifyingPassword ? "Verifying..." : "Continue"}
-                </Button>
-              </div>
-            </>
+                </Typography>
+              </Box>
+              <TextField
+                fullWidth
+                type={showPassword ? "text" : "password"}
+                placeholder="Master Password"
+                value={masterPassword}
+                onChange={(e) => setMasterPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleContinueToName()}
+                variant="filled"
+                InputProps={{
+                  disableUnderline: true,
+                  sx: { borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.05)' },
+                  endAdornment: (
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: 'text.secondary' }}>
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </IconButton>
+                  )
+                }}
+              />
+            </Stack>
           )}
 
           {step === 2 && (
-            <>
-              <div className="space-y-3">
-                <h3 className="font-medium">Step 2: Name Passkey</h3>
-                <p className="text-sm text-gray-600">
-                  Give this passkey a name to identify it later (e.g., &ldquo;MacBook Pro&rdquo;, &ldquo;iPhone&rdquo;).
-                </p>
-                <Input
-                  type="text"
-                  placeholder="Passkey Name"
-                  value={passkeyName}
-                  onChange={(e) => setPasskeyName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleContinueToCreate()}
-                  autoFocus
-                />
-              </div>
-              <div className="flex gap-3 pt-4">
-                <Button variant="outline" onClick={() => setStep(1)}>
-                  Back
-                </Button>
-                <Button
-                  onClick={handleContinueToCreate}
-                  disabled={!passkeyName.trim()}
-                >
-                  Continue
-                </Button>
-              </div>
-            </>
+            <Stack spacing={3}>
+              <Box sx={{ textAlign: 'center' }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                  Step 2: Name Passkey
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                  Give this passkey a name to identify it later (e.g., &ldquo;MacBook Pro&rdquo;).
+                </Typography>
+              </Box>
+              <TextField
+                fullWidth
+                placeholder="Passkey Name"
+                value={passkeyName}
+                onChange={(e) => setPasskeyName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleContinueToCreate()}
+                variant="filled"
+                autoFocus
+                InputProps={{
+                  disableUnderline: true,
+                  sx: { borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                }}
+              />
+            </Stack>
           )}
 
           {step === 3 && (
-            <>
-              <div className="space-y-3">
-                <h3 className="font-medium">Step 3: Create Passkey</h3>
-                <p className="text-sm text-gray-600">
+            <Stack spacing={3} sx={{ textAlign: 'center' }}>
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
+                  Step 3: Create Passkey
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
                   Click &ldquo;Create Passkey&rdquo; and follow your device&rsquo;s prompts.
-                </p>
-                <ul className="text-sm text-gray-600 space-y-1 ml-4">
-                  <li>• Face ID / Touch ID</li>
-                  <li>• Windows Hello</li>
-                  <li>• Security Key</li>
-                </ul>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setStep(2)}
-                  disabled={loading}
-                >
-                  Back
-                </Button>
-                <Button onClick={handleCreate} disabled={loading}>
-                  {loading ? "Creating..." : "Create Passkey"}
-                </Button>
-              </div>
-            </>
+                </Typography>
+                <Box sx={{ 
+                  p: 2, 
+                  borderRadius: '16px', 
+                  bgcolor: 'rgba(0, 240, 255, 0.05)', 
+                  border: '1px dashed rgba(0, 240, 255, 0.2)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 1
+                }}>
+                  <Fingerprint size={32} color={muiTheme.palette.primary.main} />
+                  <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600 }}>
+                    Face ID • Touch ID • Windows Hello
+                  </Typography>
+                </Box>
+              </Box>
+            </Stack>
           )}
 
           {step === 4 && (
-            <>
-              <div className="space-y-3">
-                <h3 className="font-medium text-green-700">
-                  ✓ Passkey Added!
-                </h3>
-                <p className="text-sm text-gray-600">
+            <Stack spacing={3} sx={{ textAlign: 'center', py: 2 }}>
+              <Box sx={{ 
+                width: 64, 
+                height: 64, 
+                borderRadius: '50%', 
+                bgcolor: 'rgba(76, 175, 80, 0.1)', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                mx: 'auto',
+                mb: 1
+              }}>
+                <CheckCircle2 size={32} color="#4CAF50" />
+              </Box>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: '#4CAF50', mb: 1 }}>
+                  Passkey Added!
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                   You can now use <strong>{passkeyName}</strong> to unlock your vault.
-                </p>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <Button
-                  onClick={() => {
-                    onSuccess();
-                    handleClose();
-                  }}
-                  className="w-full"
-                >
-                  Done
-                </Button>
-              </div>
-            </>
+                </Typography>
+              </Box>
+            </Stack>
           )}
-        </div>
-      </div>
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 4, pt: 0, gap: 1.5 }}>
+        {step === 1 && (
+          <>
+            <Button onClick={handleClose} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleContinueToName}
+              disabled={!masterPassword.trim() || verifyingPassword}
+              variant="contained"
+              fullWidth
+              sx={{ borderRadius: '12px' }}
+            >
+              {verifyingPassword ? <CircularProgress size={20} /> : "Continue"}
+            </Button>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <Button onClick={() => setStep(1)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>
+              Back
+            </Button>
+            <Button
+              onClick={handleContinueToCreate}
+              disabled={!passkeyName.trim()}
+              variant="contained"
+              fullWidth
+              sx={{ borderRadius: '12px' }}
+            >
+              Continue
+            </Button>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <Button
+              variant="outlined"
+              onClick={() => setStep(2)}
+              disabled={loading}
+              fullWidth
+              sx={{ borderRadius: '12px' }}
+            >
+              Back
+            </Button>
+            <Button 
+              onClick={handleCreate} 
+              disabled={loading}
+              variant="contained"
+              fullWidth
+              sx={{ borderRadius: '12px' }}
+            >
+              {loading ? <CircularProgress size={20} /> : "Create Passkey"}
+            </Button>
+          </>
+        )}
+
+        {step === 4 && (
+          <Button
+            onClick={() => {
+              onSuccess();
+              handleClose();
+            }}
+            variant="contained"
+            fullWidth
+            sx={{ borderRadius: '12px' }}
+          >
+            Done
+          </Button>
+        )}
+      </DialogActions>
     </Dialog>
   );
 }

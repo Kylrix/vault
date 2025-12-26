@@ -2,9 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { createPortal } from "react-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Typography,
+  Button,
+  Box,
+  CircularProgress,
+  Stack,
+  Fade,
+  alpha,
+} from "@mui/material";
+import { CheckCircle2, AlertCircle, Mail, Home, Settings } from "lucide-react";
 import { completeEmailVerification } from "@/lib/appwrite";
 
 interface VerifyEmailModalProps {
@@ -15,16 +25,11 @@ interface VerifyEmailModalProps {
 export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
   const params = useSearchParams();
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
 
   const [status, setStatus] = useState<
     "idle" | "verifying" | "success" | "error" | "missing"
   >("idle");
   const [message, setMessage] = useState<string>("");
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -67,69 +72,176 @@ export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
     router.replace("/");
   };
 
-  if (!isOpen || !mounted) return null;
+  return (
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      maxWidth="xs"
+      fullWidth
+      TransitionComponent={Fade}
+      PaperProps={{
+        sx: {
+          borderRadius: '28px',
+          bgcolor: 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundImage: 'none',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+          overflow: 'hidden'
+        }
+      }}
+    >
+      <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 1 }}>
+        <Box sx={{ 
+          display: 'inline-flex', 
+          p: 1.5, 
+          borderRadius: '16px', 
+          bgcolor: alpha(
+            status === 'success' ? '#00F5FF' : 
+            status === 'error' || status === 'missing' ? '#FF4D4D' : '#00F5FF', 
+            0.1
+          ),
+          color: status === 'success' ? '#00F5FF' : 
+                 status === 'error' || status === 'missing' ? '#FF4D4D' : '#00F5FF',
+          mb: 2
+        }}>
+          {status === 'verifying' && <CircularProgress size={32} color="inherit" />}
+          {status === 'success' && <CheckCircle2 size={32} />}
+          {(status === 'error' || status === 'missing') && <AlertCircle size={32} />}
+          {status === 'idle' && <Mail size={32} />}
+        </Box>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 900, 
+          letterSpacing: '-0.03em',
+          fontFamily: 'var(--font-space-grotesk)',
+          color: 'white'
+        }}>
+          Verify Email
+        </Typography>
+      </DialogTitle>
 
-  const modalContent = (
-    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <Card className="w-full max-w-md shadow-2xl relative bg-background">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Verify Email</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {status === "verifying" && (
-              <p className="text-sm text-muted-foreground text-center">Verifying…</p>
-            )}
+      <DialogContent sx={{ pb: 4, textAlign: 'center' }}>
+        <Stack spacing={3} sx={{ mt: 1 }}>
+          {status === "verifying" && (
+            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+              Verifying your email address, please wait...
+            </Typography>
+          )}
 
-            {status === "missing" && (
-              <div className="space-y-3">
-                <p className="text-sm text-red-600">{message}</p>
-                <p className="text-xs text-muted-foreground">
-                  Please open the most recent verification email and try again.
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={goHome} className="flex-1">Go Home</Button>
-                </div>
-              </div>
-            )}
+          {status === "missing" && (
+            <Box>
+              <Typography variant="body2" sx={{ color: '#FF4D4D', mb: 1, fontWeight: 600 }}>
+                {message}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', mb: 3 }}>
+                Please open the most recent verification email and try again.
+              </Typography>
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<Home size={18} />}
+                onClick={goHome}
+                sx={{
+                  py: 1.5,
+                  borderRadius: '14px',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)',
+                  color: 'white',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.1)' }
+                }}
+              >
+                Go Home
+              </Button>
+            </Box>
+          )}
 
-            {status === "success" && (
-              <div className="space-y-3">
-                <p className="text-sm text-green-600">{message}</p>
-                <p className="text-xs text-muted-foreground">
-                  You can now continue setting up MFA or using your account.
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={goToSettings} className="flex-1">Open Settings</Button>
-                  <Button variant="ghost" onClick={goHome}>
-                    Go Home
-                  </Button>
-                </div>
-              </div>
-            )}
+          {status === "success" && (
+            <Box>
+              <Typography variant="body2" sx={{ color: '#00F5FF', mb: 1, fontWeight: 600 }}>
+                {message}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', mb: 3 }}>
+                You can now continue setting up MFA or using your account.
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<Settings size={18} />}
+                  onClick={goToSettings}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: '14px',
+                    bgcolor: '#00F5FF',
+                    color: '#000',
+                    fontWeight: 700,
+                    '&:hover': { bgcolor: '#00D1DA' }
+                  }}
+                >
+                  Settings
+                </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Home size={18} />}
+                  onClick={goHome}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: '14px',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                  }}
+                >
+                  Home
+                </Button>
+              </Stack>
+            </Box>
+          )}
 
-            {status === "error" && (
-              <div className="space-y-3">
-                <p className="text-sm text-red-600">{message}</p>
-                <p className="text-xs text-muted-foreground">
-                  If the link expired, request a new verification email from
-                  Settings.
-                </p>
-                <div className="flex gap-2">
-                  <Button onClick={goToSettings} className="flex-1">Open Settings</Button>
-                  <Button variant="ghost" onClick={goHome}>
-                    Go Home
-                  </Button>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-        </div>
-      </div>
-    </div>
+          {status === "error" && (
+            <Box>
+              <Typography variant="body2" sx={{ color: '#FF4D4D', mb: 1, fontWeight: 600 }}>
+                {message}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', mb: 3 }}>
+                If the link expired, request a new verification email from Settings.
+              </Typography>
+              <Stack direction="row" spacing={2}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  startIcon={<Settings size={18} />}
+                  onClick={goToSettings}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: '14px',
+                    bgcolor: 'rgba(255, 255, 255, 0.05)',
+                    color: 'white',
+                    '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.1)' }
+                  }}
+                >
+                  Settings
+                </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  startIcon={<Home size={18} />}
+                  onClick={goHome}
+                  sx={{
+                    py: 1.5,
+                    borderRadius: '14px',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    color: 'white',
+                    '&:hover': { borderColor: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                  }}
+                >
+                  Home
+                </Button>
+              </Stack>
+            </Box>
+          )}
+        </Stack>
+      </DialogContent>
+    </Dialog>
   );
-
-  return createPortal(modalContent, document.body);
 }

@@ -14,8 +14,22 @@ import {
   PlusCircle,
   Share2,
   Upload,
+  Lock,
 } from "lucide-react";
-import { Button, Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Typography, Paper } from "@mui/material";
+import { 
+  Button, 
+  Box, 
+  List, 
+  ListItem, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  Divider, 
+  Typography, 
+  Paper,
+  alpha,
+  useTheme as useMuiTheme
+} from "@mui/material";
 import { useTheme } from "@/app/providers";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
@@ -49,6 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+  const muiTheme = useMuiTheme();
   const { user, loading, logout, refresh } = useAppwrite();
   const [showPasskeySetup, setShowPasskeySetup] = useState(false);
 
@@ -142,7 +157,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const ThemeSymbol = ThemeIcon();
 
   if (isSimplifiedLayout) {
-    return <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>{children}</Box>;
+    return <Box sx={{ minHeight: '100vh', bgcolor: '#000' }}>{children}</Box>;
   }
 
   if (!loading && !user) {
@@ -150,54 +165,60 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
+    <Box sx={{ minHeight: '100vh', bgcolor: '#000', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
       <Navbar />
 
-      <Box sx={{ flex: 1, display: 'flex', w: '100%', overflowX: 'hidden', pt: 8 }}>
+      <Box sx={{ flex: 1, display: 'flex', width: '100%', overflowX: 'hidden', pt: '72px' }}>
         <Box
           component="aside"
           sx={{
             display: { xs: 'none', lg: 'block' },
             position: 'fixed',
             left: 0,
-            top: 64,
-            height: 'calc(100vh - 64px)',
-            width: 256,
-            bgcolor: 'background.paper',
-            borderRight: '1px solid',
-            borderColor: 'divider',
+            top: 72,
+            height: 'calc(100vh - 72px)',
+            width: 280,
+            bgcolor: 'rgba(10, 10, 10, 0.95)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            borderRight: '1px solid rgba(255, 255, 255, 0.1)',
             overflowY: 'auto',
-            zIndex: 30
+            zIndex: 30,
+            p: 2
           }}
           aria-label="Primary sidebar navigation"
         >
-          <Box sx={{ display: 'flex', flexDirection: 'column', h: '100%' }}>
-            <List sx={{ flex: 1, px: 1, py: 1.5 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <List sx={{ flex: 1, py: 0 }}>
               {navigation.map((item) => {
                 const isActive = pathname === item.href;
                 return (
-                  <ListItem key={item.name} disablePadding sx={{ mb: 0.5 }}>
+                  <ListItem key={item.name} disablePadding sx={{ mb: 1 }}>
                     <ListItemButton
                       component={Link}
                       href={item.href}
                       sx={{
-                        borderRadius: 1,
-                        bgcolor: isActive ? 'primary.main' : 'transparent',
-                        color: isActive ? 'background.default' : 'text.primary',
+                        borderRadius: '16px',
+                        bgcolor: isActive ? alpha('#00F5FF', 0.1) : 'transparent',
+                        color: isActive ? '#00F5FF' : 'rgba(255, 255, 255, 0.6)',
+                        border: isActive ? '1px solid rgba(0, 245, 255, 0.2)' : '1px solid transparent',
                         '&:hover': {
-                          bgcolor: isActive ? 'primary.dark' : 'rgba(255, 255, 255, 0.05)',
+                          bgcolor: isActive ? alpha('#00F5FF', 0.15) : 'rgba(255, 255, 255, 0.05)',
+                          color: 'white'
                         },
-                        py: item.big ? 1.5 : 1
+                        py: item.big ? 2 : 1.5,
+                        transition: 'all 0.2s ease'
                       }}
                     >
-                      <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>
+                      <ListItemIcon sx={{ color: 'inherit', minWidth: 44 }}>
                         <item.icon size={item.big ? 24 : 20} />
                       </ListItemIcon>
                       <ListItemText
                         primary={item.name}
                         primaryTypographyProps={{
-                          variant: item.big ? 'body1' : 'body2',
-                          fontWeight: 600
+                          variant: 'body2',
+                          fontWeight: isActive ? 800 : 600,
+                          fontFamily: 'var(--font-space-grotesk)',
+                          letterSpacing: '0.02em'
                         }}
                       />
                     </ListItemButton>
@@ -205,11 +226,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 );
               })}
             </List>
-            <Divider />
-            <Box sx={{ p: 1, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+            
+            <Box sx={{ mt: 'auto', pt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)', mb: 2 }} />
+              
               <Button
                 variant="text"
-                size="small"
                 fullWidth
                 startIcon={<ThemeSymbol size={18} />}
                 onClick={() => {
@@ -217,15 +239,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length];
                   setTheme(nextTheme);
                 }}
-                sx={{ justifyContent: 'flex-start', color: 'text.secondary' }}
+                sx={{ 
+                  justifyContent: 'flex-start', 
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  borderRadius: '12px',
+                  px: 2,
+                  py: 1,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)', color: 'white' }
+                }}
               >
-                {`${theme.charAt(0).toUpperCase() + theme.slice(1)} theme`}
+                {`${theme.charAt(0).toUpperCase() + theme.slice(1)} Mode`}
               </Button>
+
               <Button
                 variant="text"
-                size="small"
                 fullWidth
-                startIcon={<Shield size={18} />}
+                startIcon={<Lock size={18} />}
                 onClick={() => {
                   masterPassCrypto.lockNow();
                   if (!masterPassCrypto.isVaultUnlocked()) {
@@ -233,17 +264,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     router.replace("/masterpass");
                   }
                 }}
-                sx={{ justifyContent: 'flex-start', color: 'text.secondary' }}
+                sx={{ 
+                  justifyContent: 'flex-start', 
+                  color: 'rgba(255, 255, 255, 0.5)',
+                  borderRadius: '12px',
+                  px: 2,
+                  py: 1,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)', color: 'white' }
+                }}
               >
-                Lock now
+                Lock Vault
               </Button>
+
               <Button
                 variant="text"
-                size="small"
                 fullWidth
                 startIcon={<LogOut size={18} />}
                 onClick={logout}
-                sx={{ justifyContent: 'flex-start', color: 'error.main', '&:hover': { bgcolor: 'rgba(244, 67, 54, 0.08)' } }}
+                sx={{ 
+                  justifyContent: 'flex-start', 
+                  color: '#FF4D4D',
+                  borderRadius: '12px',
+                  px: 2,
+                  py: 1,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                  '&:hover': { bgcolor: alpha('#FF4D4D', 0.1) }
+                }}
               >
                 Logout
               </Button>
@@ -251,36 +300,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Box>
         </Box>
 
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden', ml: { lg: '256px' } }}>
-          <Box component="main" sx={{ flex: 1, px: { xs: 2, sm: 3, md: 4 }, py: 4, pb: { xs: 10, lg: 4 }, overflowX: 'hidden', maxWidth: '100%' }}>
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, overflowX: 'hidden', ml: { lg: '280px' } }}>
+          <Box component="main" sx={{ flex: 1, px: { xs: 2, sm: 4, md: 6 }, py: 6, pb: { xs: 12, lg: 6 }, overflowX: 'hidden', maxWidth: '100%' }}>
             {children}
           </Box>
         </Box>
       </Box>
 
+      {/* Mobile Bottom Navigation */}
       <Paper
         component="nav"
         elevation={0}
         sx={{
           position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
+          bottom: 20,
+          left: 20,
+          right: 20,
           zIndex: 50,
-          bgcolor: 'rgba(0, 0, 0, 0.8)',
-          backdropFilter: 'blur(20px)',
-          borderTop: '1px solid',
-          borderColor: 'divider',
+          bgcolor: 'rgba(10, 10, 10, 0.9)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '24px',
           display: { xs: 'flex', lg: 'none' },
           justifyContent: 'space-around',
           alignItems: 'center',
-          height: 64,
-          pb: 'env(safe-area-inset-bottom)',
-          boxSizing: 'content-box'
+          height: 72,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+          overflow: 'visible'
         }}
       >
         {navigation
-          .filter((item) => item.name !== "Import")
+          .filter((item) => item.name !== "Import" && item.name !== "Settings")
           .map((item) => {
             const isActive = pathname === item.href;
             const isBig = item.big;
@@ -296,32 +346,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    mt: -5,
+                    mt: -6,
                     textDecoration: 'none'
                   }}
                 >
                   <Box
                     sx={{
-                      h: 64,
-                      w: 64,
-                      borderRadius: '50%',
+                      height: 64,
+                      width: 64,
+                      borderRadius: '20px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      bgcolor: 'primary.main',
-                      color: 'background.default',
-                      border: '4px solid',
-                      borderColor: 'background.default',
-                      boxShadow: '0 4px 20px rgba(0, 240, 255, 0.4)',
-                      transition: 'transform 0.2s',
-                      '&:active': { transform: 'scale(0.95)' }
+                      bgcolor: '#00F5FF',
+                      color: '#000',
+                      boxShadow: '0 0 20px rgba(0, 245, 255, 0.4)',
+                      transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:active': { transform: 'scale(0.9) translateY(4px)' }
                     }}
                   >
-                    <item.icon size={32} />
+                    <item.icon size={28} strokeWidth={2.5} />
                   </Box>
-                  <Typography variant="caption" sx={{ fontWeight: 700, mt: 0.5, textTransform: 'uppercase', color: 'primary.main', fontSize: 10 }}>
-                    {item.name}
-                  </Typography>
                 </Box>
               );
             }
@@ -337,15 +382,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   p: 1,
-                  minWidth: 0,
-                  flex: 1,
+                  minWidth: 64,
                   textDecoration: 'none',
-                  color: isActive ? 'primary.main' : 'text.secondary',
-                  transition: 'color 0.2s'
+                  color: isActive ? '#00F5FF' : 'rgba(255, 255, 255, 0.4)',
+                  transition: 'all 0.2s ease'
                 }}
               >
-                <item.icon size={20} style={{ marginBottom: 4 }} />
-                <Typography variant="caption" sx={{ fontSize: 10, fontWeight: 500, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <item.icon size={22} strokeWidth={isActive ? 2.5 : 2} />
+                <Typography 
+                  variant="caption" 
+                  sx={{ 
+                    fontSize: 10, 
+                    fontWeight: isActive ? 800 : 500, 
+                    mt: 0.5,
+                    fontFamily: 'var(--font-space-grotesk)'
+                  }}
+                >
                   {item.name}
                 </Typography>
               </Box>

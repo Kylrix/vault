@@ -136,8 +136,8 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                   </>
                 ) : (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Loader2 className="animate-spin" size={16} style={{ color: '#00F0FF' }} />
-                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Initializing import...</Typography>
+                    <CircularProgress size={16} sx={{ color: '#00F5FF' }} />
+                    <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>Initializing import...</Typography>
                   </Box>
                 )}
               </Box>
@@ -150,10 +150,10 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                   gap: 1.5, 
                   p: 2, 
                   borderRadius: '12px',
-                  bgcolor: importResult.success ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                  bgcolor: importResult.success ? alpha('#00F5FF', 0.1) : alpha('#FF4D4D', 0.1),
                   border: '1px solid',
-                  borderColor: importResult.success ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
-                  color: importResult.success ? '#4CAF50' : '#F44336'
+                  borderColor: importResult.success ? alpha('#00F5FF', 0.2) : alpha('#FF4D4D', 0.2),
+                  color: importResult.success ? '#00F5FF' : '#FF4D4D'
                 }}>
                     {importResult.success ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
@@ -162,14 +162,14 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                 </Box>
                 
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, px: 1 }}>
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>Credentials: {importResult.summary.credentialsCreated}</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>Folders: {importResult.summary.foldersCreated}</Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>TOTP Secrets: {importResult.summary.totpSecretsCreated}</Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>Credentials: {importResult.summary.credentialsCreated}</Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>Folders: {importResult.summary.foldersCreated}</Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>TOTP Secrets: {importResult.summary.totpSecretsCreated}</Typography>
                     {importResult.summary.skippedExisting > 0 && (
                         <Typography variant="caption" sx={{ color: '#FFC107' }}>Skipped (Existing): {importResult.summary.skippedExisting}</Typography>
                     )}
                     {importResult.summary.errors > 0 && (
-                        <Typography variant="caption" sx={{ color: 'error.main', fontWeight: 600 }}>Errors: {importResult.summary.errors}</Typography>
+                        <Typography variant="caption" sx={{ color: '#FF4D4D', fontWeight: 600 }}>Errors: {importResult.summary.errors}</Typography>
                     )}
                 </Box>
 
@@ -179,11 +179,11 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                       overflowY: 'auto', 
                       p: 1.5, 
                       borderRadius: '8px', 
-                      bgcolor: 'rgba(244, 67, 54, 0.05)',
-                      border: '1px solid rgba(244, 67, 54, 0.1)'
+                      bgcolor: alpha('#FF4D4D', 0.05),
+                      border: '1px solid rgba(255, 77, 77, 0.1)'
                     }}>
                         {importResult.errors.map((e, i) => (
-                          <Typography key={i} variant="caption" sx={{ color: 'error.main', display: 'block' }}>• {e}</Typography>
+                          <Typography key={i} variant="caption" sx={{ color: '#FF4D4D', display: 'block' }}>• {e}</Typography>
                         ))}
                     </Box>
                 )}
@@ -193,7 +193,13 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                   variant="contained" 
                   size="small" 
                   onClick={closeWidget}
-                  sx={{ borderRadius: '8px', fontWeight: 700 }}
+                  sx={{ 
+                    borderRadius: '10px', 
+                    fontWeight: 700,
+                    bgcolor: '#00F5FF',
+                    color: '#000',
+                    '&:hover': { bgcolor: '#00D1DA' }
+                  }}
                 >
                     Close
                 </Button>

@@ -1,19 +1,33 @@
 "use client";
 
 import {
-  SunIcon,
-  MoonIcon,
-  ComputerDesktopIcon,
-  UserIcon,
-  ArrowRightOnRectangleIcon,
-  KeyIcon,
-  ShieldCheckIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/outline";
+  Sun,
+  Moon,
+  Monitor,
+  User,
+  LogOut,
+  Key,
+  ShieldCheck,
+  Sparkles,
+  Settings,
+  Lock,
+} from "lucide-react";
 import { useTheme } from "@/app/providers";
 import Link from "next/link";
 import { useAppwrite } from "@/app/appwrite-provider";
-import { Button, Box, AppBar, Toolbar, Typography, IconButton, Menu, MenuItem, Divider, Tooltip } from "@mui/material";
+import { 
+  Button, 
+  Box, 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  IconButton, 
+  Menu, 
+  MenuItem, 
+  Divider, 
+  Tooltip,
+  alpha
+} from "@mui/material";
 import { useState } from "react";
 import { DropdownMenu } from "@/components/ui/DropdownMenu";
 import PasswordGenerator from "@/components/ui/PasswordGenerator";
@@ -50,27 +64,39 @@ export function Navbar() {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'rgba(0, 0, 0, 0.7)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '1px solid',
-        borderColor: 'divider',
-        boxShadow: 'none'
+        bgcolor: 'rgba(10, 10, 10, 0.8)',
+        backdropFilter: 'blur(25px) saturate(180%)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: 'none',
+        backgroundImage: 'none'
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 64 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 72 }}>
         <Box component={Link} href="/" sx={{ display: 'flex', alignItems: 'center', gap: 1.5, textDecoration: 'none', color: 'inherit' }}>
           <Box
-            component="img"
-            src="/images/logo.png"
-            alt="Whisperrkeep Logo"
-            sx={{ h: 32, w: 32, borderRadius: 1, objectFit: 'contain' }}
-          />
+            sx={{ 
+              width: 32, 
+              height: 32, 
+              bgcolor: '#00F5FF', 
+              borderRadius: '8px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              color: '#000',
+              fontWeight: 900,
+              fontSize: '1.2rem'
+            }}
+          >
+            W
+          </Box>
           <Typography
             variant="h6"
             sx={{
-              fontWeight: 600,
+              fontWeight: 900,
               display: { xs: 'none', sm: 'inline' },
-              fontFamily: 'var(--font-space-grotesk)'
+              fontFamily: 'var(--font-space-grotesk)',
+              letterSpacing: '-0.02em',
+              color: 'white'
             }}
           >
             Whisperrkeep
@@ -82,9 +108,12 @@ export function Navbar() {
             <Tooltip title="AI Assistant">
               <IconButton
                 onClick={openAIModal}
-                sx={{ color: 'primary.main', '&:hover': { bgcolor: 'rgba(0, 240, 255, 0.1)' } }}
+                sx={{ 
+                  color: '#00F5FF', 
+                  '&:hover': { bgcolor: alpha('#00F5FF', 0.1) } 
+                }}
               >
-                <SparklesIcon style={{ width: 20, height: 20 }} />
+                <Sparkles size={20} />
               </IconButton>
             </Tooltip>
           )}
@@ -99,16 +128,17 @@ export function Navbar() {
                     : "light";
               setTheme(nextTheme);
             }}
+            sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}
           >
-            {theme === "light" && <SunIcon style={{ width: 20, height: 20 }} />}
-            {theme === "dark" && <MoonIcon style={{ width: 20, height: 20 }} />}
-            {theme === "system" && <ComputerDesktopIcon style={{ width: 20, height: 20 }} />}
+            {theme === "light" && <Sun size={20} />}
+            {theme === "dark" && <Moon size={20} />}
+            {theme === "system" && <Monitor size={20} />}
           </IconButton>
 
           <DropdownMenu
             trigger={
-              <IconButton title="Password Generator">
-                <KeyIcon style={{ width: 20, height: 20 }} />
+              <IconButton title="Password Generator" sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}>
+                <Key size={20} />
               </IconButton>
             }
             width="400px"
@@ -121,7 +151,7 @@ export function Navbar() {
 
           {!user ? (
             <Button
-              variant="outlined"
+              variant="contained"
               size="small"
               onClick={() => {
                 try {
@@ -130,7 +160,14 @@ export function Navbar() {
                   alert(err instanceof Error ? err.message : "Failed to open authentication");
                 }
               }}
-              sx={{ borderColor: 'divider' }}
+              sx={{ 
+                bgcolor: '#00F5FF', 
+                color: '#000',
+                fontWeight: 800,
+                borderRadius: '12px',
+                px: 3,
+                '&:hover': { bgcolor: '#00D1DA' }
+              }}
             >
               Connect
             </Button>
@@ -140,10 +177,17 @@ export function Navbar() {
                 variant="text"
                 size="small"
                 onClick={handleOpenMenu}
-                startIcon={<UserIcon style={{ width: 16, height: 16 }} />}
-                sx={{ color: 'text.primary' }}
+                startIcon={<User size={18} />}
+                sx={{ 
+                  color: 'white',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  px: 2,
+                  borderRadius: '12px',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                }}
               >
-                <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'inline' }, fontWeight: 700 }}>
                   {user.name || user.email}
                 </Typography>
               </Button>
@@ -154,30 +198,34 @@ export function Navbar() {
                 PaperProps={{
                   sx: {
                     mt: 1.5,
-                    minWidth: 220,
-                    bgcolor: 'background.paper',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)'
+                    minWidth: 240,
+                    bgcolor: 'rgba(10, 10, 10, 0.95)',
+                    backdropFilter: 'blur(25px) saturate(180%)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '20px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+                    backgroundImage: 'none',
+                    color: 'white'
                   }
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <Box sx={{ px: 2, py: 1.5 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                <Box sx={{ px: 2.5, py: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'white' }}>
                     {user.name || user.email}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {user.email}
                   </Typography>
                 </Box>
-                <Divider />
-                <MenuItem component={Link} href="/settings" onClick={handleCloseMenu}>
-                  <Typography variant="body2">Account Settings</Typography>
+                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+                <MenuItem component={Link} href="/settings" onClick={handleCloseMenu} sx={{ py: 1.5, px: 2.5, gap: 1.5 }}>
+                  <Settings size={18} color="rgba(255, 255, 255, 0.6)" />
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>Account Settings</Typography>
                 </MenuItem>
                 <MenuItem
-                  sx={{ display: { xs: 'flex', sm: 'none' }, gap: 1 }}
+                  sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
                   onClick={() => {
                     import("@/app/(protected)/masterpass/logic").then(({ masterPassCrypto }) => {
                       masterPassCrypto.lockNow();
@@ -187,18 +235,19 @@ export function Navbar() {
                     handleCloseMenu();
                   }}
                 >
-                  <ShieldCheckIcon style={{ width: 16, height: 16 }} />
-                  <Typography variant="body2">Lock now</Typography>
+                  <Lock size={18} color="rgba(255, 255, 255, 0.6)" />
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>Lock Vault</Typography>
                 </MenuItem>
+                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
                 <MenuItem
                   onClick={async () => {
                     handleCloseMenu();
                     await logout();
                   }}
-                  sx={{ color: 'error.main', gap: 1 }}
+                  sx={{ py: 1.5, px: 2.5, gap: 1.5, color: '#FF4D4D' }}
                 >
-                  <ArrowRightOnRectangleIcon style={{ width: 16, height: 16 }} />
-                  <Typography variant="body2">Logout</Typography>
+                  <LogOut size={18} />
+                  <Typography variant="body2" sx={{ fontWeight: 700 }}>Logout</Typography>
                 </MenuItem>
               </Menu>
             </Box>

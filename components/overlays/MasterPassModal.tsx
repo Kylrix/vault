@@ -2,11 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { createPortal } from "react-dom";
-import { Eye, EyeOff, Lock, Shield } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  IconButton,
+  Typography,
+  Box,
+  Stack,
+  CircularProgress,
+  Paper,
+  alpha,
+  useTheme,
+  Tooltip
+} from "@mui/material";
+import { Eye, EyeOff, Lock, Shield, LogOut, Fingerprint, AlertCircle } from "lucide-react";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { useFinalizeAuth } from "@/lib/finalizeAuth";
@@ -26,6 +39,7 @@ interface MasterPassModalProps {
 }
 
 export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
+  const muiTheme = useTheme();
   const [masterPassword, setMasterPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,17 +50,11 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const [confirmCapsLock, setConfirmCapsLock] = useState(false);
   const [hasPasskey, setHasPasskey] = useState(false);
   const [passkeyLoading, setPasskeyLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   const { user } = useAppwrite();
   const { finalizeAuth } = useFinalizeAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Check masterpass and passkey status from database
   useEffect(() => {
     if (!user) return;
     setLoading(true);
@@ -80,7 +88,6 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
 
     try {
       if (isFirstTime) {
-        // First time setup - validate confirmation
         if (masterPassword !== confirmPassword) {
           toast.error("Passwords don't match");
           setLoading(false);
@@ -92,7 +99,6 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           return;
         }
 
-        // Unlock vault with first-time flag
         const success = await masterPassCrypto.unlock(
           masterPassword,
           user?.$id || "",
@@ -109,7 +115,6 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           toast.error("Failed to set master password");
         }
       } else {
-        // Existing user - attempt to unlock vault normally
         const success = await masterPassCrypto.unlock(
           masterPassword,
           user?.$id || "",
@@ -157,269 +162,212 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
     setPasskeyLoading(false);
   };
 
-  if (!isOpen || !mounted) return null;
+  return (
+    <Dialog 
+      open={isOpen} 
+      onClose={() => {}} // Prevent closing by clicking outside
+      PaperProps={{
+        sx: {
+          borderRadius: '32px',
+          bgcolor: 'rgba(10, 10, 10, 0.9)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundImage: 'none',
+          width: '100%',
+          maxWidth: '440px',
+          overflow: 'visible'
+        }
+      }}
+    >
+      <Box sx={{ position: 'absolute', top: -40, left: '50%', transform: 'translateX(-50%)' }}>
+        <Paper sx={{ 
+          width: 80, 
+          height: 80, 
+          borderRadius: '24px', 
+          bgcolor: 'primary.main', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          boxShadow: '0 8px 32px rgba(0, 240, 255, 0.3)',
+          color: 'black'
+        }}>
+          <Lock size={40} />
+        </Paper>
+      </Box>
 
-  // Loading state for DB check
-  if (isFirstTime === null || loading) {
-    const loadingContent = (
-      <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
-        <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4">
-            <div className="text-lg text-muted-foreground">Loading...</div>
-          </div>
-        </div>
-      </div>
-    );
-    return createPortal(loadingContent, document.body);
-  }
-
-  const modalContent = (
-    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <Card className="w-full max-w-md shadow-2xl relative bg-background">
-          <CardHeader className="text-center">
-            <div className="flex justify-center mb-4">
-              <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Lock className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-            {/* Account name/email for personalization */}
-            {user && (
-              <div className="mb-2">
-                <span className="font-semibold text-base">
-                  {user.name || user.email}
-                </span>
-                {user.email && user.name && (
-                  <div className="text-xs text-muted-foreground">
-                    {user.email}
-                  </div>
-                )}
-              </div>
+      <DialogTitle sx={{ textAlign: 'center', pt: 7, pb: 1 }}>
+        {user && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
+              {user.name || user.email}
+            </Typography>
+            {user.email && user.name && (
+              <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }}>
+                {user.email}
+              </Typography>
             )}
-            <CardTitle className="text-2xl">
-              {isFirstTime ? "Set Master Password" : "Unlock Vault"}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {isFirstTime
-                ? "Create a master password to encrypt your data"
-                : "Enter your master password to access encrypted data"}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">
-                  {isFirstTime ? "Create Master Password" : "Master Password"}
-                </label>
-                <div className="relative">
-                  <Input
-                    type={showPassword ? "text" : "password"}
-                    placeholder={
-                      isFirstTime
-                        ? "Create a strong master password"
-                        : "Enter your master password"
+          </Box>
+        )}
+        <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', letterSpacing: '-0.02em' }}>
+          {isFirstTime ? "Set Master Password" : "Unlock Vault"}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1, fontWeight: 500 }}>
+          {isFirstTime
+            ? "Create a master password to encrypt your data"
+            : "Enter your master password to access encrypted data"}
+        </Typography>
+      </DialogTitle>
+
+      <DialogContent sx={{ mt: 2 }}>
+        {isFirstTime === null || (loading && !masterPassword) ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Stack spacing={3} component="form" onSubmit={handleSubmit}>
+            <Box>
+              <Typography variant="caption" sx={{ fontWeight: 700, mb: 1, display: 'block', ml: 1 }}>
+                {isFirstTime ? "CREATE MASTER PASSWORD" : "MASTER PASSWORD"}
+              </Typography>
+              <TextField
+                fullWidth
+                type={showPassword ? "text" : "password"}
+                placeholder={isFirstTime ? "Create a strong master password" : "Enter your master password"}
+                value={masterPassword}
+                onChange={(e) => setMasterPassword(e.target.value)}
+                required
+                autoFocus
+                variant="filled"
+                onKeyDown={(e) => {
+                  if ("getModifierState" in e && (e as React.KeyboardEvent).getModifierState("CapsLock")) {
+                    setCapsLock(true);
+                  } else {
+                    setCapsLock(false);
+                  }
+                }}
+                InputProps={{
+                  disableUnderline: true,
+                  sx: { borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.05)' },
+                  endAdornment: (
+                    <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: 'text.secondary' }}>
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </IconButton>
+                  )
+                }}
+              />
+              {capsLock && (
+                <Typography variant="caption" sx={{ color: 'warning.main', mt: 1, display: 'flex', alignItems: 'center', gap: 0.5, ml: 1 }}>
+                  <AlertCircle size={12} /> Caps Lock is ON
+                </Typography>
+              )}
+            </Box>
+
+            {isFirstTime && (
+              <Box>
+                <Typography variant="caption" sx={{ fontWeight: 700, mb: 1, display: 'block', ml: 1 }}>
+                  CONFIRM MASTER PASSWORD
+                </Typography>
+                <TextField
+                  fullWidth
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm your master password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  variant="filled"
+                  onKeyDown={(e) => {
+                    if ("getModifierState" in e && (e as React.KeyboardEvent).getModifierState("CapsLock")) {
+                      setConfirmCapsLock(true);
+                    } else {
+                      setConfirmCapsLock(false);
                     }
-                    value={masterPassword}
-                    onChange={(e) => setMasterPassword(e.target.value)}
-                    required
-                    autoFocus
-                    onKeyDown={(e) => {
-                      if (
-                        "getModifierState" in e &&
-                        (
-                          e as React.KeyboardEvent<HTMLInputElement>
-                        ).getModifierState("CapsLock")
-                      ) {
-                        setCapsLock(true);
-                      } else {
-                        setCapsLock(false);
-                      }
-                    }}
-                    onKeyUp={(e) => {
-                      if (
-                        "getModifierState" in e &&
-                        (
-                          e as React.KeyboardEvent<HTMLInputElement>
-                        ).getModifierState("CapsLock")
-                      ) {
-                        setCapsLock(true);
-                      } else {
-                        setCapsLock(false);
-                      }
-                    }}
-                    onBlur={() => setCapsLock(false)}
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() => setShowPassword((v) => !v)}
-                    tabIndex={-1}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {capsLock && (
-                  <div className="text-xs text-yellow-700 mt-1">
-                    <span className="font-semibold">Caps Lock is ON</span>
-                  </div>
+                  }}
+                  InputProps={{
+                    disableUnderline: true,
+                    sx: { borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.05)' },
+                    endAdornment: (
+                      <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'text.secondary' }}>
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </IconButton>
+                    )
+                  }}
+                />
+                {confirmCapsLock && (
+                  <Typography variant="caption" sx={{ color: 'warning.main', mt: 1, display: 'flex', alignItems: 'center', gap: 0.5, ml: 1 }}>
+                    <AlertCircle size={12} /> Caps Lock is ON
+                  </Typography>
                 )}
-              </div>
+                {confirmPassword.length > 0 && (
+                  <Typography variant="caption" sx={{ color: confirmPassword === masterPassword ? 'success.main' : 'error.main', mt: 1, display: 'block', ml: 1 }}>
+                    {confirmPassword === masterPassword ? "✓ Passwords match" : "✗ Passwords do not match"}
+                  </Typography>
+                )}
+              </Box>
+            )}
 
-              {isFirstTime && (
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Confirm Master Password
-                  </label>
-                  <div className="relative">
-                    <Input
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your master password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      onKeyDown={(e) => {
-                        if (
-                          "getModifierState" in e &&
-                          (
-                            e as React.KeyboardEvent<HTMLInputElement>
-                          ).getModifierState("CapsLock")
-                        ) {
-                          setConfirmCapsLock(true);
-                        } else {
-                          setConfirmCapsLock(false);
-                        }
-                      }}
-                      onKeyUp={(e) => {
-                        if (
-                          "getModifierState" in e &&
-                          (
-                            e as React.KeyboardEvent<HTMLInputElement>
-                          ).getModifierState("CapsLock")
-                        ) {
-                          setConfirmCapsLock(true);
-                        } else {
-                          setConfirmCapsLock(false);
-                        }
-                      }}
-                      onBlur={() => setConfirmCapsLock(false)}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3"
-                      onClick={() => setShowConfirmPassword((v) => !v)}
-                      tabIndex={-1}
-                    >
-                      {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  {confirmCapsLock && (
-                    <div className="text-xs text-yellow-700 mt-1">
-                      <span className="font-semibold">Caps Lock is ON</span>
-                    </div>
-                  )}
-                  {confirmPassword.length > 0 && (
-                    <div className="text-xs mt-1">
-                      {confirmPassword === masterPassword ? (
-                        <span className="text-green-700">Passwords match</span>
-                      ) : (
-                        <span className="text-red-700">
-                          Passwords do not match
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+            {isFirstTime && (
+              <Paper sx={{ 
+                p: 2, 
+                borderRadius: '16px', 
+                bgcolor: alpha(muiTheme.palette.info.main, 0.05), 
+                border: `1px solid ${alpha(muiTheme.palette.info.main, 0.2)}`,
+                display: 'flex',
+                gap: 1.5
+              }}>
+                <Shield size={20} color={muiTheme.palette.info.main} style={{ flexShrink: 0 }} />
+                <Typography variant="caption" sx={{ color: 'info.main', fontWeight: 500 }}>
+                  <strong>Important:</strong> Your master password encrypts all your data locally. We cannot recover it if you forget it.
+                </Typography>
+              </Paper>
+            )}
 
-              {isFirstTime && (
-                <div className="bg-blue-50 dark:bg-blue-950 p-3 rounded-lg text-xs text-blue-800 dark:text-blue-200">
-                  <div className="flex items-start gap-2">
-                    <Shield className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <strong>Important:</strong> Your master password encrypts
-                      all your data locally. We cannot recover it if you forget
-                      it. Please store it in a safe place.
-                    </div>
-                  </div>
-                </div>
-              )}
+            <Button 
+              type="submit" 
+              variant="contained" 
+              fullWidth 
+              disabled={loading}
+              sx={{ borderRadius: '16px', py: 1.5, fontWeight: 800, fontSize: '1rem' }}
+            >
+              {loading ? <CircularProgress size={24} /> : (isFirstTime ? "Set Master Password" : "Unlock Vault")}
+            </Button>
+          </Stack>
+        )}
+      </DialogContent>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading
-                  ? "Processing..."
-                  : isFirstTime
-                    ? "Set Master Password"
-                    : "Unlock Vault"}
-              </Button>
-            </form>
+      <DialogActions sx={{ flexDirection: 'column', p: 4, pt: 0, gap: 2 }}>
+        {!isFirstTime && hasPasskey && (
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={handlePasskeyUnlock}
+            disabled={passkeyLoading || loading}
+            startIcon={passkeyLoading ? <CircularProgress size={18} /> : <Fingerprint size={18} />}
+            sx={{ 
+              borderRadius: '16px', 
+              py: 1.5, 
+              fontWeight: 700,
+              bgcolor: 'rgba(255, 255, 255, 0.02)',
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+              '&:hover': {
+                bgcolor: 'rgba(255, 255, 255, 0.05)',
+                borderColor: 'primary.main'
+              }
+            }}
+          >
+            {passkeyLoading ? "Unlocking..." : "Unlock with Passkey"}
+          </Button>
+        )}
 
-            <div className="mt-6 text-center flex flex-col gap-2">
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Logout from Account
-              </Button>
-
-              {/* Passkey/biometric unlock button */}
-              {!isFirstTime && hasPasskey && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePasskeyUnlock}
-                  disabled={passkeyLoading || loading}
-                  className="transform transition-transform duration-150 ease-out hover:-translate-y-0.5 hover:scale-[1.02] active:translate-y-0.5 active:scale-95 shadow-[0_8px_16px_rgba(2,6,23,0.08)] dark:shadow-none bg-gradient-to-b from-white/60 to-white/30 dark:from-white/5 dark:to-white/3 border border-muted/30 rounded-lg py-2 px-3 flex items-center justify-center gap-2"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-4 w-4"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      d="M12 1v4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <rect
-                      x="4"
-                      y="5"
-                      width="16"
-                      height="14"
-                      rx="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M8 11a4 4 0 0 1 8 0v2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <span className="font-medium">
-                    {passkeyLoading ? "Unlocking..." : "Unlock with Passkey"}
-                  </span>
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        </div>
-      </div>
-    </div>
+        <Button 
+          variant="text" 
+          size="small" 
+          onClick={handleLogout}
+          startIcon={<LogOut size={14} />}
+          sx={{ color: 'text.secondary', fontWeight: 600 }}
+        >
+          Logout from Account
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
-
-  return createPortal(modalContent, document.body);
 }

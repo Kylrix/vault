@@ -1,11 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Eye, EyeOff, RefreshCw, Plus, X } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Grid, 
+  Paper, 
+  TextField, 
+  IconButton, 
+  Stack, 
+  MenuItem, 
+  Select, 
+  FormControl, 
+  InputLabel, 
+  InputAdornment, 
+  CircularProgress,
+  alpha,
+  ToggleButton,
+  ToggleButtonGroup
+} from "@mui/material";
+import { ArrowLeft, Eye, EyeOff, RefreshCw, Plus, X, Shield, Folder, Key } from "lucide-react";
 import { useAppwrite } from "@/app/appwrite-provider";
 import {
   createCredential,
@@ -18,7 +34,6 @@ import { generateRandomPassword } from "@/utils/password";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import toast from "react-hot-toast";
 import VaultGuard from "@/components/layout/VaultGuard";
-import { useEffect } from "react";
 
 export default function NewCredentialPage() {
   const router = useRouter();
@@ -84,13 +99,11 @@ export default function NewCredentialPage() {
         throw new Error("Not authenticated");
       }
 
-      // Check if vault is unlocked before proceeding
       if (!masterPassCrypto.isVaultUnlocked()) {
         throw new Error("Vault is locked. Please unlock your vault first.");
       }
 
       if (formData.type === "credential") {
-        // Clean and prepare credential data with proper null handling
         const credentialData: Pick<
           Credentials,
           | "userId"
@@ -159,12 +172,10 @@ export default function NewCredentialPage() {
           sortOrder: 0,
           isDeleted: false,
           deletedAt: null,
-          // createdAt/updatedAt are server-managed; omit to avoid type clashes
         } as unknown as Omit<Folders, "$id" | "$createdAt" | "$updatedAt">);
         toast.success("Folder created!");
         router.push("/dashboard");
       } else if (formData.type === "totp") {
-        // Check vault for TOTP as well
         if (!masterPassCrypto.isVaultUnlocked()) {
           throw new Error("Vault is locked. Please unlock your vault first.");
         }
@@ -198,263 +209,334 @@ export default function NewCredentialPage() {
     setLoading(false);
   };
 
-  // Don't render if user is not available
   if (!user) {
     return (
       <VaultGuard>
-        <div className="space-y-6">
-          {" "}
-          <div className="text-lg text-muted-foreground">Loading...</div>
-        </div>
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+          <CircularProgress sx={{ color: '#00F5FF' }} />
+        </Box>
       </VaultGuard>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" onClick={() => router.back()}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+    <Box sx={{ maxWidth: '800px', mx: 'auto', p: { xs: 2, md: 4 } }}>
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
+        <IconButton 
+          onClick={() => router.back()}
+          sx={{ 
+            bgcolor: 'rgba(255, 255, 255, 0.05)',
+            '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.1)' }
+          }}
+        >
+          <ArrowLeft size={20} />
+        </IconButton>
+        <Box>
+          <Typography variant="h4" sx={{ 
+            fontWeight: 900, 
+            fontFamily: 'var(--font-space-grotesk)',
+            letterSpacing: '-0.02em'
+          }}>
             {formData.type === "credential" ? "Add Credential" : "Add Folder"}
-          </h1>
-          <p className="text-muted-foreground">
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
             {formData.type === "credential"
-              ? "Store a new password securely"
-              : "Organize your credentials"}
-          </p>
-        </div>
-      </div>
+              ? "Store a new password securely in your vault"
+              : "Organize your credentials with folders"}
+          </Typography>
+        </Box>
+      </Stack>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {formData.type === "credential"
-              ? "Credential Details"
-              : "Folder Details"}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+      <Paper sx={{ 
+        p: 4, 
+        borderRadius: '28px', 
+        bgcolor: 'rgba(10, 10, 10, 0.9)',
+        backdropFilter: 'blur(25px) saturate(180%)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        backgroundImage: 'none'
+      }}>
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={4}>
             {/* Type Switcher */}
-            <div className="flex gap-2 mb-2">
-              <Button
-                type="button"
-                variant={formData.type === "credential" ? "default" : "outline"}
-                onClick={() =>
-                  setFormData((f) => ({ ...f, type: "credential" }))
-                }
+            <Box>
+              <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 1.5, display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Item Type
+              </Typography>
+              <ToggleButtonGroup
+                value={formData.type}
+                exclusive
+                onChange={(_, val) => val && setFormData(f => ({ ...f, type: val }))}
+                sx={{ 
+                  width: '100%',
+                  '& .MuiToggleButton-root': {
+                    flex: 1,
+                    borderRadius: '14px',
+                    py: 1.5,
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    fontWeight: 700,
+                    '&.Mui-selected': {
+                      bgcolor: 'rgba(0, 245, 255, 0.1)',
+                      color: '#00F5FF',
+                      borderColor: '#00F5FF',
+                      '&:hover': { bgcolor: 'rgba(0, 245, 255, 0.15)' }
+                    }
+                  }
+                }}
               >
-                Password
-              </Button>
-              <Button
-                type="button"
-                variant={formData.type === "folder" ? "default" : "outline"}
-                onClick={() => setFormData((f) => ({ ...f, type: "folder" }))}
-              >
-                Folder
-              </Button>
-              {/* Add TOTP option here if needed */}
-            </div>
+                <ToggleButton value="credential">
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Key size={18} />
+                    <span>Password</span>
+                  </Stack>
+                </ToggleButton>
+                <ToggleButton value="folder">
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Folder size={18} />
+                    <span>Folder</span>
+                  </Stack>
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Box>
 
             {formData.type === "credential" ? (
               <>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Name *</label>
-                    <Input
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Name"
                       placeholder="e.g., GitHub, Gmail"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
+                      variant="outlined"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '16px',
+                          bgcolor: 'rgba(255, 255, 255, 0.03)',
+                        }
+                      }}
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Website URL</label>
-                    <Input
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Website URL"
                       type="url"
                       placeholder="https://example.com"
                       value={formData.url}
-                      onChange={(e) =>
-                        setFormData({ ...formData, url: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Username/Email *
-                  </label>
-                  <Input
-                    placeholder="john@example.com"
-                    value={formData.username}
-                    onChange={(e) =>
-                      setFormData({ ...formData, username: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Password *</label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter or generate password"
-                        value={formData.password}
-                        onChange={(e) =>
-                          setFormData({ ...formData, password: e.target.value })
+                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                      variant="outlined"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '16px',
+                          bgcolor: 'rgba(255, 255, 255, 0.03)',
                         }
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleGeneratePassword}
-                    >
-                      <RefreshCw className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Folder</label>
-                    <select
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                      value={formData.folder}
-                      onChange={(e) =>
-                        setFormData({ ...formData, folder: e.target.value })
-                      }
-                    >
-                      <option value="">No Folder</option>
-                      {folders.map((folder) => (
-                        <option key={folder.$id} value={folder.$id}>
-                          {folder.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Tags</label>
-                    <Input
-                      placeholder="Comma separated: work, email, important"
-                      value={formData.tags}
-                      onChange={(e) =>
-                        setFormData({ ...formData, tags: e.target.value })
-                      }
+                      }}
                     />
-                  </div>
-                </div>
+                  </Grid>
+                </Grid>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Notes</label>
-                  <textarea
-                    className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    placeholder="Additional notes or information"
-                    value={formData.notes}
-                    onChange={(e) =>
-                      setFormData({ ...formData, notes: e.target.value })
+                <TextField
+                  fullWidth
+                  label="Username/Email"
+                  placeholder="john@example.com"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '16px',
+                      bgcolor: 'rgba(255, 255, 255, 0.03)',
                     }
+                  }}
+                />
+
+                <Box>
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter or generate password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    required
+                    variant="outlined"
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                          </IconButton>
+                          <IconButton onClick={handleGeneratePassword} edge="end" sx={{ ml: 1 }}>
+                            <RefreshCw size={20} />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: '16px',
+                        bgcolor: 'rgba(255, 255, 255, 0.03)',
+                      }
+                    }}
                   />
-                </div>
+                </Box>
+
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>Folder</InputLabel>
+                      <Select
+                        value={formData.folder}
+                        onChange={(e) => setFormData({ ...formData, folder: e.target.value as string })}
+                        label="Folder"
+                        sx={{
+                          borderRadius: '16px',
+                          bgcolor: 'rgba(255, 255, 255, 0.03)',
+                        }}
+                      >
+                        <MenuItem value="">No Folder</MenuItem>
+                        {folders.map((folder) => (
+                          <MenuItem key={folder.$id} value={folder.$id}>
+                            {folder.name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      label="Tags"
+                      placeholder="work, email, important"
+                      value={formData.tags}
+                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      variant="outlined"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          borderRadius: '16px',
+                          bgcolor: 'rgba(255, 255, 255, 0.03)',
+                        }
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+
+                <TextField
+                  fullWidth
+                  label="Notes"
+                  multiline
+                  rows={3}
+                  placeholder="Additional notes or information"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '16px',
+                      bgcolor: 'rgba(255, 255, 255, 0.03)',
+                    }
+                  }}
+                />
 
                 {/* Custom Fields */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium">Custom Fields</label>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
+                <Box>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Custom Fields</Typography>
+                    <Button 
+                      size="small" 
+                      startIcon={<Plus size={16} />} 
                       onClick={addCustomField}
+                      sx={{ color: '#00F5FF', fontWeight: 700 }}
                     >
-                      <Plus className="h-4 w-4 mr-2" />
                       Add Field
                     </Button>
-                  </div>
-                  {customFields.map((field) => (
-                    <div key={field.id} className="flex gap-2">
-                      <Input
-                        placeholder="Field name"
-                        value={field.label}
-                        onChange={(e) =>
-                          updateCustomField(field.id, "label", e.target.value)
-                        }
-                      />
-                      <Input
-                        placeholder="Field value"
-                        value={field.value}
-                        onChange={(e) =>
-                          updateCustomField(field.id, "value", e.target.value)
-                        }
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeCustomField(field.id)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                  </Stack>
+                  <Stack spacing={2}>
+                    {customFields.map((field) => (
+                      <Stack key={field.id} direction="row" spacing={2}>
+                        <TextField
+                          fullWidth
+                          placeholder="Field name"
+                          value={field.label}
+                          onChange={(e) => updateCustomField(field.id, "label", e.target.value)}
+                          variant="outlined"
+                          size="small"
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+                        />
+                        <TextField
+                          fullWidth
+                          placeholder="Field value"
+                          value={field.value}
+                          onChange={(e) => updateCustomField(field.id, "value", e.target.value)}
+                          variant="outlined"
+                          size="small"
+                          sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
+                        />
+                        <IconButton onClick={() => removeCustomField(field.id)} sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
+                          <X size={20} />
+                        </IconButton>
+                      </Stack>
+                    ))}
+                  </Stack>
+                </Box>
               </>
             ) : (
-              // Folder creation
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Folder Name *</label>
-                <Input
-                  placeholder="e.g., Work, Personal"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+              <TextField
+                fullWidth
+                label="Folder Name"
+                placeholder="e.g., Work, Personal"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '16px',
+                    bgcolor: 'rgba(255, 255, 255, 0.03)',
                   }
-                  required
-                />
-              </div>
+                }}
+              />
             )}
 
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
+            <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ pt: 2 }}>
+              <Button 
+                variant="text" 
                 onClick={() => router.back()}
+                sx={{ 
+                  borderRadius: '14px', 
+                  px: 4, 
+                  py: 1.5, 
+                  fontWeight: 700,
+                  color: 'rgba(255, 255, 255, 0.5)'
+                }}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading
-                  ? "Saving..."
-                  : formData.type === "credential"
-                    ? "Save Credential"
-                    : "Save Folder"}
+              <Button 
+                type="submit" 
+                variant="contained" 
+                disabled={loading}
+                sx={{ 
+                  borderRadius: '14px', 
+                  px: 6, 
+                  py: 1.5, 
+                  fontWeight: 800,
+                  bgcolor: '#00F5FF',
+                  color: '#000',
+                  '&:hover': { bgcolor: '#00D1DA' },
+                  '&.Mui-disabled': { bgcolor: 'rgba(0, 245, 255, 0.3)' }
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : (formData.type === "credential" ? "Save Credential" : "Save Folder")}
               </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+            </Stack>
+          </Stack>
+        </form>
+      </Paper>
+    </Box>
   );
 }

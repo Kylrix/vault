@@ -12,11 +12,12 @@ import {
   FormControlLabel, 
   Checkbox,
   Grid,
-  CircularProgress
+  CircularProgress,
+  alpha
 } from "@mui/material";
 import { createTotpSecret, updateTotpSecret } from "@/lib/appwrite";
 import { useAppwrite } from "@/app/appwrite-provider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function NewTotpDialog({
@@ -118,22 +119,29 @@ export default function NewTotpDialog({
       onClose={onClose}
       PaperProps={{
         sx: {
-          borderRadius: '24px',
-          bgcolor: 'rgba(10, 10, 10, 0.9)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid',
-          borderColor: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: '28px',
+          bgcolor: 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           backgroundImage: 'none',
           maxWidth: '450px',
-          width: '100%'
+          width: '100%',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
         }
       }}
     >
       <form onSubmit={handleSubmit}>
-        <DialogTitle sx={{ fontWeight: 800, fontFamily: 'var(--font-space-grotesk)', pt: 3 }}>
+        <DialogTitle sx={{ 
+          fontWeight: 900, 
+          fontFamily: 'var(--font-space-grotesk)', 
+          pt: 4, 
+          px: 4,
+          fontSize: '1.5rem',
+          letterSpacing: '-0.02em'
+        }}>
           {initialData ? "Edit" : "Add"} TOTP Code
         </DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2, px: 4 }}>
           <TextField
             fullWidth
             label="Issuer"
@@ -144,9 +152,12 @@ export default function NewTotpDialog({
             variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                bgcolor: 'rgba(255, 255, 255, 0.02)',
-              }
+                borderRadius: '16px',
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.5)' }
             }}
           />
           <TextField
@@ -159,9 +170,12 @@ export default function NewTotpDialog({
             variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                bgcolor: 'rgba(255, 255, 255, 0.02)',
-              }
+                borderRadius: '16px',
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.5)' }
             }}
           />
           <TextField
@@ -174,9 +188,12 @@ export default function NewTotpDialog({
             variant="outlined"
             sx={{
               '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                bgcolor: 'rgba(255, 255, 255, 0.02)',
-              }
+                borderRadius: '16px',
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+              },
+              '& .MuiInputLabel-root': { color: 'rgba(255, 255, 255, 0.5)' }
             }}
           />
           
@@ -185,10 +202,13 @@ export default function NewTotpDialog({
               <Checkbox 
                 checked={showAdvanced} 
                 onChange={(e) => setShowAdvanced(e.target.checked)}
-                sx={{ color: 'rgba(255, 255, 255, 0.3)', '&.Mui-checked': { color: 'primary.main' } }}
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.2)', 
+                  '&.Mui-checked': { color: '#00F5FF' } 
+                }}
               />
             }
-            label={<Typography variant="body2" sx={{ fontWeight: 600 }}>Advanced Settings</Typography>}
+            label={<Typography variant="body2" sx={{ fontWeight: 600, color: 'rgba(255, 255, 255, 0.7)' }}>Advanced Settings</Typography>}
           />
 
           {showAdvanced && (
@@ -205,6 +225,7 @@ export default function NewTotpDialog({
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '12px',
                       bgcolor: 'rgba(255, 255, 255, 0.01)',
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
                     }
                   }}
                 />
@@ -221,6 +242,7 @@ export default function NewTotpDialog({
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '12px',
                       bgcolor: 'rgba(255, 255, 255, 0.01)',
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
                     }
                   }}
                 />
@@ -228,12 +250,17 @@ export default function NewTotpDialog({
             </Grid>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 3, gap: 1 }}>
+        <DialogActions sx={{ p: 4, gap: 2 }}>
           <Button 
             fullWidth 
-            variant="outlined" 
+            variant="text" 
             onClick={onClose}
-            sx={{ borderRadius: '12px', py: 1.2 }}
+            sx={{ 
+              borderRadius: '16px', 
+              py: 1.5, 
+              color: 'rgba(255, 255, 255, 0.5)',
+              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+            }}
           >
             Cancel
           </Button>
@@ -242,7 +269,15 @@ export default function NewTotpDialog({
             type="submit" 
             variant="contained" 
             disabled={loading}
-            sx={{ borderRadius: '12px', py: 1.2, fontWeight: 700 }}
+            sx={{ 
+              borderRadius: '16px', 
+              py: 1.5, 
+              fontWeight: 800,
+              bgcolor: '#00F5FF',
+              color: '#000',
+              '&:hover': { bgcolor: '#00D1DA' },
+              '&.Mui-disabled': { bgcolor: 'rgba(0, 245, 255, 0.3)' }
+            }}
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : (initialData ? "Save Changes" : "Add TOTP")}
           </Button>

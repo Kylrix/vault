@@ -1,7 +1,30 @@
 "use client";
 
-import { Box, Typography, Button, Grid, Paper, IconButton, TextField, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, alpha, Chip } from "@mui/material";
+import { useState, useEffect } from "react";
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Grid, 
+  Paper, 
+  IconButton, 
+  TextField, 
+  CircularProgress, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  alpha, 
+  Chip 
+} from "@mui/material";
 import { Shield, Plus, Copy, Edit, Trash2 } from "lucide-react";
+import { useAppwrite } from "@/app/appwrite-provider";
+import { listTotpSecrets, deleteTotpSecret, listFolders } from "@/lib/appwrite";
+import { authenticator } from "otplib";
+import toast from "react-hot-toast";
+import VaultGuard from "@/components/layout/VaultGuard";
+import NewTotpDialog from "@/components/app/totp/new";
+import { useSudo } from "@/app/context/SudoContext";
 
 export default function TOTPPage() {
   const [search, setSearch] = useState("");

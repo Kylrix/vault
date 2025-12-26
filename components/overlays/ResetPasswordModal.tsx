@@ -2,11 +2,21 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { createPortal } from "react-dom";
-import { X } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  Button, 
+  TextField, 
+  Box, 
+  Typography, 
+  IconButton, 
+  CircularProgress,
+  alpha,
+  Stack
+} from "@mui/material";
+import { X, Mail, Lock, KeyRound } from "lucide-react";
 import { createPasswordRecovery, updatePasswordRecovery } from "@/lib/appwrite";
 import toast from "react-hot-toast";
 
@@ -17,20 +27,14 @@ interface ResetPasswordModalProps {
 
 export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps) {
   const params = useSearchParams();
-  const [mounted, setMounted] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordAgain, setPasswordAgain] = useState("");
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   const userId = params.get("userId") || "";
   const secret = params.get("secret") || "";
 
-  // If userId/secret are present, show reset form. Otherwise, show request form.
   const showResetForm = !!userId && !!secret;
 
   const handleRequest = async (e: React.FormEvent) => {
@@ -68,89 +72,141 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
     setLoading(false);
   };
 
-  if (!isOpen || !mounted) return null;
+  return (
+    <Dialog 
+      open={isOpen} 
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          borderRadius: '28px',
+          bgcolor: 'rgba(10, 10, 10, 0.95)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backgroundImage: 'none',
+          maxWidth: '450px',
+          width: '100%',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        }
+      }}
+    >
+      <IconButton
+        onClick={onClose}
+        sx={{
+          position: 'absolute',
+          right: 16,
+          top: 16,
+          color: 'rgba(255, 255, 255, 0.3)',
+          '&:hover': { color: '#fff', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+        }}
+      >
+        <X size={20} />
+      </IconButton>
 
-  const modalContent = (
-    <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <Card className="w-full max-w-md shadow-2xl relative bg-background">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full hover:bg-accent"
-          >
-            <X className="h-4 w-4" />
-          </button>
-          
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Reset Password</CardTitle>
-          </CardHeader>
-          <CardContent>
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Box sx={{ 
+          width: 64, 
+          height: 64, 
+          borderRadius: '20px', 
+          bgcolor: alpha('#00F5FF', 0.1), 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          mx: 'auto',
+          mb: 3
+        }}>
+          {showResetForm ? <KeyRound size={32} color="#00F5FF" /> : <Mail size={32} color="#00F5FF" />}
+        </Box>
+        <Typography variant="h5" sx={{ 
+          fontWeight: 900, 
+          fontFamily: 'var(--font-space-grotesk)',
+          letterSpacing: '-0.02em',
+          mb: 1
+        }}>
+          {showResetForm ? "Set New Password" : "Reset Password"}
+        </Typography>
+        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500, mb: 4 }}>
+          {showResetForm 
+            ? "Enter your new secure password below." 
+            : "Enter your email to receive a password recovery link."}
+        </Typography>
+
+        <form onSubmit={showResetForm ? handleReset : handleRequest}>
+          <Stack spacing={2.5}>
             {showResetForm ? (
-              <form onSubmit={handleReset} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">New Password</label>
-                  <Input
-                    type="password"
-                    placeholder="New password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Confirm Password</label>
-                  <Input
-                    type="password"
-                    placeholder="Repeat new password"
-                    value={passwordAgain}
-                    onChange={(e) => setPasswordAgain(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button className="w-full" type="submit" disabled={loading}>
-                  {loading ? "Resetting..." : "Reset Password"}
-                </Button>
-                <Button
-                  variant="ghost"
-                  type="button"
-                  className="w-full"
-                  onClick={onClose}
-                >
-                  Cancel
-                </Button>
-              </form>
+              <>
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="New Password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '16px',
+                      bgcolor: 'rgba(255, 255, 255, 0.03)',
+                    }
+                  }}
+                />
+                <TextField
+                  fullWidth
+                  type="password"
+                  label="Confirm Password"
+                  placeholder="••••••••"
+                  value={passwordAgain}
+                  onChange={(e) => setPasswordAgain(e.target.value)}
+                  required
+                  variant="outlined"
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      borderRadius: '16px',
+                      bgcolor: 'rgba(255, 255, 255, 0.03)',
+                    }
+                  }}
+                />
+              </>
             ) : (
-              <form onSubmit={handleRequest} className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email address</label>
-                  <Input
-                    type="email"
-                    placeholder="Your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button className="w-full" type="submit" disabled={loading}>
-                  {loading ? "Sending..." : "Send Reset Email"}
-                </Button>
-                <Button
-                  variant="ghost"
-                  type="button"
-                  className="w-full"
-                  onClick={onClose}
-                >
-                  Cancel
-                </Button>
-              </form>
+              <TextField
+                fullWidth
+                type="email"
+                label="Email Address"
+                placeholder="name@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                variant="outlined"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: '16px',
+                    bgcolor: 'rgba(255, 255, 255, 0.03)',
+                  }
+                }}
+              />
             )}
-          </CardContent>
-        </Card>
-        </div>
-      </div>
-    </div>
-  );
 
-  return createPortal(modalContent, document.body);
+            <Button 
+              fullWidth 
+              type="submit" 
+              variant="contained" 
+              disabled={loading}
+              sx={{ 
+                borderRadius: '16px', 
+                py: 1.8, 
+                fontWeight: 800,
+                bgcolor: '#00F5FF',
+                color: '#000',
+                mt: 1,
+                '&:hover': { bgcolor: '#00D1DA' },
+                '&.Mui-disabled': { bgcolor: 'rgba(0, 245, 255, 0.3)' }
+              }}
+            >
+              {loading ? <CircularProgress size={24} color="inherit" /> : (showResetForm ? "Update Password" : "Send Reset Link")}
+            </Button>
+          </Stack>
+        </form>
+      </Box>
+    </Dialog>
+  );
 }

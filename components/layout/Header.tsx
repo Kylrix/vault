@@ -1,12 +1,24 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Menu, Moon, Sun, Monitor, User, Sparkles } from "lucide-react";
+import { Menu as MenuIcon, Moon, Sun, Monitor, User, Sparkles, LogOut, Settings } from "lucide-react";
 import { useTheme } from "@/app/providers";
 import { useAppwrite } from "@/app/appwrite-provider";
-import { Button } from "@/components/ui/Button";
-import { DropdownMenu } from "@/components/ui/DropdownMenu";
+import { 
+  AppBar, 
+  Toolbar, 
+  IconButton, 
+  Typography, 
+  Box, 
+  Button, 
+  alpha,
+  Tooltip,
+  Menu,
+  MenuItem,
+  Divider
+} from "@mui/material";
 import { useAI } from "@/app/context/AIContext";
+import { useState } from "react";
 
 // Pages that should use the simplified layout (no sidebar/header)
 const SIMPLIFIED_LAYOUT_PATHS = ["/"];
@@ -21,53 +33,92 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { user, logout } = useAppwrite();
   const { openAIModal } = useAI();
   const pathname = usePathname();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   // Don't render the header on simplified layout pages
   if (SIMPLIFIED_LAYOUT_PATHS.includes(pathname)) {
     return null;
   }
 
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="flex items-center justify-between h-16 px-4 lg:px-6">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
+    <AppBar
+      position="fixed"
+      sx={{
+        zIndex: (theme) => theme.zIndex.drawer + 1,
+        bgcolor: 'rgba(10, 10, 10, 0.8)',
+        backdropFilter: 'blur(25px) saturate(180%)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        boxShadow: 'none',
+        backgroundImage: 'none'
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 64 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <IconButton
             onClick={onMenuClick}
-            className="lg:hidden"
+            sx={{ 
+              display: { lg: 'none' },
+              color: 'rgba(255, 255, 255, 0.6)',
+              '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+            }}
           >
-            <Menu className="h-5 w-5" />
-          </Button>
+            <MenuIcon size={20} />
+          </IconButton>
 
-          <div className="flex items-center gap-2">
-            {/* Replace PM with logo */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/logo.png"
-              alt="Whisperrkeep Logo"
-              className="h-8 w-8 rounded-lg object-contain"
-            />
-            <h1 className="font-semibold text-lg hidden sm:block">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box
+              sx={{ 
+                width: 32, 
+                height: 32, 
+                bgcolor: '#00F5FF', 
+                borderRadius: '8px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                color: '#000',
+                fontWeight: 900,
+                fontSize: '1.1rem'
+              }}
+            >
+              W
+            </Box>
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: 900,
+                display: { xs: 'none', sm: 'inline' },
+                fontFamily: 'var(--font-space-grotesk)',
+                letterSpacing: '-0.02em',
+                color: 'white'
+              }}
+            >
               Whisperrkeep
-            </h1>
-          </div>
-        </div>
+            </Typography>
+          </Box>
+        </Box>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={openAIModal}
-            className="text-primary hover:text-primary hover:bg-primary/10"
-            title="AI Assistant"
-          >
-            <Sparkles className="h-4 w-4" />
-          </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Tooltip title="AI Assistant">
+            <IconButton
+              onClick={openAIModal}
+              sx={{ 
+                color: '#00F5FF', 
+                '&:hover': { bgcolor: alpha('#00F5FF', 0.1) } 
+              }}
+            >
+              <Sparkles size={20} />
+            </IconButton>
+          </Tooltip>
 
-          <Button
-            variant="ghost"
-            size="sm"
+          <IconButton
             onClick={() => {
               const nextTheme =
                 theme === "light"
@@ -77,40 +128,76 @@ export function Header({ onMenuClick }: HeaderProps) {
                     : "light";
               setTheme(nextTheme);
             }}
+            sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}
           >
-            {theme === "light" && <Sun className="h-4 w-4" />}
-            {theme === "dark" && <Moon className="h-4 w-4" />}
-            {theme === "system" && <Monitor className="h-4 w-4" />}
-          </Button>
+            {theme === "light" && <Sun size={20} />}
+            {theme === "dark" && <Moon size={20} />}
+            {theme === "system" && <Monitor size={20} />}
+          </IconButton>
 
-          <DropdownMenu
-            trigger={
-              <Button variant="ghost" size="sm">
-                <User className="h-4 w-4" />
-              </Button>
-            }
-          >
-            <div className="flex flex-col px-3 py-2 bg-background shadow-lg rounded-md border border-border">
-              <span className="font-medium">{user?.name || user?.email}</span>
-              <span className="text-xs text-muted-foreground">
-                {user?.email}
-              </span>
-            </div>
-            <hr className="my-1 border-border" />
-            <a href={`https://${process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN}.${process.env.NEXT_PUBLIC_DOMAIN}/settings?source=${encodeURIComponent(window.location.origin)}`}>
-              <button className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-accent rounded-md">
-                Settings
-              </button>
-            </a>
-            <button
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-accent rounded-md text-destructive"
-              onClick={logout}
+          <Box>
+            <IconButton 
+              onClick={handleOpenMenu}
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.6)', 
+                '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } 
+              }}
             >
-              Logout
-            </button>
-          </DropdownMenu>
-        </div>
-      </div>
-    </header>
+              <User size={20} />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+              PaperProps={{
+                sx: {
+                  mt: 1.5,
+                  minWidth: 240,
+                  bgcolor: 'rgba(10, 10, 10, 0.95)',
+                  backdropFilter: 'blur(25px) saturate(180%)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '20px',
+                  boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+                  backgroundImage: 'none',
+                  color: 'white'
+                }
+              }}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+              <Box sx={{ px: 2.5, py: 2 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'white' }}>
+                  {user?.name || user?.email}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.email}
+                </Typography>
+              </Box>
+              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+              <MenuItem 
+                component="a" 
+                href={`https://${process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN}.${process.env.NEXT_PUBLIC_DOMAIN}/settings?source=${encodeURIComponent(window.location.origin)}`}
+                onClick={handleCloseMenu} 
+                sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
+              >
+                <Settings size={18} color="rgba(255, 255, 255, 0.6)" />
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>Account Settings</Typography>
+              </MenuItem>
+              <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+              <MenuItem
+                onClick={async () => {
+                  handleCloseMenu();
+                  await logout();
+                }}
+                sx={{ py: 1.5, px: 2.5, gap: 1.5, color: '#FF4D4D' }}
+              >
+                <LogOut size={18} />
+                <Typography variant="body2" sx={{ fontWeight: 700 }}>Logout</Typography>
+              </MenuItem>
+            </Menu>
+          </Box>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }

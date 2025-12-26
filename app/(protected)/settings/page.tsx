@@ -10,14 +10,38 @@ import {
   Upload,
   LogOut,
   Key,
+  Folder,
+  Edit,
+  Trash,
+  ChevronRight,
+  AlertTriangle,
+  CheckCircle2,
+  X,
+  Plus
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { Dialog } from "@/components/ui/Dialog";
-import { Folder, Edit, Trash } from "lucide-react";
-import { useTheme } from "@/app/providers";
-import clsx from "clsx";
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  Container, 
+  Grid, 
+  Paper, 
+  TextField, 
+  IconButton, 
+  Divider, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  alpha, 
+  useTheme,
+  Stack,
+  Switch,
+  FormControlLabel,
+  Checkbox,
+  CircularProgress,
+  Tooltip
+} from "@mui/material";
 import {
   setVaultTimeout,
   getVaultTimeout,
@@ -27,18 +51,12 @@ import { useAppwrite } from "@/app/appwrite-provider";
 import { PasskeySetup } from "@/components/overlays/passkeySetup";
 import {
   appwriteAccount,
-  appwriteDatabases,
-  APPWRITE_DATABASE_ID,
-  APPWRITE_COLLECTION_USER_ID,
   createFolder,
   updateFolder,
   deleteFolder,
   listFolders,
-  Query,
-} from "@/lib/appwrite";
-import {
-  updateUserProfile,
   AppwriteService,
+  updateUserProfile,
   exportAllUserData,
   deleteUserAccount,
   resetMasterpassAndWipe,
@@ -47,13 +65,49 @@ import toast from "react-hot-toast";
 import VaultGuard from "@/components/layout/VaultGuard";
 import { useSudo } from "@/app/context/SudoContext";
 
+function SettingsCard({ title, icon: Icon, children, danger = false }: { title: string, icon: any, children: React.ReactNode, danger?: boolean }) {
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: '24px',
+        bgcolor: 'rgba(255, 255, 255, 0.02)',
+        border: '1px solid',
+        borderColor: danger ? 'rgba(255, 59, 48, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+        <Box sx={{ 
+          p: 1, 
+          borderRadius: '10px', 
+          bgcolor: danger ? 'rgba(255, 59, 48, 0.1)' : 'rgba(0, 240, 255, 0.1)',
+          color: danger ? '#FF3B30' : 'primary.main',
+          display: 'flex'
+        }}>
+          <Icon size={20} />
+        </Box>
+        <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: 'var(--font-space-grotesk)' }}>
+          {title}
+        </Typography>
+      </Box>
+      <Box sx={{ flexGrow: 1 }}>
+        {children}
+      </Box>
+    </Paper>
+  );
+}
+
 export default function SettingsPage() {
-  const { theme, setTheme } = useTheme();
+  const muiTheme = useTheme();
   const { user, logout } = useAppwrite();
   const [profile, setProfile] = useState({
     name: user?.name || "",
     email: user?.email || "",
-  }); // email is shown but not editable
+  });
   const [saving, setSaving] = useState(false);
   const [dangerLoading, setDangerLoading] = useState(false);
   const [vaultTimeout, setVaultTimeoutState] = useState(getVaultTimeout());
@@ -100,7 +154,6 @@ export default function SettingsPage() {
   const [folderName, setFolderName] = useState("");
   const [isDeleteFolderModalOpen, setIsDeleteFolderModalOpen] = useState(false);
   const [folderToDelete, setFolderToDelete] = useState<FolderItem | null>(null);
-  // Folders list
   const [folders, setFolders] = useState<FolderItem[]>([]);
 
   // Load folders on mount
@@ -109,7 +162,6 @@ export default function SettingsPage() {
       try {
         if (!user) return;
         const res = await listFolders(user.$id);
-        // listFolders returns an array of folders; ensure we handle both array and object shapes
         const items = Array.isArray(res)
           ? res
           : res &&
@@ -129,8 +181,6 @@ export default function SettingsPage() {
     };
     loadFolders();
   }, [user]);
-
-
 
   // Fetch passkey status
   const loadPasskeys = useCallback(async () => {
@@ -176,7 +226,6 @@ export default function SettingsPage() {
     if (!editingPasskey || !passkeyRenameValue.trim()) return;
     setSaving(true);
     try {
-      // We need to fetch the original entry to preserve other params
       const entries = await AppwriteService.listKeychainEntries(user!.$id);
       const entry = entries.find((k) => k.$id === editingPasskey.$id);
       if (entry) {
@@ -207,7 +256,6 @@ export default function SettingsPage() {
       setIsDeletePasskeyModalOpen(false);
       setPasskeyToDelete(null);
 
-      // If no passkeys left, update user doc flag
       if (passkeys.length <= 1) {
         await AppwriteService.removePasskey(user!.$id);
       }
@@ -233,7 +281,6 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       if (!user) throw new Error("Not authenticated");
-      // Only allow updating the name, not the email
       await updateUserProfile(user.$id, { name: profile.name });
       toast.success("Profile updated!");
     } catch (e: unknown) {
@@ -339,12 +386,9 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await appwriteAccount.updatePassword(passwords.new, passwords.current);
-
-      // Re-wrap MEK with new password
       if (user?.$id) {
         await masterPassCrypto.changeMasterPassword(passwords.new, user.$id);
       }
-
       toast.success("Password updated successfully!");
       setIsChangePasswordModalOpen(false);
       setPasswords({ current: "", new: "", confirm: "" });
@@ -360,7 +404,6 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       if (editingFolder) {
-        // Update existing folder
         const updatedFolder = await updateFolder(editingFolder.$id, {
           name: folderName,
         });
@@ -369,7 +412,6 @@ export default function SettingsPage() {
         );
         toast.success("Folder updated!");
       } else {
-        // Create new folder
         const newFolder = await createFolder({
           name: folderName,
           userId: user.$id,
@@ -428,643 +470,470 @@ export default function SettingsPage() {
 
   return (
     <VaultGuard>
-      <div className="w-full min-h-screen bg-background flex flex-col items-center py-8 px-2 animate-fade-in">
-        <div className="w-full max-w-5xl">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold tracking-tight text-primary drop-shadow-sm">
+      <Box sx={{ minHeight: '100vh', py: 6, px: { xs: 2, md: 4 } }}>
+        <Container maxWidth="lg">
+          <Box sx={{ mb: 6 }}>
+            <Typography variant="h3" sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', letterSpacing: '-0.03em', mb: 1 }}>
               Settings
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your account and preferences
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+              Manage your account, security, and vault preferences
+            </Typography>
+          </Box>
+
+          <Grid container spacing={3}>
             {/* Profile Settings */}
-            <Card className="animate-fade-in-up">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
-                  Profile
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Full Name</label>
-                  <Input
+            <Grid item xs={12} md={6}>
+              <SettingsCard title="Profile" icon={User}>
+                <Stack spacing={3}>
+                  <TextField
+                    fullWidth
+                    label="Full Name"
                     value={profile.name}
-                    onChange={(e) =>
-                      setProfile({ ...profile, name: e.target.value })
-                    }
-                    autoComplete="name"
+                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                    variant="filled"
+                    InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Email</label>
-                  <Input
-                    type="email"
+                  <TextField
+                    fullWidth
+                    label="Email Address"
                     value={profile.email}
-                    readOnly
                     disabled
-                    autoComplete="email"
-                  />{" "}
-                </div>
-                <Button
-                  onClick={handleSaveProfile}
-                  disabled={saving}
-                  className={clsx(
-                    "transition-all duration-200",
-                    saving && "opacity-70",
-                  )}
-                >
-                  {saving ? (
-                    <span className="flex items-center gap-2">
-                      <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-primary rounded-full" />
-                      Saving...
-                    </span>
-                  ) : (
-                    "Save Changes"
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+                    variant="filled"
+                    InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.01)' } }}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveProfile}
+                    disabled={saving}
+                    sx={{ borderRadius: '12px', py: 1.5, fontWeight: 700 }}
+                  >
+                    {saving ? <CircularProgress size={20} sx={{ mr: 1 }} /> : null}
+                    {saving ? "Saving..." : "Save Changes"}
+                  </Button>
+                </Stack>
+              </SettingsCard>
+            </Grid>
 
             {/* Security Settings */}
-            <Card
-              className="animate-fade-in-up"
-              style={{ animationDelay: "60ms" }}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5" />
-                  Security
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2"
-                  onClick={() => setIsChangePasswordModalOpen(true)}
-                >
-                  <Key className="h-4 w-4" />
-                  Change Password
-                </Button>
+            <Grid item xs={12} md={6}>
+              <SettingsCard title="Security" icon={Shield}>
+                <Stack spacing={3}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Key size={18} />}
+                    onClick={() => setIsChangePasswordModalOpen(true)}
+                    sx={{ borderRadius: '12px', py: 1.5, justifyContent: 'flex-start', px: 2, fontWeight: 600 }}
+                  >
+                    Change Master Password
+                  </Button>
 
+                  <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
 
-                <div className="pt-4 border-t space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-sm font-medium flex items-center gap-2">
-                      <Key className="h-4 w-4" />
-                      Passkeys
-                    </label>
-                    <Button size="sm" variant="outline" onClick={handleTogglePasskey}>
-                      + Add Passkey
-                    </Button>
-                  </div>
+                  <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Passkeys</Typography>
+                      <Button size="small" onClick={handleTogglePasskey} startIcon={<Plus size={16} />}>
+                        Add Passkey
+                      </Button>
+                    </Box>
 
-                  {passkeys.length > 0 ? (
-                    <div className="space-y-2">
-                      {passkeys.map((pk) => (
-                        <div key={pk.$id} className="flex items-center justify-between p-2 rounded-md border bg-card/50">
-                          <div className="flex flex-col">
-                            <span className="font-medium text-sm">{pk.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              Added {new Date(pk.created).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <div className="flex gap-1">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8"
-                              onClick={() => openRenamePasskey(pk)}
-                            >
-                              <Edit className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 text-destructive hover:text-destructive"
-                              onClick={() => openDeletePasskey(pk)}
-                            >
-                              <Trash className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground italic">
-                      No passkeys added yet.
-                    </p>
-                  )}
-                </div>
+                    {passkeys.length > 0 ? (
+                      <Stack spacing={1}>
+                        {passkeys.map((pk) => (
+                          <Paper key={pk.$id} sx={{ p: 1.5, borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box>
+                              <Typography variant="body2" sx={{ fontWeight: 700 }}>{pk.name}</Typography>
+                              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                Added {new Date(pk.created).toLocaleDateString()}
+                              </Typography>
+                            </Box>
+                            <Box>
+                              <IconButton size="small" onClick={() => openRenamePasskey(pk)} sx={{ color: 'text.secondary' }}>
+                                <Edit size={16} />
+                              </IconButton>
+                              <IconButton size="small" onClick={() => openDeletePasskey(pk)} sx={{ color: 'error.main' }}>
+                                <Trash size={16} />
+                              </IconButton>
+                            </Box>
+                          </Paper>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+                        No passkeys added yet.
+                      </Typography>
+                    )}
+                  </Box>
 
-                {/* Vault Timeout Setting */}
-                <div className="pt-4 border-t">
-                  <div className="space-y-3">
-                    <label className="text-sm font-medium">
-                      Vault Auto-Lock Timeout
-                    </label>
-                    <div className="grid grid-cols-4 gap-2">
+                  <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+
+                  <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2 }}>Vault Auto-Lock</Typography>
+                    <Grid container spacing={1} sx={{ mb: 2 }}>
                       {[5, 10, 15, 30].map((minutes) => (
-                        <Button
-                          key={minutes}
-                          variant={
-                            vaultTimeout === minutes ? "default" : "outline"
-                          }
-                          size="sm"
-                          onClick={() => handleVaultTimeoutChange(minutes)}
-                          className="text-xs"
-                        >
-                          {minutes}m
-                        </Button>
+                        <Grid item xs={3} key={minutes}>
+                          <Button
+                            fullWidth
+                            variant={vaultTimeout === minutes ? "contained" : "outlined"}
+                            size="small"
+                            onClick={() => handleVaultTimeoutChange(minutes)}
+                            sx={{ borderRadius: '8px', fontWeight: 700 }}
+                          >
+                            {minutes}m
+                          </Button>
+                        </Grid>
                       ))}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Input
+                    </Grid>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <TextField
                         type="number"
-                        min="1"
-                        max="120"
+                        size="small"
                         value={vaultTimeout}
-                        onChange={(e) =>
-                          handleVaultTimeoutChange(
-                            parseInt(e.target.value) || 10,
-                          )
-                        }
-                        className="w-20 text-sm"
+                        onChange={(e) => handleVaultTimeoutChange(parseInt(e.target.value) || 10)}
+                        sx={{ width: 80 }}
+                        InputProps={{ sx: { borderRadius: '8px' } }}
                       />
-                      <span className="text-xs text-muted-foreground">
-                        minutes
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Vault will auto-lock after {vaultTimeout} minutes of
-                      inactivity
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Theme Settings */}
-            <Card
-              className="animate-fade-in-up"
-              style={{ animationDelay: "120ms" }}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Palette className="h-5 w-5" />
-                  Appearance
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Theme</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button
-                      variant={theme === "light" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTheme("light")}
-                      aria-pressed={theme === "light"}
-                    >
-                      Light
-                    </Button>
-                    <Button
-                      variant={theme === "dark" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTheme("dark")}
-                      aria-pressed={theme === "dark"}
-                    >
-                      Dark
-                    </Button>
-                    <Button
-                      variant={theme === "system" ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setTheme("system")}
-                      aria-pressed={theme === "system"}
-                    >
-                      System
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Data Management */}
-            <Card
-              className="animate-fade-in-up"
-              style={{ animationDelay: "180ms" }}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Download className="h-5 w-5" />
-                  Data Management
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2"
-                  onClick={onExportClick}
-                >
-                  <Download className="h-4 w-4" />
-                  Export Data
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start gap-2"
-                  onClick={() => (window.location.href = "/import")}
-                >
-                  <Upload className="h-4 w-4" />
-                  Import Data
-                </Button>
-              </CardContent>
-            </Card>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                        minutes of inactivity before auto-lock
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Stack>
+              </SettingsCard>
+            </Grid>
 
             {/* Folder Management */}
-            <Card
-              className="animate-fade-in-up"
-              style={{ animationDelay: "240ms" }}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <Folder className="h-5 w-5" />
-                    Folder Management
-                  </span>
-                  <Button size="sm" onClick={() => openFolderModal()}>
-                    + Add Folder
+            <Grid item xs={12} md={6}>
+              <SettingsCard title="Folders" icon={Folder}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                  <Button size="small" onClick={() => openFolderModal()} startIcon={<Plus size={16} />}>
+                    New Folder
                   </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {folders.length > 0 ? (
-                  folders.map((folder) => (
-                    <div
-                      key={folder.$id}
-                      className="flex items-center justify-between p-2 rounded-md hover:bg-accent/50"
-                    >
-                      <span>{folder.name}</span>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openFolderModal(folder)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openDeleteFolderModal(folder)}
-                        >
-                          <Trash className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    No folders created yet.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                </Box>
+                <Stack spacing={1}>
+                  {folders.length > 0 ? (
+                    folders.map((folder) => (
+                      <Paper key={folder.$id} sx={{ p: 1.5, borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>{folder.name}</Typography>
+                        <Box>
+                          <IconButton size="small" onClick={() => openFolderModal(folder)} sx={{ color: 'text.secondary' }}>
+                            <Edit size={16} />
+                          </IconButton>
+                          <IconButton size="small" onClick={() => openDeleteFolderModal(folder)} sx={{ color: 'error.main' }}>
+                            <Trash size={16} />
+                          </IconButton>
+                        </Box>
+                      </Paper>
+                    ))
+                  ) : (
+                    <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', textAlign: 'center', py: 2 }}>
+                      No folders created yet.
+                    </Typography>
+                  )}
+                </Stack>
+              </SettingsCard>
+            </Grid>
+
+            {/* Data Management */}
+            <Grid item xs={12} md={6}>
+              <SettingsCard title="Data" icon={Download}>
+                <Stack spacing={2}>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Download size={18} />}
+                    onClick={onExportClick}
+                    sx={{ borderRadius: '12px', py: 1.5, justifyContent: 'flex-start', px: 2, fontWeight: 600 }}
+                  >
+                    Export Vault Data
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    fullWidth
+                    startIcon={<Upload size={18} />}
+                    onClick={() => (window.location.href = "/import")}
+                    sx={{ borderRadius: '12px', py: 1.5, justifyContent: 'flex-start', px: 2, fontWeight: 600 }}
+                  >
+                    Import Vault Data
+                  </Button>
+                </Stack>
+              </SettingsCard>
+            </Grid>
 
             {/* Danger Zone */}
-            <Card
-              className={clsx(
-                "border-destructive animate-fade-in-up",
-                dangerLoading && "opacity-70",
-              )}
-              style={{ animationDelay: "300ms" }}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-destructive">
-                  <Trash2 className="h-5 w-5" />
-                  Danger Zone
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-medium">Delete Account</h4>
-                    <p className="text-sm text-muted-foreground">
-                      Permanently delete your account and all associated data.
-                      This action cannot be undone.
-                    </p>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    onClick={() => setIsDeleteAccountModalOpen(true)}
-                    disabled={dangerLoading}
-                    className="transition-all"
-                  >
-                    {dangerLoading ? (
-                      <span className="flex items-center gap-2">
-                        <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full" />
-                        Deleting...
-                      </span>
-                    ) : (
-                      "Delete Account"
-                    )}
-                  </Button>
-                  <div className="border-t border-destructive/50 pt-4">
-                    <h4 className="font-medium">Reset Master Password</h4>
-                    <p className="text-sm text-muted-foreground">
-                      This will wipe all your encrypted data (credentials, TOTP
-                      secrets) but keep your account. You will be logged out and
-                      prompted to set a new master password.
-                    </p>
-                  </div>
-                  <Button
-                    variant="destructive"
-                    onClick={() => setIsResetModalOpen(true)}
-                    disabled={dangerLoading}
-                    className="transition-all"
-                  >
-                    {dangerLoading ? (
-                      <span className="flex items-center gap-2">
-                        <span className="animate-spin h-4 w-4 border-2 border-t-transparent border-white rounded-full" />
-                        Resetting...
-                      </span>
-                    ) : (
-                      "Reset Master Password"
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          {/* Logout button for mobile */}
-          <div className="mt-8 flex justify-end md:hidden">
+            <Grid item xs={12}>
+              <SettingsCard title="Danger Zone" icon={AlertTriangle} danger>
+                <Grid container spacing={3}>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FF3B30', mb: 1 }}>Delete Account</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                      Permanently delete your account and all associated data. This action cannot be undone.
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => setIsDeleteAccountModalOpen(true)}
+                      disabled={dangerLoading}
+                      sx={{ borderRadius: '12px', fontWeight: 700 }}
+                    >
+                      Delete Account
+                    </Button>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FF3B30', mb: 1 }}>Reset Vault</Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                      Wipe all encrypted data but keep your account. You will be prompted to set a new master password.
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      onClick={() => setIsResetModalOpen(true)}
+                      disabled={dangerLoading}
+                      sx={{ borderRadius: '12px', fontWeight: 700 }}
+                    >
+                      Reset and Wipe Data
+                    </Button>
+                  </Grid>
+                </Grid>
+              </SettingsCard>
+            </Grid>
+          </Grid>
+
+          {/* Mobile Logout */}
+          <Box sx={{ mt: 6, display: { xs: 'flex', md: 'none' }, justifyContent: 'center' }}>
             <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-destructive hover:text-destructive"
+              variant="text"
+              color="error"
+              startIcon={<LogOut size={18} />}
               onClick={logout}
+              sx={{ fontWeight: 700 }}
             >
               Logout
             </Button>
-          </div>
-        </div>
-        {isExportModalOpen && (
-          <Dialog open={isExportModalOpen} onClose={() => setIsExportModalOpen(false)}>
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Export Data</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Select the data you want to export. Your data will be exported as a JSON file.
-              </p>
+          </Box>
+        </Container>
 
-              <div className="space-y-4 mt-4">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="exp-creds"
-                    checked={exportOptions.credentials}
-                    onChange={(e) => setExportOptions({ ...exportOptions, credentials: e.target.checked })}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <label htmlFor="exp-creds" className="text-sm font-medium">Login Credentials</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="exp-totp"
-                    checked={exportOptions.totpSecrets}
-                    onChange={(e) => setExportOptions({ ...exportOptions, totpSecrets: e.target.checked })}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <label htmlFor="exp-totp" className="text-sm font-medium">TOTP Secrets</label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="exp-folders"
-                    checked={exportOptions.folders}
-                    onChange={(e) => setExportOptions({ ...exportOptions, folders: e.target.checked })}
-                    className="h-4 w-4 rounded border-gray-300"
-                  />
-                  <label htmlFor="exp-folders" className="text-sm font-medium">Folders</label>
-                </div>
-              </div>
+        {/* Modals */}
+        {/* Export Modal */}
+        <Dialog 
+          open={isExportModalOpen} 
+          onClose={() => setIsExportModalOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)' }}>Export Data</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ color: 'text.secondary', mb: 3 }}>
+              Select the data you want to export. Your data will be exported as a JSON file.
+            </Typography>
+            <Stack spacing={1}>
+              <FormControlLabel
+                control={<Checkbox checked={exportOptions.credentials} onChange={(e) => setExportOptions({ ...exportOptions, credentials: e.target.checked })} />}
+                label="Login Credentials"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={exportOptions.totpSecrets} onChange={(e) => setExportOptions({ ...exportOptions, totpSecrets: e.target.checked })} />}
+                label="TOTP Secrets"
+              />
+              <FormControlLabel
+                control={<Checkbox checked={exportOptions.folders} onChange={(e) => setExportOptions({ ...exportOptions, folders: e.target.checked })} />}
+                label="Folders"
+              />
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setIsExportModalOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button onClick={confirmExport} variant="contained" fullWidth sx={{ borderRadius: '12px' }}>Export Selected</Button>
+          </DialogActions>
+        </Dialog>
 
-              <div className="mt-6 flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsExportModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={confirmExport}>
-                  Export Selected
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
+        {/* Delete Account Modal */}
+        <Dialog 
+          open={isDeleteAccountModalOpen} 
+          onClose={resetDeleteFlow}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', color: '#FF3B30' }}>
+            {deleteStep === "initial" ? "Export Required" : "Final Confirmation"}
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {deleteStep === "initial" 
+                ? "This is a permanent action. To prevent data loss, you must export your data first."
+                : "Your data has been exported. Are you absolutely sure you want to permanently delete your account? This cannot be undone."}
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={resetDeleteFlow} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            {deleteStep === "initial" ? (
+              <Button variant="contained" color="error" fullWidth onClick={() => handleExportData(true)} sx={{ borderRadius: '12px' }}>Export & Continue</Button>
+            ) : (
+              <Button variant="contained" color="error" fullWidth onClick={() => requestSudo({ onSuccess: handleDeleteAccount })} sx={{ borderRadius: '12px' }}>Delete Forever</Button>
+            )}
+          </DialogActions>
+        </Dialog>
 
-        {isDeleteAccountModalOpen && deleteStep === "initial" && (
-          <Dialog open={isDeleteAccountModalOpen} onClose={resetDeleteFlow}>
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Delete Account</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                This is a permanent action. To prevent data loss, you must
-                export your data first.
-              </p>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={resetDeleteFlow}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => handleExportData(true)}
-                >
-                  Export Data & Continue
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
+        {/* Reset Vault Modal */}
+        <Dialog 
+          open={isResetModalOpen} 
+          onClose={() => setIsResetModalOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', color: '#FF3B30' }}>Reset Vault?</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Are you sure you want to reset your master password? All your encrypted data will be permanently deleted. This action cannot be undone.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setIsResetModalOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button variant="contained" color="error" fullWidth onClick={handleResetMasterPassword} sx={{ borderRadius: '12px' }}>Reset and Wipe</Button>
+          </DialogActions>
+        </Dialog>
 
-        {isDeleteAccountModalOpen && deleteStep === "confirm" && (
-          <Dialog open={isDeleteAccountModalOpen} onClose={resetDeleteFlow}>
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Are you absolutely sure?</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Your data has been exported. Do you want to permanently delete
-                your account? This action cannot be undone.
-              </p>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={resetDeleteFlow}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    // trigger sudo
-                    // close the delete warning dialog? Or keep it open until success?
-                    // Usually we close warning then show sudo.
-                    requestSudo({
-                      onSuccess: handleDeleteAccount
-                    });
-                  }}
-                >
-                  Delete Forever
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
+        {/* Change Password Modal */}
+        <Dialog 
+          open={isChangePasswordModalOpen} 
+          onClose={() => setIsChangePasswordModalOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)' }}>Change Password</DialogTitle>
+          <DialogContent>
+            <Stack spacing={2.5} sx={{ mt: 1 }}>
+              <TextField
+                fullWidth
+                type="password"
+                label="Current Password"
+                value={passwords.current}
+                onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                variant="filled"
+                InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+              />
+              <TextField
+                fullWidth
+                type="password"
+                label="New Password"
+                value={passwords.new}
+                onChange={(e) => setPasswords({ ...passwords, new: e.target.value })}
+                variant="filled"
+                InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+              />
+              <TextField
+                fullWidth
+                type="password"
+                label="Confirm New Password"
+                value={passwords.confirm}
+                onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                variant="filled"
+                InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+              />
+              {passwordError && <Typography color="error" variant="caption">{passwordError}</Typography>}
+            </Stack>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setIsChangePasswordModalOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button onClick={handleChangePassword} variant="contained" fullWidth disabled={saving} sx={{ borderRadius: '12px' }}>
+              {saving ? "Saving..." : "Save Password"}
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-        {isResetModalOpen && (
-          <Dialog
-            open={isResetModalOpen}
-            onClose={() => setIsResetModalOpen(false)}
-          >
-            <div className="p-6">
-              <h3 className="text-lg font-bold">
-                Reset Master Password?
-              </h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Are you sure you want to reset your master password? All your
-                encrypted data will be permanently deleted. This action cannot
-                be undone.
-              </p>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsResetModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => {
-                    setIsResetModalOpen(false);
-                    handleResetMasterPassword();
-                  }}
-                >
-                  Reset and Wipe Data
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
+        {/* Folder Modal */}
+        <Dialog 
+          open={isFolderModalOpen} 
+          onClose={() => setIsFolderModalOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)' }}>
+            {editingFolder ? "Rename Folder" : "Create Folder"}
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              placeholder="Folder Name"
+              value={folderName}
+              onChange={(e) => setFolderName(e.target.value)}
+              variant="filled"
+              sx={{ mt: 1 }}
+              InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setIsFolderModalOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button onClick={handleSaveFolder} variant="contained" fullWidth disabled={saving || !folderName} sx={{ borderRadius: '12px' }}>
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-        {isChangePasswordModalOpen && (
-          <Dialog
-            open={isChangePasswordModalOpen}
-            onClose={() => setIsChangePasswordModalOpen(false)}
-          >
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Change Password</h3>
-              <div className="space-y-4 mt-4">
-                <Input
-                  type="password"
-                  placeholder="Current Password"
-                  value={passwords.current}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, current: e.target.value })
-                  }
-                />
-                <Input
-                  type="password"
-                  placeholder="New Password"
-                  value={passwords.new}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, new: e.target.value })
-                  }
-                />
-                <Input
-                  type="password"
-                  placeholder="Confirm New Password"
-                  value={passwords.confirm}
-                  onChange={(e) =>
-                    setPasswords({ ...passwords, confirm: e.target.value })
-                  }
-                />
-                {passwordError && (
-                  <p className="text-red-600 text-sm">{passwordError}</p>
-                )}
-              </div>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsChangePasswordModalOpen(false)}
-                  disabled={saving}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleChangePassword} disabled={saving}>
-                  {saving ? "Saving..." : "Save Password"}
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
-        {isFolderModalOpen && (
-          <Dialog
-            open={isFolderModalOpen}
-            onClose={() => setIsFolderModalOpen(false)}
-          >
-            <div className="p-6">
-              <h3 className="text-lg font-bold">
-                {editingFolder ? "Rename Folder" : "Create Folder"}
-              </h3>
-              <div className="space-y-4 mt-4">
-                <Input
-                  placeholder="Folder Name"
-                  value={folderName}
-                  onChange={(e) => setFolderName(e.target.value)}
-                />
-              </div>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsFolderModalOpen(false)}
-                  disabled={saving}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSaveFolder}
-                  disabled={saving || !folderName}
-                >
-                  {saving ? "Saving..." : "Save"}
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
-        {isDeleteFolderModalOpen && (
-          <Dialog
-            open={isDeleteFolderModalOpen}
-            onClose={() => setIsDeleteFolderModalOpen(false)}
-          >
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Delete Folder</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Are you sure you want to delete the folder &quot;
-                {folderToDelete?.name}&quot;? This will not delete the
-                credentials inside it.
-              </p>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDeleteFolderModalOpen(false)}
-                  disabled={dangerLoading}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteFolder}
-                  disabled={dangerLoading}
-                >
-                  {dangerLoading ? "Deleting..." : "Delete"}
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
+        {/* Delete Folder Modal */}
+        <Dialog 
+          open={isDeleteFolderModalOpen} 
+          onClose={() => setIsDeleteFolderModalOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', color: '#FF3B30' }}>Delete Folder</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Are you sure you want to delete the folder &quot;{folderToDelete?.name}&quot;? This will not delete the credentials inside it.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setIsDeleteFolderModalOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button variant="contained" color="error" fullWidth onClick={handleDeleteFolder} disabled={dangerLoading} sx={{ borderRadius: '12px' }}>
+              {dangerLoading ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Passkey Rename Modal */}
+        <Dialog 
+          open={passkeyRenameOpen} 
+          onClose={() => setPasskeyRenameOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)' }}>Rename Passkey</DialogTitle>
+          <DialogContent>
+            <TextField
+              fullWidth
+              value={passkeyRenameValue}
+              onChange={(e) => setPasskeyRenameValue(e.target.value)}
+              placeholder="Passkey Name"
+              variant="filled"
+              sx={{ mt: 1 }}
+              InputProps={{ disableUnderline: true, sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+              autoFocus
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setPasskeyRenameOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button onClick={handleRenamePasskey} variant="contained" fullWidth disabled={saving || !passkeyRenameValue.trim()} sx={{ borderRadius: '12px' }}>
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Delete Passkey Modal */}
+        <Dialog 
+          open={isDeletePasskeyModalOpen} 
+          onClose={() => setIsDeletePasskeyModalOpen(false)}
+          PaperProps={{ sx: { borderRadius: '24px', bgcolor: 'rgba(10, 10, 10, 0.9)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255, 255, 255, 0.1)', backgroundImage: 'none' } }}
+        >
+          <DialogTitle sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', color: '#FF3B30' }}>Delete Passkey</DialogTitle>
+          <DialogContent>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              Are you sure you want to delete the passkey &ldquo;{passkeyToDelete?.name}&rdquo;? You will no longer be able to use it to unlock your vault.
+            </Typography>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1.5 }}>
+            <Button onClick={() => setIsDeletePasskeyModalOpen(false)} variant="outlined" fullWidth sx={{ borderRadius: '12px' }}>Cancel</Button>
+            <Button variant="contained" color="error" fullWidth onClick={handleDeletePasskey} disabled={dangerLoading} sx={{ borderRadius: '12px' }}>
+              {dangerLoading ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         <PasskeySetup
           isOpen={passkeySetupOpen}
           onClose={() => setPasskeySetupOpen(false)}
@@ -1073,51 +942,7 @@ export default function SettingsPage() {
             loadPasskeys();
           }}
         />
-
-        {passkeyRenameOpen && (
-          <Dialog open={passkeyRenameOpen} onClose={() => setPasskeyRenameOpen(false)}>
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Rename Passkey</h3>
-              <div className="mt-4">
-                <Input
-                  value={passkeyRenameValue}
-                  onChange={(e) => setPasskeyRenameValue(e.target.value)}
-                  placeholder="Passkey Name"
-                  autoFocus
-                />
-              </div>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setPasskeyRenameOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleRenamePasskey} disabled={saving || !passkeyRenameValue.trim()}>
-                  {saving ? "Saving..." : "Save"}
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
-
-        {isDeletePasskeyModalOpen && (
-          <Dialog open={isDeletePasskeyModalOpen} onClose={() => setIsDeletePasskeyModalOpen(false)}>
-            <div className="p-6">
-              <h3 className="text-lg font-bold">Delete Passkey</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Are you sure you want to delete the passkey &ldquo;{passkeyToDelete?.name}&rdquo;?
-                You will no longer be able to use it to unlock your vault.
-              </p>
-              <div className="mt-4 flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsDeletePasskeyModalOpen(false)}>
-                  Cancel
-                </Button>
-                <Button variant="destructive" onClick={handleDeletePasskey} disabled={dangerLoading}>
-                  {dangerLoading ? "Deleting..." : "Delete"}
-                </Button>
-              </div>
-            </div>
-          </Dialog>
-        )}
-      </div>
+      </Box>
     </VaultGuard>
   );
 }

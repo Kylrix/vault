@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
+import { Menu, MenuItem, Box, Divider, alpha } from "@mui/material";
 
 interface DropdownMenuProps {
   trigger: React.ReactNode;
@@ -13,89 +14,69 @@ interface DropdownMenuProps {
 export function DropdownMenu({
   trigger,
   children,
-  className = "",
+  width = "240px",
 }: DropdownMenuProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
-  const closeDropdown = () => setIsOpen(false);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
 
-  // Handle click outside to close dropdown
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        closeDropdown();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
-  // Handle escape key to close dropdown
-  useEffect(() => {
-    const handleEscKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        closeDropdown();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscKey);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscKey);
-    };
-  }, [isOpen]);
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
-    <div className={`relative inline-block ${className}`} ref={dropdownRef}>
-      {/* Trigger element wrapped with button for accessibility */}
-      <div
-        onClick={toggleDropdown}
-        className="cursor-pointer inline-block"
-        aria-haspopup="true"
-        aria-expanded={isOpen}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            toggleDropdown();
-            e.preventDefault();
+    <Box sx={{ display: 'inline-block' }}>
+      <Box onClick={handleClick} sx={{ cursor: 'pointer' }}>
+        {trigger}
+      </Box>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        onClick={handleClose}
+        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        PaperProps={{
+          sx: {
+            mt: 1.5,
+            minWidth: width,
+            bgcolor: 'rgba(10, 10, 10, 0.95)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '20px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+            backgroundImage: 'none',
+            color: 'white',
+            overflow: 'visible',
+            '&:before': {
+              content: '""',
+              display: 'block',
+              position: 'absolute',
+              top: 0,
+              right: 14,
+              width: 10,
+              height: 10,
+              bgcolor: 'rgba(10, 10, 10, 0.95)',
+              transform: 'translateY(-50%) rotate(45deg)',
+              zIndex: 0,
+              borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            },
           }
         }}
       >
-        {trigger}
-      </div>
-
-      {/* Dropdown content */}
-      {isOpen && (
-        <div
-          className={`absolute z-50 mt-2 left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 bg-card border-2 border-border rounded-xl shadow-resting overflow-hidden w-[95vw] max-w-[400px] mx-2 sm:mx-0 shadow-ceramic`}
-          role="menu"
-        >
-          <div className="py-1 text-foreground">{children}</div>
-        </div>
-      )}
-    </div>
+        {children}
+      </Menu>
+    </Box>
   );
 }
 
-// Export a menu item component for convenience
 export function DropdownMenuItem({
   children,
   onClick,
-  className = "",
   disabled = false,
 }: {
   children: React.ReactNode;
@@ -104,25 +85,23 @@ export function DropdownMenuItem({
   disabled?: boolean;
 }) {
   return (
-    <div
-      className={`px-4 py-2 cursor-pointer hover:bg-accent text-sm ${disabled ? "opacity-50 cursor-not-allowed" : ""
-        } ${className}`}
-      onClick={disabled ? undefined : onClick}
-      role="menuitem"
-      tabIndex={disabled ? -1 : 0}
-      onKeyDown={(e) => {
-        if ((e.key === "Enter" || e.key === " ") && !disabled && onClick) {
-          onClick();
-          e.preventDefault();
-        }
+    <MenuItem 
+      onClick={onClick} 
+      disabled={disabled}
+      sx={{
+        px: 2.5,
+        py: 1.5,
+        fontSize: '0.875rem',
+        fontWeight: 600,
+        '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' },
+        '&.Mui-disabled': { opacity: 0.5 }
       }}
     >
       {children}
-    </div>
+    </MenuItem>
   );
 }
 
-// Export a separator component for convenience
 export function DropdownMenuSeparator() {
-  return <hr className="my-1 border-border" role="separator" />;
+  return <Divider sx={{ my: 1, borderColor: 'rgba(255, 255, 255, 0.05)' }} />;
 }

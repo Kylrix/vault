@@ -17,39 +17,31 @@ import {
   Search,
   User,
   Settings,
+  Copy as CopyIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { useTheme } from "@/app/providers";
+import {
+  Box,
+  Typography,
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  IconButton,
+  alpha,
+  useTheme as useMuiTheme,
+  CircularProgress,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import { ChevronDown } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
-import { openAuthPopup } from "@/lib/authUrl";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { useRouter } from "next/navigation";
 
-// Copy icon component - used in dashboard preview
-function Copy(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
-      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
-    </svg>
-  );
-}
-
 export default function LandingPage() {
-  const { } = useTheme();
   const { user, openIDMWindow, isAuthenticating } = useAppwrite();
   const router = useRouter();
   const demoRef = useRef<HTMLDivElement>(null);
@@ -151,353 +143,481 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="relative overflow-hidden">
-      {/* Use Navbar component instead of Header */}
+    <Box sx={{ bgcolor: '#000', minHeight: '100vh', color: 'white', overflowX: 'hidden' }}>
       <Navbar />
 
-      {/* Hero Section - Adjust padding to account for navbar */}
-      <div className="relative py-32 md:py-40 px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(45%_25%_at_50%_25%,var(--tw-gradient-from)_0%,var(--tw-gradient-to)_100%)] from-primary/20 to-transparent dark:from-primary/10"></div>
+      {/* Hero Section */}
+      <Container maxWidth="lg" sx={{ pt: { xs: 15, md: 20 }, pb: 10, position: 'relative' }}>
+        <Box sx={{
+          position: 'absolute',
+          top: '10%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '80%',
+          height: '60%',
+          background: 'radial-gradient(circle, rgba(0, 245, 255, 0.08) 0%, transparent 70%)',
+          zIndex: 0,
+          pointerEvents: 'none'
+        }} />
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight mb-6 max-w-4xl">
-          Your Passwords. <span className="text-primary">Protected</span>.
-          Everywhere.
-        </h1>
+        <Stack spacing={4} alignItems="center" textAlign="center" sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography variant="h1" sx={{ 
+            fontSize: { xs: '2.5rem', sm: '3.5rem', md: '4.5rem' },
+            fontWeight: 900,
+            letterSpacing: '-0.04em',
+            fontFamily: 'var(--font-space-grotesk)',
+            maxWidth: '900px',
+            lineHeight: 1.1
+          }}>
+            Your Passwords. <Box component="span" sx={{ color: '#00F5FF' }}>Protected</Box>. Everywhere.
+          </Typography>
 
-        <p className="text-xl text-muted-foreground max-w-2xl mb-10">
-          Secure, simple password management for individuals and teams. Store
-          unlimited passwords, generate strong credentials, and autofill with
-          ease.
-        </p>
+          <Typography variant="h6" sx={{ 
+            color: 'rgba(255, 255, 255, 0.6)', 
+            maxWidth: '700px',
+            fontWeight: 400,
+            lineHeight: 1.6
+          }}>
+            Secure, simple password management for individuals and teams. Store
+            unlimited passwords, generate strong credentials, and autofill with
+            ease.
+          </Typography>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-16">
-          <Button
-            size="lg"
-            className="gap-2"
-            isLoading={isAuthenticating}
-            onClick={() => {
-              if (user) {
-                router.push("/dashboard");
-                return;
-              }
-              try {
-                openIDMWindow();
-              } catch (err) {
-                alert(err instanceof Error ? err.message : "Failed to open authentication");
-              }
-            }}
-          >
-            {user ? "Go to Dashboard" : "Get Started Free"} <ChevronRight className="h-4 w-4" />
-          </Button>
-          <Button size="lg" variant="outline" onClick={handleViewDemo}>
-            View Demo
-          </Button>
-        </div>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ pt: 2 }}>
+            <Button
+              variant="contained"
+              size="large"
+              endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRight size={20} />}
+              onClick={() => {
+                if (user) {
+                  router.push("/dashboard");
+                  return;
+                }
+                try {
+                  openIDMWindow();
+                } catch (err) {
+                  alert(err instanceof Error ? err.message : "Failed to open authentication");
+                }
+              }}
+              sx={{
+                bgcolor: '#00F5FF',
+                color: '#000',
+                px: 4,
+                py: 2,
+                borderRadius: '16px',
+                fontWeight: 800,
+                fontSize: '1.1rem',
+                '&:hover': {
+                  bgcolor: '#00D1DA',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 12px 30px rgba(0, 245, 255, 0.3)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {user ? "Go to Dashboard" : "Get Started Free"}
+            </Button>
+            <Button 
+              variant="outlined" 
+              size="large" 
+              onClick={handleViewDemo}
+              sx={{
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                color: 'white',
+                px: 4,
+                py: 2,
+                borderRadius: '16px',
+                fontWeight: 700,
+                '&:hover': {
+                  borderColor: 'white',
+                  bgcolor: 'rgba(255, 255, 255, 0.05)',
+                  transform: 'translateY(-2px)'
+                },
+                transition: 'all 0.3s ease'
+              }}
+            >
+              View Demo
+            </Button>
+          </Stack>
+        </Stack>
 
         {/* Dashboard Preview */}
-        <div
+        <Box
           ref={demoRef}
-          className="w-full max-w-5xl rounded-lg overflow-hidden shadow-2xl border dark:border-gray-800 bg-background relative"
+          sx={{
+            mt: 12,
+            width: '100%',
+            maxWidth: '1000px',
+            mx: 'auto',
+            borderRadius: '32px',
+            overflow: 'hidden',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            bgcolor: 'rgba(10, 10, 10, 0.95)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            boxShadow: '0 50px 100px -20px rgba(0, 0, 0, 0.5)',
+            position: 'relative'
+          }}
         >
-          {/* Dashboard Header */}
-          <div className="border-b px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">
-                  PM
-                </span>
-              </div>
-              <h2 className="font-semibold text-lg">Whisperrkeep</h2>
-            </div>
-            <div className="flex items-center gap-2">
-              <button className="p-2 rounded-full hover:bg-accent">
-                <Search className="h-4 w-4" />
-              </button>
-              <button className="p-2 rounded-full hover:bg-accent">
-                <User className="h-4 w-4" />
-              </button>
-              <button className="p-2 rounded-full hover:bg-accent">
-                <Settings className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+          {/* Preview Header */}
+          <Box sx={{ 
+            p: 3, 
+            borderBottom: '1px solid rgba(255, 255, 255, 0.05)', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            bgcolor: 'rgba(255, 255, 255, 0.02)'
+          }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box sx={{ 
+                width: 36, 
+                height: 36, 
+                bgcolor: '#00F5FF', 
+                borderRadius: '10px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                color: '#000',
+                fontWeight: 900
+              }}>
+                W
+              </Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>Whisperrkeep</Typography>
+            </Stack>
+            <Stack direction="row" spacing={1}>
+              {[Search, User, Settings].map((Icon, i) => (
+                <IconButton key={i} size="small" sx={{ color: 'rgba(255, 255, 255, 0.4)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}>
+                  <Icon size={18} />
+                </IconButton>
+              ))}
+            </Stack>
+          </Box>
 
-          {/* Dashboard Content */}
-          <div className="p-6 space-y-6">
-            <div>
-              <h2 className="text-2xl font-bold mb-1">Dashboard</h2>
-              <p className="text-muted-foreground text-sm">
-                Welcome back! Here&apos;s your security overview.
-              </p>
-            </div>
+          {/* Preview Content */}
+          <Box sx={{ p: 4 }}>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h5" sx={{ fontWeight: 900, mb: 0.5 }}>Dashboard</Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>Welcome back! Here&apos;s your security overview.</Typography>
+            </Box>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Total Credentials
-                    </p>
-                    <p className="text-xl font-bold">24</p>
-                  </div>
-                  <Key className="h-6 w-6 text-blue-500" />
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      TOTP Codes
-                    </p>
-                    <p className="text-xl font-bold">8</p>
-                  </div>
-                  <Shield className="h-6 w-6 text-green-500" />
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Recent Activity
-                    </p>
-                    <p className="text-xl font-bold">3</p>
-                  </div>
-                  <Clock className="h-6 w-6 text-orange-500" />
-                </div>
-              </Card>
-              <Card className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground">
-                      Security Alerts
-                    </p>
-                    <p className="text-xl font-bold">1</p>
-                  </div>
-                  <AlertTriangle className="h-6 w-6 text-red-500" />
-                </div>
-              </Card>
-            </div>
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              {[
+                { label: 'Total Credentials', val: '24', icon: Key, color: '#00F5FF' },
+                { label: 'TOTP Codes', val: '8', icon: Shield, color: '#4CAF50' },
+                { label: 'Recent Activity', val: '3', icon: Clock, color: '#FF9800' },
+                { label: 'Security Alerts', val: '1', icon: AlertTriangle, color: '#FF4D4D' },
+              ].map((stat, i) => (
+                <Grid item xs={6} md={3} key={i}>
+                  <Paper sx={{ 
+                    p: 2.5, 
+                    borderRadius: '20px', 
+                    bgcolor: 'rgba(255, 255, 255, 0.03)', 
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
+                    backgroundImage: 'none'
+                  }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                      <Box>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>{stat.val}</Typography>
+                      </Box>
+                      <stat.icon size={24} color={stat.color} />
+                    </Stack>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
 
-            {/* Quick Actions */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm font-semibold mb-3">Quick Actions</h3>
-                <div className="grid grid-cols-3 gap-2">
-                  <Button size="sm" className="h-auto py-2 justify-start gap-2">
-                    <Plus className="h-3 w-3" />
-                    Add Credential
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-auto py-2 justify-start gap-2"
-                  >
-                    <Download className="h-3 w-3" />
-                    Backup
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-auto py-2 justify-start gap-2"
-                  >
-                    <FileText className="h-3 w-3" />
-                    Logs
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={4}>
+                <Paper sx={{ 
+                  p: 3, 
+                  borderRadius: '24px', 
+                  bgcolor: 'rgba(255, 255, 255, 0.03)', 
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  backgroundImage: 'none',
+                  height: '100%'
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2 }}>Quick Actions</Typography>
+                  <Stack spacing={1.5}>
+                    <Button fullWidth variant="contained" startIcon={<Plus size={16} />} sx={{ bgcolor: '#00F5FF', color: '#000', borderRadius: '12px', fontWeight: 700, textTransform: 'none' }}>Add Credential</Button>
+                    <Button fullWidth variant="outlined" startIcon={<Download size={16} />} sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '12px', fontWeight: 600, textTransform: 'none' }}>Backup</Button>
+                    <Button fullWidth variant="outlined" startIcon={<FileText size={16} />} sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '12px', fontWeight: 600, textTransform: 'none' }}>Logs</Button>
+                  </Stack>
+                </Paper>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Paper sx={{ 
+                  p: 3, 
+                  borderRadius: '24px', 
+                  bgcolor: 'rgba(255, 255, 255, 0.03)', 
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  backgroundImage: 'none'
+                }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2 }}>Recent Items</Typography>
+                  <Stack spacing={1}>
+                    {[
+                      { name: "GitHub", user: "john@example.com", icon: "🐙" },
+                      { name: "Gmail", user: "john.doe@gmail.com", icon: "📧" },
+                      { name: "AWS Console", user: "johndoe", icon: "☁️" },
+                    ].map((item, i) => (
+                      <Box key={i} sx={{ 
+                        p: 1.5, 
+                        borderRadius: '16px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'space-between',
+                        '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' },
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                          <Typography variant="h6">{item.icon}</Typography>
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 700 }}>{item.name}</Typography>
+                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>{item.user}</Typography>
+                          </Box>
+                        </Stack>
+                        <IconButton size="small" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
+                          <CopyIcon size={14} />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Box>
 
-            {/* Recent Items */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="text-sm font-semibold mb-3">Recent Items</h3>
-                <div className="space-y-2">
-                  {[
-                    {
-                      name: "GitHub",
-                      username: "john@example.com",
-                      icon: "🐙",
-                    },
-                    {
-                      name: "Gmail",
-                      username: "john.doe@gmail.com",
-                      icon: "📧",
-                    },
-                    { name: "AWS Console", username: "johndoe", icon: "☁️" },
-                  ].map((item) => (
-                    <div
-                      key={item.name}
-                      className="flex items-center justify-between p-2 rounded-md hover:bg-accent/50 cursor-pointer"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="text-lg">{item.icon}</div>
-                        <div>
-                          <p className="text-sm font-medium">{item.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {item.username}
-                          </p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent"></div>
-        </div>
-      </div>
+          {/* Fade out effect */}
+          <Box sx={{ 
+            position: 'absolute', 
+            bottom: 0, 
+            left: 0, 
+            right: 0, 
+            height: '100px', 
+            background: 'linear-gradient(to top, rgba(10, 10, 10, 1), transparent)',
+            pointerEvents: 'none'
+          }} />
+        </Box>
+      </Container>
 
       {/* Features Section */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">
-            Security-First Password Management
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Designed with your security and privacy as the top priority.
-          </p>
-        </div>
+      <Box sx={{ py: 15, bgcolor: 'rgba(255, 255, 255, 0.01)', borderY: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: 10 }}>
+            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, fontFamily: 'var(--font-space-grotesk)' }}>
+              Security-First Password Management
+            </Typography>
+            <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.5)', maxWidth: '700px', mx: 'auto' }}>
+              Designed with your security and privacy as the top priority.
+            </Typography>
+          </Box>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="bg-card p-6 rounded-lg border transition-all duration-200 hover:shadow-md"
-            >
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-5">
-                <feature.icon className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+          <Grid container spacing={4}>
+            {features.map((feature, i) => (
+              <Grid item xs={12} sm={6} md={4} key={i}>
+                <Paper sx={{ 
+                  p: 4, 
+                  height: '100%', 
+                  borderRadius: '28px', 
+                  bgcolor: 'rgba(255, 255, 255, 0.02)', 
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  backgroundImage: 'none',
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    transform: 'translateY(-8px)',
+                    borderColor: alpha('#00F5FF', 0.3),
+                    bgcolor: 'rgba(255, 255, 255, 0.04)'
+                  }
+                }}>
+                  <Box sx={{ 
+                    width: 56, 
+                    height: 56, 
+                    borderRadius: '16px', 
+                    bgcolor: alpha('#00F5FF', 0.1), 
+                    color: '#00F5FF', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center',
+                    mb: 3
+                  }}>
+                    <feature.icon size={28} />
+                  </Box>
+                  <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>{feature.title}</Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', lineHeight: 1.6 }}>{feature.description}</Typography>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
 
       {/* Trust Section */}
-      <div className="bg-card py-20 px-4 sm:px-6 lg:px-8 border-y">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
-              Your Security Is Our Priority
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              With industry-leading encryption and rigorous security practices.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center p-6">
-              <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mb-5">
-                <Shield className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Advanced Encryption</h3>
-              <p className="text-muted-foreground">
-                Military-grade encryption that protects your data at rest and in
-                transit.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center text-center p-6">
-              <div className="h-16 w-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mb-5">
-                <Lock className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">SOC 2 Certified</h3>
-              <p className="text-muted-foreground">
-                Our security processes are regularly audited and certified by
-                independent experts.
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center text-center p-6">
-              <div className="h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mb-5">
-                <Fingerprint className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Private Access</h3>
-              <p className="text-muted-foreground">
-                We never see your passwords. Your data is encrypted and
-                decrypted locally.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Box sx={{ py: 15 }}>
+        <Container maxWidth="lg">
+          <Grid container spacing={8} alignItems="center">
+            <Grid item xs={12} md={6}>
+              <Typography variant="h3" sx={{ fontWeight: 900, mb: 3, fontFamily: 'var(--font-space-grotesk)' }}>
+                Your Security Is Our Priority
+              </Typography>
+              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 4, lineHeight: 1.8 }}>
+                With industry-leading encryption and rigorous security practices, Whisperrkeep ensures your digital life remains private and protected.
+              </Typography>
+              <Stack spacing={3}>
+                {[
+                  { icon: Shield, title: 'Advanced Encryption', desc: 'Military-grade encryption that protects your data at rest and in transit.', color: '#4CAF50' },
+                  { icon: Lock, title: 'SOC 2 Certified', desc: 'Our security processes are regularly audited and certified by independent experts.', color: '#2196F3' },
+                  { icon: Fingerprint, title: 'Private Access', desc: 'We never see your passwords. Your data is encrypted and decrypted locally.', color: '#9C27B0' },
+                ].map((item, i) => (
+                  <Stack key={i} direction="row" spacing={3} alignItems="flex-start">
+                    <Box sx={{ 
+                      p: 1.5, 
+                      borderRadius: '12px', 
+                      bgcolor: alpha(item.color, 0.1), 
+                      color: item.color 
+                    }}>
+                      <item.icon size={24} />
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{item.title}</Typography>
+                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>{item.desc}</Typography>
+                    </Box>
+                  </Stack>
+                ))}
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Box sx={{ 
+                position: 'relative',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: '-10%',
+                  right: '-10%',
+                  width: '120%',
+                  height: '120%',
+                  background: 'radial-gradient(circle, rgba(0, 245, 255, 0.05) 0%, transparent 70%)',
+                  zIndex: 0
+                }
+              }}>
+                <Paper sx={{ 
+                  p: 1, 
+                  borderRadius: '32px', 
+                  bgcolor: 'rgba(255, 255, 255, 0.02)', 
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backgroundImage: 'none',
+                  position: 'relative',
+                  zIndex: 1,
+                  overflow: 'hidden'
+                }}>
+                  <Box component="img" src="https://images.unsplash.com/photo-1633265485768-30698f1d11bc?auto=format&fit=crop&q=80&w=1000" sx={{ width: '100%', borderRadius: '24px', display: 'block', opacity: 0.8 }} />
+                </Paper>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
 
       {/* Testimonials */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">Trusted by Thousands</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            See what our users have to say about Whisperrkeep.
-          </p>
-        </div>
+      <Box sx={{ py: 15, bgcolor: 'rgba(255, 255, 255, 0.01)' }}>
+        <Container maxWidth="lg">
+          <Box sx={{ textAlign: 'center', mb: 10 }}>
+            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, fontFamily: 'var(--font-space-grotesk)' }}>
+              Trusted by Thousands
+            </Typography>
+            <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
+              See what our users have to say about Whisperrkeep.
+            </Typography>
+          </Box>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {testimonials.map((testimonial, i) => (
-            <div key={i} className="bg-card p-8 rounded-lg border relative">
-              <div className="flex mb-4">
-                {[...Array(testimonial.stars)].map((_, j) => (
-                  <Star
-                    key={j}
-                    className="h-5 w-5 fill-yellow-400 text-yellow-400"
-                  />
-                ))}
-              </div>
-              <p className="italic mb-6">&quot;{testimonial.quote}&quot;</p>
-              <div>
-                <p className="font-semibold">{testimonial.name}</p>
-                <p className="text-muted-foreground text-sm">
-                  {testimonial.role}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+          <Grid container spacing={4}>
+            {testimonials.map((t, i) => (
+              <Grid item xs={12} md={4} key={i}>
+                <Paper sx={{ 
+                  p: 5, 
+                  height: '100%', 
+                  borderRadius: '28px', 
+                  bgcolor: 'rgba(10, 10, 10, 0.5)', 
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  backgroundImage: 'none',
+                  position: 'relative'
+                }}>
+                  <Stack direction="row" spacing={0.5} sx={{ mb: 3 }}>
+                    {[...Array(t.stars)].map((_, j) => (
+                      <Star key={j} size={18} fill="#FFD700" color="#FFD700" />
+                    ))}
+                  </Stack>
+                  <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 4, color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.7 }}>
+                    &quot;{t.quote}&quot;
+                  </Typography>
+                  <Box>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{t.name}</Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.role}</Typography>
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Container>
+      </Box>
 
       {/* FAQ Section */}
-      <div className="bg-card py-20 px-4 sm:px-6 lg:px-8 border-y">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">
+      <Box sx={{ py: 15 }}>
+        <Container maxWidth="md">
+          <Box sx={{ textAlign: 'center', mb: 8 }}>
+            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, fontFamily: 'var(--font-space-grotesk)' }}>
               Frequently Asked Questions
-            </h2>
-            <p className="text-muted-foreground">
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
               Everything you need to know about Whisperrkeep
-            </p>
-          </div>
+            </Typography>
+          </Box>
 
-          <div className="space-y-6">
+          <Stack spacing={2}>
             {faqs.map((faq, i) => (
-              <div key={i} className="border rounded-lg p-6">
-                <h3 className="text-xl font-semibold mb-2">{faq.question}</h3>
-                <p className="text-muted-foreground">{faq.answer}</p>
-              </div>
+              <Accordion key={i} sx={{ 
+                bgcolor: 'rgba(255, 255, 255, 0.02)', 
+                backgroundImage: 'none',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                borderRadius: '20px !important',
+                '&::before': { display: 'none' },
+                overflow: 'hidden'
+              }}>
+                <AccordionSummary expandIcon={<ChevronDown color="rgba(255, 255, 255, 0.3)" />}>
+                  <Typography sx={{ fontWeight: 700, py: 1 }}>{faq.question}</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', pt: 3 }}>
+                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)', lineHeight: 1.7 }}>{faq.answer}</Typography>
+                </AccordionDetails>
+              </Accordion>
             ))}
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </Container>
+      </Box>
 
       {/* CTA Section */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8 text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4">
+      <Box sx={{ py: 20, textAlign: 'center', position: 'relative' }}>
+        <Box sx={{
+          position: 'absolute',
+          bottom: 0,
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '100%',
+          height: '100%',
+          background: 'radial-gradient(circle at bottom, rgba(0, 245, 255, 0.1) 0%, transparent 70%)',
+          zIndex: 0,
+          pointerEvents: 'none'
+        }} />
+        
+        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
+          <Typography variant="h3" sx={{ fontWeight: 900, mb: 3, fontFamily: 'var(--font-space-grotesk)' }}>
             Ready to secure your digital life?
-          </h2>
-          <p className="text-xl text-muted-foreground mb-8">
+          </Typography>
+          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 6 }}>
             Join thousands of users who trust Whisperrkeep with their passwords.
-          </p>
+          </Typography>
           <Button
-            size="lg"
-            className="gap-2"
-            isLoading={isAuthenticating}
+            variant="contained"
+            size="large"
+            endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRight size={20} />}
             onClick={() => {
               if (user) {
                 router.push("/dashboard");
@@ -509,14 +629,29 @@ export default function LandingPage() {
                 alert(err instanceof Error ? err.message : "Failed to open authentication");
               }
             }}
+            sx={{
+              bgcolor: '#00F5FF',
+              color: '#000',
+              px: 6,
+              py: 2.5,
+              borderRadius: '20px',
+              fontWeight: 900,
+              fontSize: '1.2rem',
+              '&:hover': {
+                bgcolor: '#00D1DA',
+                transform: 'scale(1.05)',
+                boxShadow: '0 20px 40px rgba(0, 245, 255, 0.4)'
+              },
+              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }}
           >
-            {user ? "Go to Dashboard" : "Get Started Free"} <ChevronRight className="h-4 w-4" />
+            {user ? "Go to Dashboard" : "Get Started Free"}
           </Button>
-          <p className="mt-4 text-sm text-muted-foreground">
-            No credit card required. Free forever with premium options.
-          </p>
-        </div>
-      </div>
-    </div>
+          <Typography variant="caption" sx={{ display: 'block', mt: 3, color: 'rgba(255, 255, 255, 0.3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            No credit card required • Free forever
+          </Typography>
+        </Container>
+      </Box>
+    </Box>
   );
 }
