@@ -10,8 +10,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@google/generative-ai": "^0.24.1",
     "@heroicons/react": "^2.2.0",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
     "@simplewebauthn/browser": "^9.0.1",
     "@simplewebauthn/server": "9.0.3",
     "@types/jest": "^30.0.0",
@@ -27,17 +31,14 @@
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.6.0",
     "rxdb": "^16.15.0",
-    "tailwind-merge": "^3.3.0",
     "ts-jest": "^29.4.5"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "9.34.0",
     "eslint-config-next": "15.5.2",
-    "tailwindcss": "^4",
     "typescript": "^5"
   }
 }

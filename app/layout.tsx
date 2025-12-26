@@ -28,9 +28,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${mono.variable}`}>
-      <body
-        className="font-inter antialiased bg-background text-foreground"
-      >
+      <body>
         <Providers>
           <div className="min-h-screen w-full">
             <AppShell>{children}</AppShell>

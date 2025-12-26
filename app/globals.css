@@ -1,285 +1,80 @@
-@import "tailwindcss";
+/* Reset and base styles for WhisperrKeep - The Glass Monolith */
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
 
 :root {
-  /* Refined Realism (Light) - Premium Digital Workspace */
-  --void: 250 248 246;
-  /* #FAF8F6 - Off-White */
-  --matter: 234 221 211;
-  /* #EADDD3 - Sand */
-  --matter-highlight: 216 200 189;
-  /* #D8C8BD */
-  --tungsten: 255 193 7;
-  /* #FFC107 - Gold */
-  --shadow-indigo: 26 35 126;
-  /* #1A237E - Deep Navy */
+  --color-void: #000000;
+  --color-surface: #0A0A0A;
+  --color-surface-2: #141414;
+  --color-titanium: #F2F2F2;
+  --color-gunmetal: #A1A1AA;
+  --color-electric: #00F0FF;
+  --border-subtle: #222222;
+  --border-active: #404040;
 
-  --background: var(--void);
-  --foreground: 27 28 32;
-  /* #1B1C20 - Onyx */
-  --card: var(--matter);
-  --card-foreground: 27 28 32;
-  --primary: var(--tungsten);
-  --primary-foreground: 27 28 32;
-  --secondary: var(--shadow-indigo);
-  --secondary-foreground: 250 248 246;
-  --muted: 141 123 109;
-  /* #8D7B6D */
-  --muted-foreground: 27 28 32 / 0.6;
-  --accent: var(--tungsten);
-  --accent-foreground: 27 28 32;
-  --destructive: 181 55 42;
-  --destructive-foreground: 250 248 246;
-  --border: 26 35 126 / 0.1;
-  --input: 26 35 126 / 0.1;
-  --ring: var(--tungsten);
-
-  /* Refined Realism: Radii */
-  --radius-micro: 12px;
-  --radius-macro: 24px;
-  --radius-mega: 32px;
-  --radius: var(--radius-micro);
-
-  /* Refined Realism: Shadows */
-  --shadow-resting: 0px 2px 4px rgba(var(--shadow-indigo), 0.2), 0px 8px 16px rgba(var(--shadow-indigo), 0.1);
-  --shadow-hover: 0px 4px 8px rgba(var(--shadow-indigo), 0.4), 0px 12px 24px rgba(var(--shadow-indigo), 0.2);
-  --shadow-floating: 0px 8px 16px rgba(var(--shadow-indigo), 0.3), 0px 24px 48px rgba(0, 0, 0, 0.2);
-
-  /* Surface Physics: Premium Highlight */
-  --highlight-ceramic: inset 0px 1px 0px rgba(var(--tungsten), 0.2);
+  --background: var(--color-void);
+  --foreground: var(--color-titanium);
 }
 
-.dark {
-  /* Refined Realism (Dark) */
-  --void: 27 28 32;
-  /* #1B1C20 - Onyx */
-  --matter: 45 36 33;
-  /* #2D2421 - Terra */
-  --matter-highlight: 72 74 59;
-  /* #484A3B */
-  --tungsten: 255 193 7;
-  --shadow-indigo: 26 35 126;
-
-  --background: var(--void);
-  --foreground: 250 248 246;
-  /* #FAF8F6 - Off-White */
-  --card: var(--matter);
-  --card-foreground: 250 248 246;
-  --primary: var(--tungsten);
-  --primary-foreground: 27 28 32;
-  --secondary: var(--shadow-indigo);
-  --secondary-foreground: 250 248 246;
-  --muted: 166 144 128;
-  /* #A69080 */
-  --muted-foreground: 250 248 246 / 0.6;
-  --accent: var(--tungsten);
-  --accent-foreground: 27 28 32;
-  --destructive: 181 55 42;
-  --destructive-foreground: 250 248 246;
-  --border: 61 61 61;
-  /* #3D3D3D */
-  --input: 61 61 61;
-  --ring: var(--tungsten);
-
-  --shadow-resting: 0px 2px 4px rgba(0, 0, 0, 0.4), 0px 8px 16px rgba(var(--shadow-indigo), 0.2);
-  --shadow-hover: 0px 4px 8px rgba(0, 0, 0, 0.6), 0px 12px 24px rgba(var(--shadow-indigo), 0.4);
-  --shadow-floating: 0px 8px 16px rgba(0, 0, 0, 0.8), 0px 24px 48px rgba(var(--shadow-indigo), 0.6);
-}
-
-@theme inline {
-  --color-background: rgb(var(--background));
-  --color-foreground: rgb(var(--foreground));
-  --color-card: rgb(var(--card));
-  --color-card-foreground: rgb(var(--card-foreground));
-  --color-primary: rgb(var(--primary));
-  --color-primary-foreground: rgb(var(--primary-foreground));
-  --color-secondary: rgb(var(--secondary));
-  --color-secondary-foreground: rgb(var(--secondary-foreground));
-  --color-muted: rgb(var(--muted));
-  --color-muted-foreground: rgb(var(--muted-foreground));
-  --color-accent: rgb(var(--accent));
-  --color-accent-foreground: rgb(var(--accent-foreground));
-  --color-destructive: rgb(var(--destructive));
-  --color-destructive-foreground: rgb(var(--destructive-foreground));
-  --color-border: rgb(var(--border));
-  --color-input: rgb(var(--input));
-  --color-ring: rgb(var(--ring));
-
-  --radius-micro: var(--radius-micro);
-  --radius-macro: var(--radius-macro);
-  --radius-mega: var(--radius-mega);
-
-  --shadow-resting: var(--shadow-resting);
-  --shadow-hover: var(--shadow-hover);
-  --shadow-floating: var(--shadow-floating);
-  --shadow-ceramic: var(--highlight-ceramic);
-
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-mono);
-  --font-display: var(--font-inter);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-inter), sans-serif;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-* {
-  border-color: rgb(var(--border));
-}
-
+html,
 body {
-  background-color: rgb(var(--background));
-  color: rgb(var(--foreground));
-  font-family: var(--font-inter), sans-serif;
-  font-feature-settings:
-    "rlig" 1,
-    "calt" 1;
-  /* Add subtle background texture for warmth */
-  background-image: linear-gradient(135deg,
-      rgba(191, 174, 153, 0.04) 0%,
-      rgba(141, 103, 72, 0.03) 100%);
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: var(--font-inter), "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-void);
+  color: var(--color-titanium);
+  min-height: 100vh;
 }
 
-/* Custom transition for interactive elements */
-.interactive-transition {
-  transition: all 200ms ease-in-out;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+/* Glassmorphism 2.0 */
+.glass-panel {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(var(--muted));
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--muted-foreground) / 0.5);
-  border-radius: 4px;
+  background: var(--border-subtle);
+  border-radius: 12px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--muted-foreground) / 0.8);
+  background: var(--border-active);
+}
+
+/* Selection styles */
+::selection {
+  background-color: rgba(0, 240, 255, 0.2);
+  color: var(--color-electric);
 }
 
 /* Animation keyframes */
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(90deg,
-      rgb(var(--muted)) 0px,
-      rgb(var(--muted-foreground) / 0.1) 40px,
-      rgb(var(--muted)) 80px);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-/* Premium utility */
-.glass {
-  background: rgba(var(--void), 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-resting);
-}
-
-/* Primary Structure */
-.card {
-  background: rgb(var(--matter));
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-resting);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: 12px 18px 30px rgba(var(--shadow-indigo), 0.5);
-  border-color: rgb(var(--matter-highlight));
-}
-
-/* Mobile viewport and layout fixes */
-html {
-  overflow-x: hidden;
-  scroll-behavior: smooth;
-}
-
-body {
-  overflow-x: hidden;
-  max-width: 100vw;
-}
-
-/* Safe area support for mobile devices */
-.safe-area-inset-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* Prevent horizontal scrolling on small screens */
-* {
-  box-sizing: border-box;
-}
-
-@media (max-width: 1024px) {
-  .overflow-x-hidden {
-    overflow-x: hidden !important;
-  }
-
-  /* Ensure content doesn't exceed viewport width */
-  .max-w-full {
-    max-width: 100% !important;
-  }
-}
-
-/* Fade animations for loading states */
-@keyframes fade-in-out {
-
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-.animate-fade-in-out {
-  animation: fade-in-out 1.5s ease-in-out infinite;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.4s ease-out forwards;
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
