@@ -1,10 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from "react";
-import { ImportService, ImportProgress, ImportResult } from "@/utils/import/import-service";
-import { FloatingContainer } from "@/components/ui/FloatingContainer";
+import { Box, Typography, LinearProgress, Button, alpha } from "@mui/material";
 import { CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 
 interface BackgroundTaskContextType {
   startImport: (type: string, data: string, userId: string) => Promise<void>;
@@ -99,72 +96,110 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
               : { x: 20, y: 20 }
           }
         >
-          <div className="space-y-4">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {!importResult ? (
               // Progress View
-              <div className="space-y-3">
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {importProgress ? (
                   <>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{importProgress.message}</span>
-                      <span className="text-muted-foreground">
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{importProgress.message}</Typography>
+                      <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                         {Math.round((importProgress.currentStep / importProgress.totalSteps) * 100)}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-primary h-full transition-all duration-300"
-                        style={{ width: `${(importProgress.currentStep / importProgress.totalSteps) * 100}%` }}
-                      />
-                    </div>
+                      </Typography>
+                    </Box>
+                    <LinearProgress 
+                      variant="determinate" 
+                      value={(importProgress.currentStep / importProgress.totalSteps) * 100} 
+                      sx={{ 
+                        height: 6, 
+                        borderRadius: 3,
+                        bgcolor: 'rgba(255, 255, 255, 0.05)',
+                        '& .MuiLinearProgress-bar': { borderRadius: 3 }
+                      }}
+                    />
                     {importProgress.itemsTotal > 0 && (
-                        <div className="text-xs text-muted-foreground">
+                        <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                             Processed {importProgress.itemsProcessed} of {importProgress.itemsTotal} items
-                        </div>
+                        </Typography>
                     )}
-                    <div className="text-xs text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded border border-yellow-200 dark:border-yellow-800">
+                    <Box sx={{ 
+                      p: 1.5, 
+                      borderRadius: '8px', 
+                      bgcolor: 'rgba(255, 193, 7, 0.05)', 
+                      border: '1px solid rgba(255, 193, 7, 0.1)' 
+                    }}>
+                      <Typography variant="caption" sx={{ color: '#FFC107', display: 'block' }}>
                         Please do not close this tab or disconnect your internet.
-                    </div>
+                      </Typography>
+                    </Box>
                   </>
                 ) : (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Initializing import...
-                  </div>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Loader2 className="animate-spin" size={16} style={{ color: '#00F0FF' }} />
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>Initializing import...</Typography>
+                  </Box>
                 )}
-              </div>
+              </Box>
             ) : (
               // Result View
-              <div className="space-y-3">
-                <div className={`flex items-center gap-2 p-3 rounded-md ${importResult.success ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400' : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'}`}>
-                    {importResult.success ? <CheckCircle className="h-5 w-5" /> : <AlertTriangle className="h-5 w-5" />}
-                    <span className="font-medium">{importResult.success ? "Import Successful" : "Import Failed"}</span>
-                </div>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1.5, 
+                  p: 2, 
+                  borderRadius: '12px',
+                  bgcolor: importResult.success ? 'rgba(76, 175, 80, 0.1)' : 'rgba(244, 67, 54, 0.1)',
+                  border: '1px solid',
+                  borderColor: importResult.success ? 'rgba(76, 175, 80, 0.2)' : 'rgba(244, 67, 54, 0.2)',
+                  color: importResult.success ? '#4CAF50' : '#F44336'
+                }}>
+                    {importResult.success ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
+                    <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                      {importResult.success ? "Import Successful" : "Import Failed"}
+                    </Typography>
+                </Box>
                 
-                <div className="text-sm space-y-1">
-                    <p>Credentials: {importResult.summary.credentialsCreated}</p>
-                    <p>Folders: {importResult.summary.foldersCreated}</p>
-                    <p>TOTP Secrets: {importResult.summary.totpSecretsCreated}</p>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, px: 1 }}>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>Credentials: {importResult.summary.credentialsCreated}</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>Folders: {importResult.summary.foldersCreated}</Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>TOTP Secrets: {importResult.summary.totpSecretsCreated}</Typography>
                     {importResult.summary.skippedExisting > 0 && (
-                        <p className="text-yellow-600 dark:text-yellow-400">Skipped (Existing): {importResult.summary.skippedExisting}</p>
+                        <Typography variant="caption" sx={{ color: '#FFC107' }}>Skipped (Existing): {importResult.summary.skippedExisting}</Typography>
                     )}
                     {importResult.summary.errors > 0 && (
-                        <p className="text-destructive font-medium">Errors: {importResult.summary.errors}</p>
+                        <Typography variant="caption" sx={{ color: 'error.main', fontWeight: 600 }}>Errors: {importResult.summary.errors}</Typography>
                     )}
-                </div>
+                </Box>
 
                 {importResult.errors.length > 0 && (
-                    <div className="text-xs text-destructive max-h-24 overflow-y-auto border border-destructive/20 rounded p-2">
-                        {importResult.errors.map((e, i) => <div key={i}>• {e}</div>)}
-                    </div>
+                    <Box sx={{ 
+                      maxHeight: 100, 
+                      overflowY: 'auto', 
+                      p: 1.5, 
+                      borderRadius: '8px', 
+                      bgcolor: 'rgba(244, 67, 54, 0.05)',
+                      border: '1px solid rgba(244, 67, 54, 0.1)'
+                    }}>
+                        {importResult.errors.map((e, i) => (
+                          <Typography key={i} variant="caption" sx={{ color: 'error.main', display: 'block' }}>• {e}</Typography>
+                        ))}
+                    </Box>
                 )}
 
-                <Button className="w-full" size="sm" onClick={closeWidget}>
+                <Button 
+                  fullWidth 
+                  variant="contained" 
+                  size="small" 
+                  onClick={closeWidget}
+                  sx={{ borderRadius: '8px', fontWeight: 700 }}
+                >
                     Close
                 </Button>
-              </div>
+              </Box>
             )}
-          </div>
+          </Box>
         </FloatingContainer>
       )}
     </BackgroundTaskContext.Provider>

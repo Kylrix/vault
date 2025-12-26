@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/Button";
+import { Box, Typography, Select, MenuItem, IconButton, Button, alpha, Pagination } from "@mui/material";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationControlsProps {
@@ -25,125 +25,82 @@ export default function PaginationControls({
   const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalItems);
 
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisible = 5;
-
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        pages.push(1, 2, 3, 4, "...", totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(
-          1,
-          "...",
-          totalPages - 3,
-          totalPages - 2,
-          totalPages - 1,
-          totalPages,
-        );
-      } else {
-        pages.push(
-          1,
-          "...",
-          currentPage - 1,
-          currentPage,
-          currentPage + 1,
-          "...",
-          totalPages,
-        );
-      }
-    }
-
-    return pages;
-  };
-
   if (totalItems === 0) {
     return null;
   }
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-4">
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>
+    <Box sx={{ 
+      display: 'flex', 
+      flexDirection: { xs: 'column', sm: 'row' }, 
+      justifyContent: 'space-between', 
+      alignItems: 'center', 
+      gap: 2, 
+      py: 3,
+      borderTop: '1px solid',
+      borderColor: 'rgba(255, 255, 255, 0.05)'
+    }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
           Showing {startItem}-{endItem} of {totalItems} credentials
-        </span>
+        </Typography>
+        
         {showPageSize && (
-          <div className="flex items-center gap-2">
-            <label htmlFor="page-size" className="text-sm">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
               Per page:
-            </label>
-            <select
-              id="page-size"
+            </Typography>
+            <Select
+              size="small"
               value={pageSize}
               onChange={(e) => onPageSizeChange(Number(e.target.value))}
-              className="border rounded px-2 py-1 text-sm bg-background"
               disabled={loading}
+              sx={{ 
+                height: 32, 
+                fontSize: '0.75rem',
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: 'primary.main' }
+              }}
             >
-              <option value={10}>10</option>
-              <option value={20}>20</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-          </div>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </Select>
+          </Box>
         )}
-      </div>
+      </Box>
 
-      <div className="flex items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage <= 1 || loading}
-          className="p-2"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-
-        <div className="flex items-center gap-1">
-          {getPageNumbers().map((page, index) => {
-            if (page === "...") {
-              return (
-                <span
-                  key={`ellipsis-${index}`}
-                  className="px-2 py-1 text-muted-foreground"
-                >
-                  ...
-                </span>
-              );
+      <Pagination 
+        count={totalPages} 
+        page={currentPage} 
+        onChange={(_, page) => onPageChange(page)}
+        disabled={loading}
+        size="small"
+        sx={{
+          '& .MuiPaginationItem-root': {
+            color: 'text.secondary',
+            borderRadius: '8px',
+            border: '1px solid',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            '&:hover': {
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              borderColor: 'rgba(255, 255, 255, 0.2)'
+            },
+            '&.Mui-selected': {
+              bgcolor: 'rgba(0, 240, 255, 0.1)',
+              color: '#00F0FF',
+              borderColor: 'rgba(0, 240, 255, 0.3)',
+              fontWeight: 700,
+              '&:hover': {
+                bgcolor: 'rgba(0, 240, 255, 0.15)'
+              }
             }
-
-            const pageNum = page as number;
-            const isActive = pageNum === currentPage;
-
-            return (
-              <Button
-                key={pageNum}
-                variant={isActive ? "default" : "outline"}
-                size="sm"
-                onClick={() => onPageChange(pageNum)}
-                disabled={loading}
-                className="w-8 h-8 p-0"
-              >
-                {pageNum}
-              </Button>
-            );
-          })}
-        </div>
-
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages || loading}
-          className="p-2"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
+          }
+        }}
+      />
+    </Box>
   );
 }

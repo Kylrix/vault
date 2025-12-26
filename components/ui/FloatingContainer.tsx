@@ -1,9 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { X, Minus, Maximize2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Box, Paper, Typography, IconButton, alpha } from "@mui/material";
+import { X as CloseIcon, Minus as MinimizeIcon, Maximize2 as MaximizeIcon } from "lucide-react";
 
 interface FloatingContainerProps {
   children: React.ReactNode;
@@ -18,7 +16,6 @@ export function FloatingContainer({
   title,
   onClose,
   defaultPosition = { x: 20, y: 20 },
-  className,
 }: FloatingContainerProps) {
   const [position, setPosition] = useState(defaultPosition);
   const [isDragging, setIsDragging] = useState(false);
@@ -65,56 +62,68 @@ export function FloatingContainer({
     setIsMinimized(!isMinimized);
   };
 
-  // Clamp position to viewport
-  const style: React.CSSProperties = {
-    position: "fixed",
-    left: position.x,
-    top: position.y,
-    zIndex: 50,
-    touchAction: "none",
-  };
-
   return (
-    <div style={style} ref={containerRef} className={className}>
-      <Card className="shadow-2xl border-primary/20 w-80 overflow-hidden bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <Box
+      ref={containerRef}
+      sx={{
+        position: "fixed",
+        left: position.x,
+        top: position.y,
+        zIndex: 1300,
+        touchAction: "none",
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          width: 320,
+          overflow: 'hidden',
+          bgcolor: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          border: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: '16px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+        }}
+      >
         {/* Header / Drag Handle */}
-        <div
-          className="p-3 bg-muted/50 border-b cursor-move flex items-center justify-between select-none"
+        <Box
           onMouseDown={handleMouseDown}
+          sx={{
+            p: 1.5,
+            bgcolor: 'rgba(255, 255, 255, 0.03)',
+            borderBottom: '1px solid',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            cursor: 'move',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            userSelect: 'none'
+          }}
         >
-          <span className="font-medium text-sm flex items-center gap-2">
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '0.8rem' }}>
             {title}
-          </span>
-          <div className="flex items-center gap-1" onMouseDown={(e) => e.stopPropagation()}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6"
-              onClick={toggleMinimize}
-            >
-              {isMinimized ? (
-                <Maximize2 className="h-3 w-3" />
-              ) : (
-                <Minus className="h-3 w-3" />
-              )}
-            </Button>
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }} onMouseDown={(e) => e.stopPropagation()}>
+            <IconButton size="small" onClick={toggleMinimize} sx={{ color: 'text.secondary' }}>
+              {isMinimized ? <MaximizeIcon size={14} /> : <MinimizeIcon size={14} />}
+            </IconButton>
             {onClose && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 hover:text-destructive"
-                onClick={onClose}
-              >
-                <X className="h-3 w-3" />
-              </Button>
+              <IconButton size="small" onClick={onClose} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}>
+                <CloseIcon size={14} />
+              </IconButton>
             )}
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         {/* Content */}
-        {!isMinimized && <div className="p-4 max-h-[400px] overflow-y-auto">{children}</div>}
-      </Card>
-    </div>
+        {!isMinimized && (
+          <Box sx={{ p: 2, maxHeight: 400, overflowY: 'auto' }}>
+            {children}
+          </Box>
+        )}
+      </Paper>
+    </Box>
   );
 }
 

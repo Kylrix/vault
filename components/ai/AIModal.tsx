@@ -1,13 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Dialog } from "@/components/ui/Dialog";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
+import { Dialog, Box, Typography, TextField, Button, IconButton, alpha, CircularProgress } from "@mui/material";
 import { Sparkles, Send, Loader2 } from "lucide-react";
-import { useAI } from "@/app/context/AIContext";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
 
 export function AIModal({ onClose }: { onClose: () => void }) {
   const { sendCommand, isLoading, openGlobalCreateModal } = useAI();
@@ -40,10 +34,7 @@ export function AIModal({ onClose }: { onClose: () => void }) {
       case "NAVIGATE":
         if (data?.target) {
             const target = data.target.toLowerCase();
-            // path variable removed as unused
-            // Simple mapping
             const validPaths = ["/dashboard", "/settings", "/import", "/totp", "/sharing", "/credentials/new"];
-            // Find closest match or direct
             const finalPath = validPaths.find(p => p.includes(target)) || "/dashboard";
             router.push(finalPath);
             onClose();
@@ -52,17 +43,11 @@ export function AIModal({ onClose }: { onClose: () => void }) {
         break;
 
       case "CREATE_CREDENTIAL":
-        // Use Global Modal if registered (Dashboard), otherwise fallback to navigation
-        // We will assume if openGlobalCreateModal is available (it always is in context), we try it.
-        // But we can check if we are on a page where it makes sense? 
-        // Actually, the context will simply warn if no handler. 
-        // Let's try to open modal first.
         try {
             openGlobalCreateModal({ name: data?.name, url: data?.url });
             onClose();
             toast.success("Opening new credential form...");
         } catch {
-            // Fallback
             const params = new URLSearchParams();
             if (data?.name) params.set("name", data.name);
             if (data?.url) params.set("url", data.url);
@@ -73,22 +58,47 @@ export function AIModal({ onClose }: { onClose: () => void }) {
         
       case "GENERATE_PASSWORD":
         setResponse("I can't generate the password directly, but I've opened the generator for you.");
-        // We could trigger a global event, but for now just pointing user
         break;
     }
   };
 
   return (
-    <Dialog open={true} onClose={onClose} className="max-w-lg">
-      <div className="p-6 space-y-4">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-           <Sparkles className="h-5 w-5 text-primary" />
-           AI Commander
-        </h2>
-        <div className="bg-primary/5 p-4 rounded-md text-sm text-muted-foreground border border-primary/10">
-          <p>
-            <strong>How can I help?</strong>
-            <br/>
+    <Dialog 
+      open={true} 
+      onClose={onClose}
+      PaperProps={{
+        sx: {
+          width: '100%',
+          maxWidth: 500,
+          bgcolor: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          border: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.08)',
+          borderRadius: '24px',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          backgroundImage: 'none'
+        }
+      }}
+    >
+      <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+           <Sparkles size={24} style={{ color: '#00F0FF' }} />
+           <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: 'var(--font-space-grotesk)' }}>
+             AI Commander
+           </Typography>
+        </Box>
+
+        <Box sx={{ 
+          p: 2.5, 
+          borderRadius: '16px', 
+          bgcolor: 'rgba(0, 240, 255, 0.03)', 
+          border: '1px solid',
+          borderColor: 'rgba(0, 240, 255, 0.1)'
+        }}>
+          <Typography variant="body2" sx={{ fontWeight: 700, color: '#00F0FF', mb: 1 }}>
+            How can I help?
+          </Typography>
+          <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', lineHeight: 1.6 }}>
             Try natural commands like:
             <br/>
             • &quot;Add a login for Netflix&quot;
@@ -96,33 +106,63 @@ export function AIModal({ onClose }: { onClose: () => void }) {
             • &quot;Go to my Settings&quot;
             <br/>
             • &quot;Organize my vault&quot;
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
         {response && (
-          <div className="bg-muted p-3 rounded-md text-sm whitespace-pre-wrap animate-in fade-in slide-in-from-bottom-2">
-            {response}
-          </div>
+          <Box sx={{ 
+            p: 2, 
+            borderRadius: '12px', 
+            bgcolor: 'rgba(255, 255, 255, 0.03)', 
+            border: '1px solid',
+            borderColor: 'rgba(255, 255, 255, 0.08)',
+            animation: 'fadeIn 0.3s ease-out'
+          }}>
+            <Typography variant="body2" sx={{ color: 'text.primary', whiteSpace: 'pre-wrap' }}>
+              {response}
+            </Typography>
+          </Box>
         )}
 
-        <form onSubmit={handleSubmit} className="flex gap-2 pt-2">
-          <Input
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: 1.5, pt: 1 }}>
+          <TextField
+            fullWidth
+            size="small"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Type your command..."
             disabled={isLoading}
-            className="flex-1"
             autoFocus
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '12px',
+                bgcolor: 'rgba(255, 255, 255, 0.02)',
+                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
+                '&.Mui-focused fieldset': { borderColor: 'primary.main' }
+              }
+            }}
           />
-          <Button type="submit" size="default" disabled={isLoading || !prompt.trim()}>
+          <Button 
+            type="submit" 
+            variant="contained" 
+            disabled={isLoading || !prompt.trim()}
+            sx={{ 
+              minWidth: 48, 
+              width: 48, 
+              height: 40, 
+              borderRadius: '12px',
+              p: 0
+            }}
+          >
             {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <CircularProgress size={20} sx={{ color: 'background.default' }} />
             ) : (
-              <Send className="h-4 w-4" />
+              <Send size={18} />
             )}
           </Button>
-        </form>
-      </div>
+        </Box>
+      </Box>
     </Dialog>
   );
 }
