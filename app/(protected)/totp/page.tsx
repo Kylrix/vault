@@ -17,7 +17,11 @@ import {
   alpha, 
   Chip 
 } from "@mui/material";
-import { Shield, Plus, Copy, Edit, Trash2 } from "lucide-react";
+import ShieldIcon from "@mui/icons-material/Shield";
+import AddIcon from "@mui/icons-material/Add";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { listTotpSecrets, deleteTotpSecret, listFolders } from "@/lib/appwrite";
 import { authenticator } from "otplib";
@@ -208,10 +212,10 @@ export default function TOTPPage() {
           </Box>
           <Box sx={{ display: 'flex', gap: 0.5 }}>
             <IconButton size="small" onClick={() => openEditDialog(totp)} sx={{ color: 'text.secondary' }}>
-              <Edit size={16} />
+              <EditIcon sx={{ fontSize: 16 }} />
             </IconButton>
             <IconButton size="small" onClick={() => openDeleteDialog(totp.$id)} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}>
-              <Trash2 size={16} />
+              <DeleteIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Box>
         </Box>
@@ -222,7 +226,7 @@ export default function TOTPPage() {
               {code.substring(0, 3)} {code.substring(3)}
             </Typography>
             <IconButton size="small" onClick={() => copyToClipboard(code)} sx={{ color: '#00F0FF', bgcolor: 'rgba(0, 240, 255, 0.05)' }}>
-              <Copy size={16} />
+              <ContentCopyIcon sx={{ fontSize: 16 }} />
             </IconButton>
           </Box>
 
@@ -275,7 +279,7 @@ export default function TOTPPage() {
           </Box>
           <Button 
             variant="contained" 
-            startIcon={<Plus size={18} />} 
+            startIcon={<AddIcon sx={{ fontSize: 18 }} />} 
             onClick={() => setShowNew(true)}
             sx={{ borderRadius: '12px', fontWeight: 700, px: 3 }}
           >
@@ -306,12 +310,12 @@ export default function TOTPPage() {
           </Box>
         ) : totpCodes.length === 0 ? (
           <Paper sx={{ p: 8, textAlign: 'center', borderRadius: '32px', bgcolor: 'rgba(255, 255, 255, 0.01)', border: '1px dashed', borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-            <Shield size={64} style={{ margin: '0 auto 24px', color: 'rgba(255, 255, 255, 0.1)' }} />
+            <ShieldIcon sx={{ fontSize: 64, display: 'block', mx: 'auto', mb: 3, color: 'rgba(255, 255, 255, 0.1)' }} />
             <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>No TOTP codes found</Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', mb: 4 }}>
               Start by adding your first two-factor authentication code
             </Typography>
-            <Button variant="outlined" startIcon={<Plus size={18} />} onClick={() => setShowNew(true)} sx={{ borderRadius: '12px' }}>
+            <Button variant="outlined" startIcon={<AddIcon sx={{ fontSize: 18 }} />} onClick={() => setShowNew(true)} sx={{ borderRadius: '12px' }}>
               Add TOTP
             </Button>
           </Paper>

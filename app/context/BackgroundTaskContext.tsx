@@ -1,7 +1,8 @@
 "use client";
 
-import { Box, Typography, LinearProgress, Button, alpha } from "@mui/material";
-import { CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { Box, Typography, LinearProgress, Button, alpha, CircularProgress } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import WarningIcon from "@mui/icons-material/Warning";
 
 interface BackgroundTaskContextType {
   startImport: (type: string, data: string, userId: string) => Promise<void>;
@@ -155,7 +156,7 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
                   borderColor: importResult.success ? alpha('#00F5FF', 0.2) : alpha('#FF4D4D', 0.2),
                   color: importResult.success ? '#00F5FF' : '#FF4D4D'
                 }}>
-                    {importResult.success ? <CheckCircle size={20} /> : <AlertTriangle size={20} />}
+                    {importResult.success ? <CheckCircleIcon sx={{ fontSize: 20 }} /> : <WarningIcon sx={{ fontSize: 20 }} />}
                     <Typography variant="body2" sx={{ fontWeight: 700 }}>
                       {importResult.success ? "Import Successful" : "Import Failed"}
                     </Typography>

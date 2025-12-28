@@ -19,7 +19,15 @@ import {
   ListItemIcon,
   ListItemText
 } from "@mui/material";
-import { Upload, FileJson, Shield, Info, CheckCircle2, AlertCircle, ChevronRight } from "lucide-react";
+import UploadIcon from "@mui/icons-material/Upload";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ShieldIcon from "@mui/icons-material/Shield";
+import InfoIcon from "@mui/icons-material/Info";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import FolderIcon from "@mui/icons-material/Folder";
 import { useAppwrite } from "@/app-provider";
 import { validateBitwardenExport } from "@/utils/import/bitwarden-mapper";
 import { useBackgroundTask } from "@/app/context/BackgroundTaskContext";
@@ -193,7 +201,7 @@ export default function ImportPage() {
                   border: '1px solid rgba(255, 255, 255, 0.05)'
                 }}>
                   <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ mb: 2 }}>
-                    <Info size={20} color="#00F5FF" />
+                    <InfoIcon sx={{ fontSize: 20, color: "#00F5FF" }} />
                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
                       {importType === "bitwarden" ? "How to export from Bitwarden" : "Restoring from WhisperrNote"}
                     </Typography>
@@ -231,7 +239,7 @@ export default function ImportPage() {
                     }}
                   >
                     <input type="file" hidden onChange={handleFileChange} accept=".json" />
-                    <Upload size={32} color="rgba(255, 255, 255, 0.2)" style={{ marginBottom: '12px' }} />
+                    <UploadIcon sx={{ fontSize: 32, color: "rgba(255, 255, 255, 0.2)", mb: 1.5 }} />
                     <Typography variant="body2" sx={{ fontWeight: 700, mb: 0.5 }}>
                       {file ? file.name : "Click to upload or drag and drop"}
                     </Typography>
@@ -275,7 +283,7 @@ export default function ImportPage() {
                 border: '1px solid rgba(255, 255, 255, 0.08)'
               }}>
                 <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
-                  <AlertCircle size={18} color="#FFB000" />
+                  <ErrorOutlineIcon sx={{ fontSize: 18, color: "#FFB000" }} />
                   <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Important Notes</Typography>
                 </Stack>
                 <Stack spacing={1}>
@@ -310,10 +318,10 @@ export default function ImportPage() {
             </Typography>
             <List sx={{ p: 0 }}>
               {[
-                { title: "Login Credentials", desc: "Usernames, passwords, URLs, and notes", icon: Key },
-                { title: "TOTP Secrets", desc: "Two-factor authentication codes", icon: Shield },
-                { title: "Folders", desc: "Your existing organization structure", icon: Folder },
-                { title: "Custom Fields", desc: "Additional metadata and fields", icon: FileJson }
+                { title: "Login Credentials", desc: "Usernames, passwords, URLs, and notes", icon: VpnKeyIcon },
+                { title: "TOTP Secrets", desc: "Two-factor authentication codes", icon: ShieldIcon },
+                { title: "Folders", desc: "Your existing organization structure", icon: FolderIcon },
+                { title: "Custom Fields", desc: "Additional metadata and fields", icon: DescriptionIcon }
               ].map((item, i) => (
                 <ListItem key={i} sx={{ px: 0, py: 2.5 }}>
                   <ListItemIcon sx={{ minWidth: 48 }}>
@@ -326,14 +334,14 @@ export default function ImportPage() {
                       alignItems: 'center', 
                       justifyContent: 'center' 
                     }}>
-                      <item.icon size={18} color="#00F5FF" />
+                      <item.icon sx={{ fontSize: 18, color: "#00F5FF" }} />
                     </Box>
                   </ListItemIcon>
                   <ListItemText 
                     primary={<Typography variant="body2" sx={{ fontWeight: 800 }}>{item.title}</Typography>}
                     secondary={<Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>{item.desc}</Typography>}
                   />
-                  <CheckCircle2 size={16} color="#10B981" />
+                  <CheckCircleIcon sx={{ fontSize: 16, color: "#10B981" }} />
                 </ListItem>
               ))}
             </List>

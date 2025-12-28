@@ -15,7 +15,12 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import { Upload, FileJson, FileSpreadsheet, AlertCircle, CheckCircle2, Info } from "lucide-react";
+import UploadIcon from "@mui/icons-material/Upload";
+import DescriptionIcon from "@mui/icons-material/Description";
+import TableChartIcon from "@mui/icons-material/TableChart";
+import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import InfoIcon from "@mui/icons-material/Info";
 import { AppwriteService } from "@/lib/appwrite";
 import { ImportService } from "@/utils/import/import-service";
 import { useAppwrite } from "@/app/appwrite-provider";
@@ -196,7 +201,7 @@ export default function ImportSection() {
           {file ? (
             <>
               <Box sx={{ p: 1.5, borderRadius: '12px', bgcolor: alpha('#00F5FF', 0.1), color: '#00F5FF', mb: 2 }}>
-                {file.name.endsWith('.json') ? <FileJson size={32} /> : <FileSpreadsheet size={32} />}
+                {file.name.endsWith('.json') ? <DescriptionIcon sx={{ fontSize: 32 }} /> : <TableChartIcon sx={{ fontSize: 32 }} />}
               </Box>
               <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
                 {file.name}
@@ -208,7 +213,7 @@ export default function ImportSection() {
           ) : (
             <>
               <Box sx={{ p: 1.5, borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.05)', color: 'rgba(255, 255, 255, 0.3)', mb: 2 }}>
-                <Upload size={32} />
+                <UploadIcon sx={{ fontSize: 32 }} />
               </Box>
               <Typography variant="body1" sx={{ color: 'white', fontWeight: 600 }}>
                 Click to upload file
@@ -248,21 +253,21 @@ export default function ImportSection() {
 
       {error && (
         <Paper sx={{ p: 2, borderRadius: '16px', bgcolor: alpha('#FF4D4D', 0.05), border: '1px solid rgba(255, 77, 77, 0.2)', display: 'flex', gap: 2, alignItems: 'center' }}>
-          <AlertCircle size={20} color="#FF4D4D" />
+          <ErrorOutlineIcon sx={{ fontSize: 20, color: "#FF4D4D" }} />
           <Typography variant="body2" sx={{ color: '#FF4D4D' }}>{error}</Typography>
         </Paper>
       )}
 
       {success && (
         <Paper sx={{ p: 2, borderRadius: '16px', bgcolor: alpha('#00F5FF', 0.05), border: '1px solid rgba(0, 245, 255, 0.2)', display: 'flex', gap: 2, alignItems: 'center' }}>
-          <CheckCircle2 size={20} color="#00F5FF" />
+          <CheckCircleIcon sx={{ fontSize: 20, color: "#00F5FF" }} />
           <Typography variant="body2" sx={{ color: '#00F5FF' }}>{success}</Typography>
         </Paper>
       )}
 
       <Box sx={{ p: 3, borderRadius: '20px', bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
         <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2 }}>
-          <Info size={18} color="#00F5FF" />
+          <InfoIcon sx={{ fontSize: 18, color: "#00F5FF" }} />
           <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 600 }}>
             Supported Formats
           </Typography>

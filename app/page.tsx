@@ -1,24 +1,23 @@
 "use client";
 
-import {
-  Shield,
-  Lock,
-  Key,
-  Fingerprint,
-  RefreshCw,
-  Globe,
-  ChevronRight,
-  Star,
-  Clock,
-  AlertTriangle,
-  Plus,
-  Download,
-  FileText,
-  Search,
-  User,
-  Settings,
-  Copy as CopyIcon,
-} from "lucide-react";
+import ShieldIcon from "@mui/icons-material/Shield";
+import LockIcon from "@mui/icons-material/Lock";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import PublicIcon from "@mui/icons-material/Public";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import StarIcon from "@mui/icons-material/Star";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import WarningIcon from "@mui/icons-material/Warning";
+import AddIcon from "@mui/icons-material/Add";
+import DownloadIcon from "@mui/icons-material/Download";
+import DescriptionIcon from "@mui/icons-material/Description";
+import SearchIcon from "@mui/icons-material/Search";
+import PersonIcon from "@mui/icons-material/Person";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Box,
   Typography,
@@ -35,7 +34,6 @@ import {
   AccordionSummary,
   AccordionDetails,
 } from "@mui/material";
-import { ChevronDown } from "lucide-react";
 import { useRef, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { useAppwrite } from "@/app/appwrite-provider";
@@ -60,36 +58,36 @@ export default function LandingPage() {
 
   const features = [
     {
-      icon: Shield,
+      icon: ShieldIcon,
       title: "Private Encryption",
       description:
         "Your data is encrypted on your device. We never see your passwords.",
     },
     {
-      icon: Key,
+      icon: VpnKeyIcon,
       title: "Secure Password Generator",
       description:
         "Create strong, unique passwords for all your accounts with one click.",
     },
     {
-      icon: Fingerprint,
+      icon: FingerprintIcon,
       title: "Biometric Authentication",
       description:
         "Quickly access your vault with fingerprint or face recognition.",
     },
     {
-      icon: RefreshCw,
+      icon: SyncIcon,
       title: "Automatic Syncing",
       description:
         "Your credentials sync automatically across all your devices.",
     },
     {
-      icon: Globe,
+      icon: PublicIcon,
       title: "Cross-Platform Access",
       description: "Available on desktop, mobile, and as a browser extension.",
     },
     {
-      icon: Lock,
+      icon: LockIcon,
       title: "Two-Factor Authentication",
       description: "Built-in TOTP code generator for added security.",
     },
@@ -187,7 +185,7 @@ export default function LandingPage() {
             <Button
               variant="contained"
               size="large"
-              endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRight size={20} />}
+              endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRightIcon sx={{ fontSize: 20 }} />}
               onClick={() => {
                 if (user) {
                   router.push("/dashboard");
@@ -284,9 +282,9 @@ export default function LandingPage() {
               <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>Whisperrkeep</Typography>
             </Stack>
             <Stack direction="row" spacing={1}>
-              {[Search, User, Settings].map((Icon, i) => (
+              {[SearchIcon, PersonIcon, SettingsIcon].map((Icon, i) => (
                 <IconButton key={i} size="small" sx={{ color: 'rgba(255, 255, 255, 0.4)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}>
-                  <Icon size={18} />
+                  <Icon sx={{ fontSize: 18 }} />
                 </IconButton>
               ))}
             </Stack>
@@ -301,10 +299,10 @@ export default function LandingPage() {
 
             <Grid container spacing={3} sx={{ mb: 4 }}>
               {[
-                { label: 'Total Credentials', val: '24', icon: Key, color: '#00F5FF' },
-                { label: 'TOTP Codes', val: '8', icon: Shield, color: '#4CAF50' },
-                { label: 'Recent Activity', val: '3', icon: Clock, color: '#FF9800' },
-                { label: 'Security Alerts', val: '1', icon: AlertTriangle, color: '#FF4D4D' },
+                { label: 'Total Credentials', val: '24', icon: VpnKeyIcon, color: '#00F5FF' },
+                { label: 'TOTP Codes', val: '8', icon: ShieldIcon, color: '#4CAF50' },
+                { label: 'Recent Activity', val: '3', icon: AccessTimeIcon, color: '#FF9800' },
+                { label: 'Security Alerts', val: '1', icon: WarningIcon, color: '#FF4D4D' },
               ].map((stat, i) => (
                 <Grid item xs={6} md={3} key={i}>
                   <Paper sx={{ 
@@ -319,7 +317,7 @@ export default function LandingPage() {
                         <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</Typography>
                         <Typography variant="h4" sx={{ fontWeight: 900, mt: 0.5 }}>{stat.val}</Typography>
                       </Box>
-                      <stat.icon size={24} color={stat.color} />
+                      <stat.icon sx={{ fontSize: 24, color: stat.color }} />
                     </Stack>
                   </Paper>
                 </Grid>
@@ -338,9 +336,9 @@ export default function LandingPage() {
                 }}>
                   <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 2 }}>Quick Actions</Typography>
                   <Stack spacing={1.5}>
-                    <Button fullWidth variant="contained" startIcon={<Plus size={16} />} sx={{ bgcolor: '#00F5FF', color: '#000', borderRadius: '12px', fontWeight: 700, textTransform: 'none' }}>Add Credential</Button>
-                    <Button fullWidth variant="outlined" startIcon={<Download size={16} />} sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '12px', fontWeight: 600, textTransform: 'none' }}>Backup</Button>
-                    <Button fullWidth variant="outlined" startIcon={<FileText size={16} />} sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '12px', fontWeight: 600, textTransform: 'none' }}>Logs</Button>
+                    <Button fullWidth variant="contained" startIcon={<AddIcon sx={{ fontSize: 16 }} />} sx={{ bgcolor: '#00F5FF', color: '#000', borderRadius: '12px', fontWeight: 700, textTransform: 'none' }}>Add Credential</Button>
+                    <Button fullWidth variant="outlined" startIcon={<DownloadIcon sx={{ fontSize: 16 }} />} sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '12px', fontWeight: 600, textTransform: 'none' }}>Backup</Button>
+                    <Button fullWidth variant="outlined" startIcon={<DescriptionIcon sx={{ fontSize: 16 }} />} sx={{ borderColor: 'rgba(255, 255, 255, 0.1)', color: 'white', borderRadius: '12px', fontWeight: 600, textTransform: 'none' }}>Logs</Button>
                   </Stack>
                 </Paper>
               </Grid>
@@ -376,7 +374,7 @@ export default function LandingPage() {
                           </Box>
                         </Stack>
                         <IconButton size="small" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
-                          <CopyIcon size={14} />
+                          <CopyIcon sx={{ fontSize: 14 }} />
                         </IconButton>
                       </Box>
                     ))}
@@ -439,7 +437,7 @@ export default function LandingPage() {
                     justifyContent: 'center',
                     mb: 3
                   }}>
-                    <feature.icon size={28} />
+                    <feature.icon sx={{ fontSize: 28 }} />
                   </Box>
                   <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>{feature.title}</Typography>
                   <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', lineHeight: 1.6 }}>{feature.description}</Typography>
@@ -463,9 +461,9 @@ export default function LandingPage() {
               </Typography>
               <Stack spacing={3}>
                 {[
-                  { icon: Shield, title: 'Advanced Encryption', desc: 'Military-grade encryption that protects your data at rest and in transit.', color: '#4CAF50' },
-                  { icon: Lock, title: 'SOC 2 Certified', desc: 'Our security processes are regularly audited and certified by independent experts.', color: '#2196F3' },
-                  { icon: Fingerprint, title: 'Private Access', desc: 'We never see your passwords. Your data is encrypted and decrypted locally.', color: '#9C27B0' },
+                  { icon: ShieldIcon, title: 'Advanced Encryption', desc: 'Military-grade encryption that protects your data at rest and in transit.', color: '#4CAF50' },
+                  { icon: LockIcon, title: 'SOC 2 Certified', desc: 'Our security processes are regularly audited and certified by independent experts.', color: '#2196F3' },
+                  { icon: FingerprintIcon, title: 'Private Access', desc: 'We never see your passwords. Your data is encrypted and decrypted locally.', color: '#9C27B0' },
                 ].map((item, i) => (
                   <Stack key={i} direction="row" spacing={3} alignItems="flex-start">
                     <Box sx={{ 
@@ -474,7 +472,7 @@ export default function LandingPage() {
                       bgcolor: alpha(item.color, 0.1), 
                       color: item.color 
                     }}>
-                      <item.icon size={24} />
+                      <item.icon sx={{ fontSize: 24 }} />
                     </Box>
                     <Box>
                       <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{item.title}</Typography>
@@ -542,7 +540,7 @@ export default function LandingPage() {
                 }}>
                   <Stack direction="row" spacing={0.5} sx={{ mb: 3 }}>
                     {[...Array(t.stars)].map((_, j) => (
-                      <Star key={j} size={18} fill="#FFD700" color="#FFD700" />
+                      <StarIcon key={j} sx={{ fontSize: 18, color: "#FFD700" }} />
                     ))}
                   </Stack>
                   <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 4, color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.7 }}>
@@ -581,7 +579,7 @@ export default function LandingPage() {
                 '&::before': { display: 'none' },
                 overflow: 'hidden'
               }}>
-                <AccordionSummary expandIcon={<ChevronDown color="rgba(255, 255, 255, 0.3)" />}>
+                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: "rgba(255, 255, 255, 0.3)" }} />}>
                   <Typography sx={{ fontWeight: 700, py: 1 }}>{faq.question}</Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', pt: 3 }}>
@@ -617,7 +615,7 @@ export default function LandingPage() {
           <Button
             variant="contained"
             size="large"
-            endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRight size={20} />}
+            endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRightIcon sx={{ fontSize: 20 }} />}
             onClick={() => {
               if (user) {
                 router.push("/dashboard");

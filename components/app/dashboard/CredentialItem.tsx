@@ -119,32 +119,32 @@ export default function CredentialItem({
           <>
             <Tooltip title="Copy Username">
               <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.username); }} sx={{ color: 'text.secondary' }}>
-                <User size={18} />
+                <PersonIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Copy Password">
               <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.password); }} sx={{ color: 'primary.main' }}>
-                <Lock size={18} />
+                <LockIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Edit">
               <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(); }} sx={{ color: 'text.secondary' }}>
-                <Edit size={18} />
+                <EditIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Delete">
               <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(); }} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}>
-                <Trash2 size={18} />
+                <DeleteIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           </>
         ) : (
           <>
             <IconButton size="small" onClick={(e) => { e.stopPropagation(); setCopyAnchorEl(e.currentTarget); }} sx={{ color: 'primary.main' }}>
-              <Copy size={20} />
+              <ContentCopyIcon sx={{ fontSize: 20 }} />
             </IconButton>
             <IconButton size="small" onClick={(e) => { e.stopPropagation(); setAnchorEl(e.currentTarget); }} sx={{ color: 'text.secondary' }}>
-              <MoreVertical size={20} />
+              <MoreVertIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </>
         )}
@@ -167,11 +167,11 @@ export default function CredentialItem({
         }}
       >
         <MenuItem onClick={() => handleCopy(credential.username)}>
-          <ListItemIcon><User size={18} /></ListItemIcon>
+          <ListItemIcon><PersonIcon sx={{ fontSize: 18 }} /></ListItemIcon>
           <ListItemText primary="Copy Username" primaryTypographyProps={{ fontWeight: 600 }} />
         </MenuItem>
         <MenuItem onClick={() => handleCopy(credential.password)}>
-          <ListItemIcon><Lock size={18} /></ListItemIcon>
+          <ListItemIcon><LockIcon sx={{ fontSize: 18 }} /></ListItemIcon>
           <ListItemText primary="Copy Password" primaryTypographyProps={{ fontWeight: 600 }} />
         </MenuItem>
       </Menu>
@@ -193,11 +193,11 @@ export default function CredentialItem({
         }}
       >
         <MenuItem onClick={() => { onEdit(); setAnchorEl(null); }}>
-          <ListItemIcon><Edit size={18} /></ListItemIcon>
+          <ListItemIcon><EditIcon sx={{ fontSize: 18 }} /></ListItemIcon>
           <ListItemText primary="Edit" primaryTypographyProps={{ fontWeight: 600 }} />
         </MenuItem>
         <MenuItem onClick={() => { onDelete(); setAnchorEl(null); }} sx={{ color: 'error.main' }}>
-          <ListItemIcon><Trash2 size={18} color={theme.palette.error.main} /></ListItemIcon>
+          <ListItemIcon><DeleteIcon sx={{ fontSize: 18, color: theme.palette.error.main }} /></ListItemIcon>
           <ListItemText primary="Delete" primaryTypographyProps={{ fontWeight: 700 }} />
         </MenuItem>
       </Menu>

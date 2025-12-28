@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Search, X, Sparkles } from "lucide-react";
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useAI } from "@/app/context/AIContext";
 import { 
   Box, 
@@ -54,13 +56,13 @@ export default function SearchBar({
           disableUnderline: true,
           startAdornment: (
             <InputAdornment position="start">
-              <Search size={20} color={theme.palette.primary.main} />
+              <SearchIcon sx={{ fontSize: 20, color: theme.palette.primary.main }} />
             </InputAdornment>
           ),
           endAdornment: value && (
             <InputAdornment position="end">
               <IconButton onClick={handleClear} size="small">
-                <X size={16} />
+                <CloseIcon sx={{ fontSize: 16 }} />
               </IconButton>
             </InputAdornment>
           ),
@@ -88,7 +90,7 @@ export default function SearchBar({
           variant="outlined"
           onClick={onSmartOrganize}
           disabled={isLoading}
-          startIcon={<Sparkles size={18} />}
+          startIcon={<AutoAwesomeIcon sx={{ fontSize: 18 }} />}
           sx={{
             height: 48,
             borderRadius: '24px',

@@ -13,20 +13,18 @@ import {
   Paper,
   Stack
 } from "@mui/material";
-import {
-  Copy,
-  Eye,
-  EyeOff,
-  ArrowLeft,
-  X,
-  Globe,
-  Calendar,
-  Tag,
-  ShieldAlert,
-  ShieldCheck,
-  FileText,
-  ExternalLink
-} from "lucide-react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import CloseIcon from "@mui/icons-material/Close";
+import LanguageIcon from "@mui/icons-material/Language";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import GppMaybeIcon from "@mui/icons-material/GppMaybe";
+import GppGoodIcon from "@mui/icons-material/GppGood";
+import DescriptionIcon from "@mui/icons-material/Description";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import { Credentials } from "@/types/appwrite";
 import { useAI } from "@/app/context/AIContext";
 import { useSudo } from "@/app/context/SudoContext";
@@ -123,7 +121,7 @@ export default function CredentialDetail({
         <Button 
           size="small" 
           onClick={onCopy} 
-          startIcon={<Copy size={12} />}
+          startIcon={<ContentCopyIcon sx={{ fontSize: 12 }} />}
           sx={{ 
             height: 24, 
             fontSize: '0.7rem', 
@@ -183,7 +181,7 @@ export default function CredentialDetail({
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)'
       }}>
         <IconButton onClick={onClose} sx={{ color: 'text.secondary' }}>
-          {isMobile ? <ArrowLeft size={20} /> : <X size={20} />}
+          {isMobile ? <ArrowBackIcon sx={{ fontSize: 20 }} /> : <CloseIcon sx={{ fontSize: 20 }} />}
         </IconButton>
         <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: '"Space Grotesk", sans-serif' }}>
           Credential Details
@@ -223,8 +221,8 @@ export default function CredentialDetail({
                   href={credential.url} 
                   target="_blank" 
                   size="small"
-                  startIcon={<Globe size={14} />}
-                  endIcon={<ExternalLink size={12} />}
+                  startIcon={<LanguageIcon sx={{ fontSize: 14 }} />}
+                  endIcon={<OpenInNewIcon sx={{ fontSize: 12 }} />}
                   sx={{ 
                     p: 0, 
                     minWidth: 0, 
@@ -237,7 +235,7 @@ export default function CredentialDetail({
                 </Button>
                 {urlSafety && (
                   <Chip
-                    icon={urlSafety.safe ? <ShieldCheck size={14} /> : <ShieldAlert size={14} />}
+                    icon={urlSafety.safe ? <GppGoodIcon sx={{ fontSize: 14 }} /> : <GppMaybeIcon sx={{ fontSize: 14 }} />}
                     label={`${urlSafety.riskLevel} Risk: ${urlSafety.reason}`}
                     size="small"
                     sx={{ 
@@ -278,7 +276,7 @@ export default function CredentialDetail({
                       setShowPassword(false);
                     }
                   }}
-                  startIcon={showPassword ? <EyeOff size={12} /> : <Eye size={12} />}
+                  startIcon={showPassword ? <VisibilityOffIcon sx={{ fontSize: 12 }} /> : <VisibilityIcon sx={{ fontSize: 12 }} />}
                   sx={{ height: 24, fontSize: '0.7rem', borderRadius: '6px' }}
                 >
                   {showPassword ? "Hide" : "Show"}
@@ -286,7 +284,7 @@ export default function CredentialDetail({
                 <Button 
                   size="small" 
                   onClick={() => requestSudo({ onSuccess: () => handleCopy(credential.password, "password") })}
-                  startIcon={<Copy size={12} />}
+                  startIcon={<ContentCopyIcon sx={{ fontSize: 12 }} />}
                   sx={{ 
                     height: 24, 
                     fontSize: '0.7rem', 
@@ -358,7 +356,7 @@ export default function CredentialDetail({
           {/* Metadata */}
           <Box>
             <Typography variant="caption" sx={{ fontWeight: 700, color: 'text.secondary', textTransform: 'uppercase', mb: 1.5, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Calendar size={14} /> Information
+              <CalendarTodayIcon sx={{ fontSize: 14 }} /> Information
             </Typography>
             <Stack spacing={1} sx={{ mt: 1 }}>
               {credential.createdAt && (

@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-import { 
-  Eye, 
-  EyeOff, 
-  RefreshCw, 
-  Plus, 
-  X,
-  Save,
-  Globe,
-  Tag,
-  FileText,
-  User,
-  Lock
-} from "lucide-react";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import SaveIcon from "@mui/icons-material/Save";
+import LanguageIcon from "@mui/icons-material/Language";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
 import { 
   Dialog, 
   DialogTitle, 
@@ -215,7 +213,7 @@ export default function CredentialDialog({
         }}>
           {initial ? "Edit Credential" : "Add Credential"}
           <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
-            <X size={20} />
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </DialogTitle>
 
@@ -250,7 +248,7 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <User size={18} />
+                      <PersonIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
                   sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
@@ -273,13 +271,13 @@ export default function CredentialDialog({
                     disableUnderline: true,
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock size={18} />
+                        <LockIcon sx={{ fontSize: 18 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton onClick={() => setShowPassword(!showPassword)} size="small">
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          {showPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                         </IconButton>
                       </InputAdornment>
                     ),
@@ -297,7 +295,7 @@ export default function CredentialDialog({
                     '&:hover': { bgcolor: 'rgba(0, 240, 255, 0.2)' }
                   }}
                 >
-                  <RefreshCw size={20} />
+                  <AutorenewIcon sx={{ fontSize: 20 }} />
                 </IconButton>
               </Box>
             </Grid>
@@ -315,7 +313,7 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Globe size={18} />
+                      <LanguageIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
                   sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
@@ -335,7 +333,7 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Tag size={18} />
+                      <LocalOfferIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
                   sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
@@ -357,7 +355,7 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
-                      <FileText size={18} />
+                      <DescriptionIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
                   sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
@@ -373,7 +371,7 @@ export default function CredentialDialog({
                 </Typography>
                 <Button
                   size="small"
-                  startIcon={<Plus size={16} />}
+                  startIcon={<AddIcon sx={{ fontSize: 16 }} />}
                   onClick={addCustomField}
                   sx={{ borderRadius: '8px' }}
                 >
@@ -400,7 +398,7 @@ export default function CredentialDialog({
                     InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   />
                   <IconButton onClick={() => removeCustomField(field.id)} size="small" color="error">
-                    <X size={18} />
+                    <CloseIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Box>
               ))}
@@ -428,7 +426,7 @@ export default function CredentialDialog({
             fullWidth 
             variant="contained" 
             disabled={loading}
-            startIcon={!loading && <Save size={18} />}
+            startIcon={!loading && <SaveIcon sx={{ fontSize: 18 }} />}
             sx={{ 
               borderRadius: '12px', 
               py: 1.2, 

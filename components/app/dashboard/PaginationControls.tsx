@@ -1,5 +1,4 @@
 import { Box, Typography, Select, MenuItem, IconButton, Button, alpha, Pagination } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationControlsProps {
   currentPage: number;

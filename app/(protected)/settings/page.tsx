@@ -1,24 +1,21 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  User,
-  Shield,
-  Palette,
-  Trash2,
-  Download,
-  Upload,
-  LogOut,
-  Key,
-  Folder,
-  Edit,
-  Trash,
-  ChevronRight,
-  AlertTriangle,
-  CheckCircle2,
-  X,
-  Plus
-} from "lucide-react";
+import PersonIcon from "@mui/icons-material/Person";
+import ShieldIcon from "@mui/icons-material/Shield";
+import PaletteIcon from "@mui/icons-material/Palette";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DownloadIcon from "@mui/icons-material/Download";
+import UploadIcon from "@mui/icons-material/Upload";
+import LogoutIcon from "@mui/icons-material/Logout";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import FolderIcon from "@mui/icons-material/Folder";
+import EditIcon from "@mui/icons-material/Edit";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import WarningIcon from "@mui/icons-material/Warning";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
 import { 
   Box, 
   Typography, 
@@ -88,7 +85,7 @@ function SettingsCard({ title, icon: Icon, children, danger = false }: { title: 
           color: danger ? '#FF3B30' : 'primary.main',
           display: 'flex'
         }}>
-          <Icon size={20} />
+          <Icon sx={{ fontSize: 20 }} />
         </Box>
         <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: 'var(--font-space-grotesk)' }}>
           {title}
@@ -484,7 +481,7 @@ export default function SettingsPage() {
           <Grid container spacing={3}>
             {/* Profile Settings */}
             <Grid item xs={12} md={6}>
-              <SettingsCard title="Profile" icon={User}>
+              <SettingsCard title="Profile" icon={PersonIcon}>
                 <Stack spacing={3}>
                   <TextField
                     fullWidth
@@ -517,12 +514,12 @@ export default function SettingsPage() {
 
             {/* Security Settings */}
             <Grid item xs={12} md={6}>
-              <SettingsCard title="Security" icon={Shield}>
+              <SettingsCard title="Security" icon={ShieldIcon}>
                 <Stack spacing={3}>
                   <Button
                     variant="outlined"
                     fullWidth
-                    startIcon={<Key size={18} />}
+                    startIcon={<VpnKeyIcon sx={{ fontSize: 18 }} />}
                     onClick={() => setIsChangePasswordModalOpen(true)}
                     sx={{ borderRadius: '12px', py: 1.5, justifyContent: 'flex-start', px: 2, fontWeight: 600 }}
                   >
@@ -534,7 +531,7 @@ export default function SettingsPage() {
                   <Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                       <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Passkeys</Typography>
-                      <Button size="small" onClick={handleTogglePasskey} startIcon={<Plus size={16} />}>
+                      <Button size="small" onClick={handleTogglePasskey} startIcon={<AddIcon sx={{ fontSize: 16 }} />}>
                         Add Passkey
                       </Button>
                     </Box>
@@ -551,10 +548,10 @@ export default function SettingsPage() {
                             </Box>
                             <Box>
                               <IconButton size="small" onClick={() => openRenamePasskey(pk)} sx={{ color: 'text.secondary' }}>
-                                <Edit size={16} />
+                                <EditIcon sx={{ fontSize: 16 }} />
                               </IconButton>
                               <IconButton size="small" onClick={() => openDeletePasskey(pk)} sx={{ color: 'error.main' }}>
-                                <Trash size={16} />
+                                <DeleteIcon sx={{ fontSize: 16 }} />
                               </IconButton>
                             </Box>
                           </Paper>
@@ -606,9 +603,9 @@ export default function SettingsPage() {
 
             {/* Folder Management */}
             <Grid item xs={12} md={6}>
-              <SettingsCard title="Folders" icon={Folder}>
+              <SettingsCard title="Folders" icon={FolderIcon}>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                  <Button size="small" onClick={() => openFolderModal()} startIcon={<Plus size={16} />}>
+                  <Button size="small" onClick={() => openFolderModal()} startIcon={<AddIcon sx={{ fontSize: 16 }} />}>
                     New Folder
                   </Button>
                 </Box>
@@ -619,10 +616,10 @@ export default function SettingsPage() {
                         <Typography variant="body2" sx={{ fontWeight: 700 }}>{folder.name}</Typography>
                         <Box>
                           <IconButton size="small" onClick={() => openFolderModal(folder)} sx={{ color: 'text.secondary' }}>
-                            <Edit size={16} />
+                            <EditIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                           <IconButton size="small" onClick={() => openDeleteFolderModal(folder)} sx={{ color: 'error.main' }}>
-                            <Trash size={16} />
+                            <DeleteIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Box>
                       </Paper>
@@ -638,12 +635,12 @@ export default function SettingsPage() {
 
             {/* Data Management */}
             <Grid item xs={12} md={6}>
-              <SettingsCard title="Data" icon={Download}>
+              <SettingsCard title="Data" icon={DownloadIcon}>
                 <Stack spacing={2}>
                   <Button
                     variant="outlined"
                     fullWidth
-                    startIcon={<Download size={18} />}
+                    startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
                     onClick={onExportClick}
                     sx={{ borderRadius: '12px', py: 1.5, justifyContent: 'flex-start', px: 2, fontWeight: 600 }}
                   >
@@ -652,7 +649,7 @@ export default function SettingsPage() {
                   <Button
                     variant="outlined"
                     fullWidth
-                    startIcon={<Upload size={18} />}
+                    startIcon={<UploadIcon sx={{ fontSize: 18 }} />}
                     onClick={() => (window.location.href = "/import")}
                     sx={{ borderRadius: '12px', py: 1.5, justifyContent: 'flex-start', px: 2, fontWeight: 600 }}
                   >
@@ -664,7 +661,7 @@ export default function SettingsPage() {
 
             {/* Danger Zone */}
             <Grid item xs={12}>
-              <SettingsCard title="Danger Zone" icon={AlertTriangle} danger>
+              <SettingsCard title="Danger Zone" icon={WarningIcon} danger>
                 <Grid container spacing={3}>
                   <Grid item xs={12} md={6}>
                     <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#FF3B30', mb: 1 }}>Delete Account</Typography>
@@ -706,7 +703,7 @@ export default function SettingsPage() {
             <Button
               variant="text"
               color="error"
-              startIcon={<LogOut size={18} />}
+              startIcon={<LogoutIcon sx={{ fontSize: 18 }} />}
               onClick={logout}
               sx={{ fontWeight: 700 }}
             >
