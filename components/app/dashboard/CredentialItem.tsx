@@ -13,7 +13,12 @@ import {
   useTheme,
   useMediaQuery
 } from "@mui/material";
-import { Copy, Edit, Trash2, MoreVertical, User, Lock } from "lucide-react";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
 import type { Credentials } from "@/types/appwrite.d";
 
 export default function CredentialItem({

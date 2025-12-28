@@ -14,7 +14,13 @@ import {
   CircularProgress,
   Avatar
 } from "@mui/material";
-import { Key, Shield, Clock, AlertTriangle, Files, Plus, Download, ChevronRight } from "lucide-react";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import ShieldIcon from "@mui/icons-material/Shield";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import WarningIcon from "@mui/icons-material/Warning";
+import AddIcon from "@mui/icons-material/Add";
+import DownloadIcon from "@mui/icons-material/Download";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useAppwrite } from "@/app/appwrite-provider";
 import {
   appwriteDatabases,
@@ -224,7 +230,7 @@ export default function OverviewPage() {
               component={Link}
               href="/credentials/new"
               variant="contained" 
-              startIcon={<Plus size={18} />}
+              startIcon={<AddIcon sx={{ fontSize: 18 }} />}
               sx={{ 
                 borderRadius: '14px', 
                 px: 3, 
@@ -241,7 +247,7 @@ export default function OverviewPage() {
               component={Link}
               href="/import"
               variant="outlined" 
-              startIcon={<Download size={18} />}
+              startIcon={<DownloadIcon sx={{ fontSize: 18 }} />}
               sx={{ 
                 borderRadius: '14px', 
                 px: 3, 
@@ -269,7 +275,7 @@ export default function OverviewPage() {
             alignItems: 'center',
             gap: 2
           }}>
-            <AlertTriangle size={24} color="#FFB000" />
+            <WarningIcon sx={{ fontSize: 24, color: "#FFB000" }} />
             <Typography variant="body2" sx={{ color: '#FFB000', fontWeight: 600 }}>
               Your vault is locked. Unlock to view full statistics and recent activity.
             </Typography>
@@ -279,10 +285,10 @@ export default function OverviewPage() {
         {/* Stats Grid */}
         <Grid container spacing={3} sx={{ mb: 4 }}>
           {[
-            { label: 'Total Credentials', value: stats.totalCreds, icon: Key, color: '#3B82F6' },
-            { label: 'TOTP Codes', value: stats.totpCount, icon: Shield, color: '#10B981' },
-            { label: 'Recent Activity', value: Math.min(stats.totalCreds, 5), icon: Clock, color: '#F59E0B' },
-            { label: 'Security Alerts', value: 0, icon: AlertTriangle, color: '#EF4444' }
+            { label: 'Total Credentials', value: stats.totalCreds, icon: VpnKeyIcon, color: '#3B82F6' },
+            { label: 'TOTP Codes', value: stats.totpCount, icon: ShieldIcon, color: '#10B981' },
+            { label: 'Recent Activity', value: Math.min(stats.totalCreds, 5), icon: AccessTimeIcon, color: '#F59E0B' },
+            { label: 'Security Alerts', value: 0, icon: WarningIcon, color: '#EF4444' }
           ].map((stat, i) => (
             <Grid item xs={6} md={3} key={i}>
               <Paper sx={{ 
@@ -312,7 +318,7 @@ export default function OverviewPage() {
                   alignItems: 'center', 
                   justifyContent: 'center' 
                 }}>
-                  <stat.icon size={20} color={stat.color} />
+                  <stat.icon sx={{ fontSize: 20, color: stat.color }} />
                 </Box>
               </Paper>
             </Grid>
@@ -387,7 +393,7 @@ export default function OverviewPage() {
                           )}
                         </Box>
                       </Stack>
-                      <ChevronRight size={18} color="rgba(255, 255, 255, 0.3)" />
+                      <ChevronRightIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.3)" }} />
                     </Box>
                   ))
                 )}
@@ -429,7 +435,7 @@ export default function OverviewPage() {
                   </Box>
                 ) : dupGroups.length === 0 ? (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <Shield size={40} color="rgba(255, 255, 255, 0.1)" style={{ marginBottom: '12px' }} />
+                    <ShieldIcon sx={{ fontSize: 40, color: "rgba(255, 255, 255, 0.1)", mb: '12px' }} />
                     <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
                       No duplicates detected.
                     </Typography>

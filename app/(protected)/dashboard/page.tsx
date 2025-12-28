@@ -399,7 +399,7 @@ export default function DashboardPage() {
 
           <Button 
             variant="contained" 
-            startIcon={<Plus size={18} />}
+            startIcon={<AddIcon sx={{ fontSize: 18 }} />}
             onClick={handleAdd}
             sx={{ 
               borderRadius: '12px', 
@@ -420,8 +420,8 @@ export default function DashboardPage() {
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, gap: 2, flexWrap: 'wrap' }}>
             <Button
               variant="outlined"
-              startIcon={<Folder size={18} />}
-              endIcon={<ChevronDown size={16} />}
+              startIcon={<FolderIcon sx={{ fontSize: 18 }} />}
+              endIcon={<ExpandMoreIcon sx={{ fontSize: 16 }} />}
               onClick={(e) => setFolderAnchorEl(e.currentTarget)}
               sx={{ 
                 borderRadius: '12px', 
