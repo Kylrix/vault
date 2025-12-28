@@ -21,7 +21,15 @@ import {
   ToggleButton,
   ToggleButtonGroup
 } from "@mui/material";
-import { ArrowLeft, Eye, EyeOff, RefreshCw, Plus, X, Shield, Folder, Key } from "lucide-react";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import ShieldIcon from "@mui/icons-material/Shield";
+import FolderIcon from "@mui/icons-material/Folder";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { useAppwrite } from "@/app/appwrite-provider";
 import {
   createCredential,
@@ -229,7 +237,7 @@ export default function NewCredentialPage() {
             '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.1)' }
           }}
         >
-          <ArrowLeft size={20} />
+          <ArrowBackIcon sx={{ fontSize: 20 }} />
         </IconButton>
         <Box>
           <Typography variant="h4" sx={{ 
@@ -286,13 +294,13 @@ export default function NewCredentialPage() {
               >
                 <ToggleButton value="credential">
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Key size={18} />
+                    <VpnKeyIcon sx={{ fontSize: 18 }} />
                     <span>Password</span>
                   </Stack>
                 </ToggleButton>
                 <ToggleButton value="folder">
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <Folder size={18} />
+                    <FolderIcon sx={{ fontSize: 18 }} />
                     <span>Folder</span>
                   </Stack>
                 </ToggleButton>
@@ -368,10 +376,10 @@ export default function NewCredentialPage() {
                       endAdornment: (
                         <InputAdornment position="end">
                           <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            {showPassword ? <VisibilityOffIcon sx={{ fontSize: 20 }} /> : <VisibilityIcon sx={{ fontSize: 20 }} />}
                           </IconButton>
                           <IconButton onClick={handleGeneratePassword} edge="end" sx={{ ml: 1 }}>
-                            <RefreshCw size={20} />
+                            <RefreshIcon sx={{ fontSize: 20 }} />
                           </IconButton>
                         </InputAdornment>
                       ),
@@ -448,7 +456,7 @@ export default function NewCredentialPage() {
                     <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Custom Fields</Typography>
                     <Button 
                       size="small" 
-                      startIcon={<Plus size={16} />} 
+                      startIcon={<AddIcon sx={{ fontSize: 16 }} />} 
                       onClick={addCustomField}
                       sx={{ color: '#00F5FF', fontWeight: 700 }}
                     >
@@ -477,7 +485,7 @@ export default function NewCredentialPage() {
                           sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
                         />
                         <IconButton onClick={() => removeCustomField(field.id)} sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
-                          <X size={20} />
+                          <CloseIcon sx={{ fontSize: 20 }} />
                         </IconButton>
                       </Stack>
                     ))}

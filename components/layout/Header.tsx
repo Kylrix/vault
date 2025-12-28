@@ -1,7 +1,14 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Menu as MenuIcon, Moon, Sun, Monitor, User, Sparkles, LogOut, Settings } from "lucide-react";
+import MenuIcon from "@mui/icons-material/Menu";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
+import PersonIcon from "@mui/icons-material/Person";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useTheme } from "@/app/providers";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { 
@@ -70,7 +77,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
             }}
           >
-            <MenuIcon size={20} />
+            <MenuIcon sx={{ fontSize: 20 }} />
           </IconButton>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -114,7 +121,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 '&:hover': { bgcolor: alpha('#00F5FF', 0.1) } 
               }}
             >
-              <Sparkles size={20} />
+              <AutoAwesomeIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
 
@@ -130,9 +137,9 @@ export function Header({ onMenuClick }: HeaderProps) {
             }}
             sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}
           >
-            {theme === "light" && <Sun size={20} />}
-            {theme === "dark" && <Moon size={20} />}
-            {theme === "system" && <Monitor size={20} />}
+            {theme === "light" && <LightModeIcon sx={{ fontSize: 20 }} />}
+            {theme === "dark" && <DarkModeIcon sx={{ fontSize: 20 }} />}
+            {theme === "system" && <SettingsBrightnessIcon sx={{ fontSize: 20 }} />}
           </IconButton>
 
           <Box>
@@ -143,7 +150,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } 
               }}
             >
-              <User size={20} />
+              <PersonIcon sx={{ fontSize: 20 }} />
             </IconButton>
             <Menu
               anchorEl={anchorEl}
@@ -180,7 +187,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 onClick={handleCloseMenu} 
                 sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
               >
-                <Settings size={18} color="rgba(255, 255, 255, 0.6)" />
+                <SettingsIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>Account Settings</Typography>
               </MenuItem>
               <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
@@ -191,7 +198,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 }}
                 sx={{ py: 1.5, px: 2.5, gap: 1.5, color: '#FF4D4D' }}
               >
-                <LogOut size={18} />
+                <LogoutIcon sx={{ fontSize: 18 }} />
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>Logout</Typography>
               </MenuItem>
             </Menu>

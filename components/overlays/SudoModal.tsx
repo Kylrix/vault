@@ -16,7 +16,10 @@ import {
   alpha,
   InputAdornment,
 } from "@mui/material";
-import { Lock, Fingerprint, X, ShieldCheck } from "lucide-react";
+import LockIcon from "@mui/icons-material/Lock";
+import FingerprintIcon from "@mui/icons-material/Fingerprint";
+import CloseIcon from "@mui/icons-material/Close";
+import ShieldIcon from "@mui/icons-material/Shield";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { unlockWithPasskey } from "@/app/(protected)/settings/passkey";
 import { useAppwrite } from "@/app/appwrite-provider";
@@ -127,7 +130,7 @@ export default function SudoModal({
                         '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
                     }}
                 >
-                    <X size={20} />
+                    <CloseIcon sx={{ fontSize: 20 }} />
                 </IconButton>
 
                 <Box sx={{ 
@@ -138,7 +141,7 @@ export default function SudoModal({
                     color: '#00F5FF',
                     mb: 2
                 }}>
-                    <ShieldCheck size={32} />
+                    <ShieldIcon sx={{ fontSize: 32 }} />
                 </Box>
                 <Typography variant="h5" sx={{ 
                     fontWeight: 900, 
@@ -181,7 +184,7 @@ export default function SudoModal({
                                 }
                             }}
                         >
-                            <Fingerprint size={40} color={passkeyLoading ? '#00F5FF' : 'rgba(255, 255, 255, 0.4)'} />
+                            <FingerprintIcon sx={{ fontSize: 40, color: passkeyLoading ? '#00F5FF' : 'rgba(255, 255, 255, 0.4)' }} />
                         </Box>
                         
                         <Box sx={{ textAlign: 'center' }}>
@@ -258,7 +261,7 @@ export default function SudoModal({
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
-                                                    <Lock size={18} color="rgba(255, 255, 255, 0.3)" />
+                                                    <LockIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.3)" }} />
                                                 </InputAdornment>
                                             ),
                                         }}
@@ -319,7 +322,7 @@ export default function SudoModal({
                                 <Button
                                     fullWidth
                                     variant="text"
-                                    startIcon={<Fingerprint size={18} />}
+                                    startIcon={<FingerprintIcon sx={{ fontSize: 18 }} />}
                                     onClick={() => setMode("passkey")}
                                     sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
                                 >

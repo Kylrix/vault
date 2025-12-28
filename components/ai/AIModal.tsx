@@ -1,7 +1,12 @@
 "use client";
 
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Dialog, Box, Typography, TextField, Button, IconButton, alpha, CircularProgress } from "@mui/material";
-import { Sparkles, Send, Loader2 } from "lucide-react";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import SendIcon from "@mui/icons-material/Send";
+import { useAI } from "@/app/context/AIContext";
+import { toast } from "react-hot-toast";
 
 export function AIModal({ onClose }: { onClose: () => void }) {
   const { sendCommand, isLoading, openGlobalCreateModal } = useAI();
@@ -82,7 +87,7 @@ export function AIModal({ onClose }: { onClose: () => void }) {
     >
       <Box sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-           <Sparkles size={24} style={{ color: '#00F0FF' }} />
+           <AutoAwesomeIcon sx={{ fontSize: 24, color: '#00F0FF' }} />
            <Typography variant="h6" sx={{ fontWeight: 800, fontFamily: 'var(--font-space-grotesk)' }}>
              AI Commander
            </Typography>
@@ -158,7 +163,7 @@ export function AIModal({ onClose }: { onClose: () => void }) {
             {isLoading ? (
               <CircularProgress size={20} sx={{ color: 'background.default' }} />
             ) : (
-              <Send size={18} />
+              <SendIcon sx={{ fontSize: 18 }} />
             )}
           </Button>
         </Box>

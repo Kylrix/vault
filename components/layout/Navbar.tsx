@@ -1,17 +1,15 @@
 "use client";
 
-import {
-  Sun,
-  Moon,
-  Monitor,
-  User,
-  LogOut,
-  Key,
-  ShieldCheck,
-  Sparkles,
-  Settings,
-  Lock,
-} from "lucide-react";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
+import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import ShieldIcon from "@mui/icons-material/Shield";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import SettingsIcon from "@mui/icons-material/Settings";
+import LockIcon from "@mui/icons-material/Lock";
 import { useTheme } from "@/app/providers";
 import Link from "next/link";
 import { useAppwrite } from "@/app/appwrite-provider";
@@ -113,7 +111,7 @@ export function Navbar() {
                   '&:hover': { bgcolor: alpha('#00F5FF', 0.1) } 
                 }}
               >
-                <Sparkles size={20} />
+                <AutoAwesomeIcon sx={{ fontSize: 20 }} />
               </IconButton>
             </Tooltip>
           )}
@@ -130,15 +128,15 @@ export function Navbar() {
             }}
             sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}
           >
-            {theme === "light" && <Sun size={20} />}
-            {theme === "dark" && <Moon size={20} />}
-            {theme === "system" && <Monitor size={20} />}
+            {theme === "light" && <LightModeIcon sx={{ fontSize: 20 }} />}
+            {theme === "dark" && <DarkModeIcon sx={{ fontSize: 20 }} />}
+            {theme === "system" && <SettingsBrightnessIcon sx={{ fontSize: 20 }} />}
           </IconButton>
 
           <DropdownMenu
             trigger={
               <IconButton title="Password Generator" sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}>
-                <Key size={20} />
+                <VpnKeyIcon sx={{ fontSize: 20 }} />
               </IconButton>
             }
             width="400px"
@@ -177,7 +175,7 @@ export function Navbar() {
                 variant="text"
                 size="small"
                 onClick={handleOpenMenu}
-                startIcon={<User size={18} />}
+                startIcon={<PersonIcon sx={{ fontSize: 18 }} />}
                 sx={{ 
                   color: 'white',
                   fontWeight: 700,
@@ -221,7 +219,7 @@ export function Navbar() {
                 </Box>
                 <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
                 <MenuItem component={Link} href="/settings" onClick={handleCloseMenu} sx={{ py: 1.5, px: 2.5, gap: 1.5 }}>
-                  <Settings size={18} color="rgba(255, 255, 255, 0.6)" />
+                  <SettingsIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>Account Settings</Typography>
                 </MenuItem>
                 <MenuItem
@@ -235,7 +233,7 @@ export function Navbar() {
                     handleCloseMenu();
                   }}
                 >
-                  <Lock size={18} color="rgba(255, 255, 255, 0.6)" />
+                  <LockIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>Lock Vault</Typography>
                 </MenuItem>
                 <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
@@ -246,7 +244,7 @@ export function Navbar() {
                   }}
                   sx={{ py: 1.5, px: 2.5, gap: 1.5, color: '#FF4D4D' }}
                 >
-                  <LogOut size={18} />
+                  <LogoutIcon sx={{ fontSize: 18 }} />
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>Logout</Typography>
                 </MenuItem>
               </Menu>

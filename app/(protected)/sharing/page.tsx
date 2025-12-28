@@ -1,7 +1,8 @@
 "use client";
 
 import { Box, Typography, Paper, Stack, alpha } from "@mui/material";
-import { Construction, ShieldAlert } from "lucide-react";
+import EngineeringIcon from "@mui/icons-material/Engineering";
+import SecurityIcon from "@mui/icons-material/Security";
 import VaultGuard from "@/components/layout/VaultGuard";
 
 export default function SharingPage() {
@@ -37,7 +38,7 @@ export default function SharingPage() {
               justifyContent: 'center',
               mb: 2
             }}>
-              <Construction size={40} color="#00F5FF" />
+              <EngineeringIcon sx={{ fontSize: 40, color: "#00F5FF" }} />
             </Box>
             <Typography variant="h4" sx={{ 
               fontWeight: 900, 
@@ -59,7 +60,7 @@ export default function SharingPage() {
               gap: 2,
               width: '100%'
             }}>
-              <ShieldAlert size={20} color="rgba(255, 255, 255, 0.4)" />
+              <SecurityIcon sx={{ fontSize: 20, color: "rgba(255, 255, 255, 0.4)" }} />
               <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600 }}>
                 Security is our priority. Sharing will require MasterPass verification.
               </Typography>

@@ -11,7 +11,10 @@ import {
   CircularProgress,
   alpha,
 } from "@mui/material";
-import { AlertTriangle, CheckCircle2, ArrowLeft, ShieldAlert } from "lucide-react";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SecurityIcon from "@mui/icons-material/Security";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { resetMasterpassAndWipe } from "@/lib/appwrite";
 import toast from "react-hot-toast";

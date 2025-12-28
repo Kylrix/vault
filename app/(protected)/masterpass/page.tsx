@@ -13,7 +13,7 @@ import {
   alpha,
   useTheme
 } from "@mui/material";
-import { Shield } from "lucide-react";
+import ShieldIcon from "@mui/icons-material/Shield";
 
 export default function MasterPassPage() {
   const [showModal, setShowModal] = useState(false);
@@ -69,7 +69,7 @@ export default function MasterPassPage() {
               color: 'primary.main',
               mb: 1
             }}>
-              <Shield size={40} />
+              <ShieldIcon sx={{ fontSize: 40 }} />
             </Box>
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', mb: 1 }}>
