@@ -28,7 +28,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import FolderIcon from "@mui/icons-material/Folder";
-import { useAppwrite } from "@/app-provider";
+import { useAppwrite } from "@/app/appwrite-provider";
 import { validateBitwardenExport } from "@/utils/import/bitwarden-mapper";
 import { useBackgroundTask } from "@/app/context/BackgroundTaskContext";
 import { ImportPreviewModal } from "@/components/import/ImportPreviewModal";

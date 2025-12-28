@@ -85,7 +85,8 @@ Visit [http://localhost:3000](http://localhost:3000) to view the app.
 
 - [Next.js](https://nextjs.org/) – React framework for production
 - [Appwrite](https://appwrite.io/) – Secure backend server for authentication and storage
-- [Tailwind CSS](https://tailwindcss.com/) – Utility-first CSS framework
+- [Material UI (MUI)](https://mui.com/) – React UI framework
+- [Emotion](https://emotion.sh/) – CSS-in-JS library for styling
 - [TypeScript](https://www.typescriptlang.org/) – Typed JavaScript at scale
 
 ---

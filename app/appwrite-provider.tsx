@@ -344,7 +344,6 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       {children}
     </AppwriteContext.Provider>
   );
-  );
 }
 
 // Custom hook for easy access
