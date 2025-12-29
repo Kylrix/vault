@@ -10,7 +10,6 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LockIcon from "@mui/icons-material/Lock";
-import { useTheme } from "@mui/material";
 import Link from "next/link";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { 
@@ -33,7 +32,8 @@ import { useAI } from "@/app/context/AIContext";
 import { usePathname } from "next/navigation";
 
 export function Navbar() {
-  const { theme, setTheme } = useTheme();
+  const theme = 'dark' as "light" | "dark" | "system";
+  const setTheme = (t: "light" | "dark" | "system") => {};
   const { user, logout, openIDMWindow } = useAppwrite();
   const { openAIModal } = useAI();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);

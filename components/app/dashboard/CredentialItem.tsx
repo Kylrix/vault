@@ -105,10 +105,10 @@ export default function CredentialItem({
 
       {/* Info */}
       <Box sx={{ ml: 2.5, flexGrow: 1, minWidth: 0 }}>
-        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', noWrap: true, lineHeight: 1.2, fontFamily: '"Space Grotesk", sans-serif' }}>
+        <Typography variant="subtitle1" noWrap sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.2, fontFamily: '"Space Grotesk", sans-serif' }}>
           {credential.name}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', noWrap: true, mt: 0.5 }}>
+        <Typography variant="body2" noWrap sx={{ color: 'text.secondary', mt: 0.5 }}>
           {credential.username}
         </Typography>
       </Box>

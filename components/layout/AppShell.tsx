@@ -30,7 +30,6 @@ import {
   alpha,
   useTheme as useMuiTheme
 } from "@mui/material";
-import { useTheme } from "@mui/material";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { Navbar } from "./Navbar";
@@ -62,7 +61,8 @@ const SIMPLIFIED_LAYOUT_PATHS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const theme = 'dark' as "light" | "dark" | "system";
+  const setTheme = (t: "light" | "dark" | "system") => {};
   const muiTheme = useMuiTheme();
   const { user, loading, logout, refresh } = useAppwrite();
   const [showPasskeySetup, setShowPasskeySetup] = useState(false);

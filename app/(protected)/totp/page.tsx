@@ -189,10 +189,10 @@ export default function TOTPPage() {
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary', noWrap: true }}>
+            <Typography variant="subtitle1" noWrap sx={{ fontWeight: 800, color: 'text.primary' }}>
               {totp.issuer || "Unknown Issuer"}
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', noWrap: true, mb: 1 }}>
+            <Typography variant="body2" noWrap sx={{ color: 'text.secondary', mb: 1 }}>
               {totp.accountName || "No account name"}
             </Typography>
             {folderName && (

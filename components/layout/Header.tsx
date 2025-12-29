@@ -36,7 +36,8 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { theme, setTheme } = useTheme();
+  const theme = 'dark' as "light" | "dark" | "system";
+  const setTheme = (t: "light" | "dark" | "system") => {};
   const { user, logout } = useAppwrite();
   const { openAIModal } = useAI();
   const pathname = usePathname();
