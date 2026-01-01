@@ -8,11 +8,13 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  compress: true,
   experimental: {
     optimizePackageImports: [
       '@mui/material',
       '@mui/icons-material',
       'lodash',
+      'lodash-es',
       'date-fns',
       'framer-motion',
     ],
@@ -79,7 +81,7 @@ const nextConfig: NextConfig = {
           // Prevent DNS Prefetching
           {
             key: "X-DNS-Prefetch-Control",
-            value: "off",
+            value: "on",
           },
           // Restrict Adobe Flash and PDF (legacy)
           {

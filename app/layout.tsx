@@ -35,6 +35,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${mono.variable} ${spaceGrotesk.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://fra.cloud.appwrite.io" />
+      </head>
       <body style={{ margin: 0, padding: 0, backgroundColor: '#000' }}>
         <Providers>
           <Box sx={{ minHeight: '100vh', width: '100%', bgcolor: '#000' }}>
