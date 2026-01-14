@@ -4,7 +4,11 @@ import React, { createContext, useContext, useState, ReactNode, useCallback } fr
 import { AnalysisMode } from "@/lib/ai/types";
 import { PrivacyFilter } from "@/lib/ai/sanitizer";
 import { generateAIContent } from "@/app/actions/ai";
-import { AIModal } from "@/components/ai/AIModal";
+import dynamic from "next/dynamic";
+
+const AIModal = dynamic(() => import("@/components/ai/AIModal").then(mod => mod.AIModal), {
+  ssr: false
+});
 
 interface AIContextType {
   analyze: (mode: AnalysisMode, data: unknown) => Promise<unknown>;

@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   },
   compress: true,
   experimental: {
+    reactCompiler: true,
     optimizePackageImports: [
       '@mui/material',
       '@mui/icons-material',
@@ -17,6 +18,7 @@ const nextConfig: NextConfig = {
       'lodash-es',
       'date-fns',
       'framer-motion',
+      'lucide-react',
     ],
   },
 

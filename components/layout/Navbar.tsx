@@ -24,9 +24,14 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { DropdownMenu } from "@/components/ui/DropdownMenu";
-import PasswordGenerator from "@/components/ui/PasswordGenerator";
 import { useAI } from "@/app/context/AIContext";
 import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const PasswordGenerator = dynamic(() => import("@/components/ui/PasswordGenerator"), { 
+  loading: () => <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}><CircularProgress size={24} /></Box>,
+  ssr: false 
+});
 
 export function Navbar() {
   const { user, logout, openIDMWindow } = useAppwrite();

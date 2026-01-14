@@ -1,14 +1,7 @@
 "use client";
 
 import ShieldIcon from "@mui/icons-material/Shield";
-import LockIcon from "@mui/icons-material/Lock";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import FingerprintIcon from "@mui/icons-material/Fingerprint";
-import RefreshIcon from "@mui/icons-material/Refresh";
-import PublicIcon from "@mui/icons-material/Public";
-import SyncIcon from "@mui/icons-material/Sync";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import WarningIcon from "@mui/icons-material/Warning";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,7 +11,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   Box,
   Typography,
@@ -28,17 +21,22 @@ import {
   Paper,
   Stack,
   IconButton,
-  alpha,
-  useTheme as useMuiTheme,
   CircularProgress,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
 } from "@mui/material";
 import { useRef, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+
+const Features = dynamic(() => import("@/components/landing/Features"), { 
+  loading: () => <Box sx={{ py: 10, textAlign: 'center' }}><CircularProgress color="primary" /></Box>,
+  ssr: false 
+});
+const Trust = dynamic(() => import("@/components/landing/Trust"), { ssr: false });
+const Testimonials = dynamic(() => import("@/components/landing/Testimonials"), { ssr: false });
+const FAQ = dynamic(() => import("@/components/landing/FAQ"), { ssr: false });
+const CTA = dynamic(() => import("@/components/landing/CTA"), { ssr: false });
 
 export default function LandingPage() {
   const { user, openIDMWindow, isAuthenticating } = useAppwrite();
@@ -56,90 +54,6 @@ export default function LandingPage() {
       demoRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
-
-  const features = [
-    {
-      icon: ShieldIcon,
-      title: "Private Encryption",
-      description:
-        "Your data is encrypted on your device. We never see your passwords.",
-    },
-    {
-      icon: VpnKeyIcon,
-      title: "Secure Password Generator",
-      description:
-        "Create strong, unique passwords for all your accounts with one click.",
-    },
-    {
-      icon: FingerprintIcon,
-      title: "Biometric Authentication",
-      description:
-        "Quickly access your vault with fingerprint or face recognition.",
-    },
-    {
-      icon: SyncIcon,
-      title: "Automatic Syncing",
-      description:
-        "Your credentials sync automatically across all your devices.",
-    },
-    {
-      icon: PublicIcon,
-      title: "Cross-Platform Access",
-      description: "Available on desktop, mobile, and as a browser extension.",
-    },
-    {
-      icon: LockIcon,
-      title: "Two-Factor Authentication",
-      description: "Built-in TOTP code generator for added security.",
-    },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        "Whisperrkeep app has completely transformed how I manage my online security. I finally feel safe online.",
-      name: "Sarah Johnson",
-      role: "Software Developer",
-      stars: 5,
-    },
-    {
-      quote:
-        "The best password manager I've used. Simple, secure, and works everywhere I need it to.",
-      name: "Michael Chen",
-      role: "Security Consultant",
-      stars: 5,
-    },
-    {
-      quote:
-        "I was hesitant to use a password manager, but Whisperrkeep made it so easy. Now I can't imagine life without it.",
-      name: "Elena Rodriguez",
-      role: "Digital Marketer",
-      stars: 5,
-    },
-  ];
-
-  const faqs = [
-    {
-      question: "Is Whisperrkeep really secure?",
-      answer:
-        "Yes, Whisperrkeep uses private encryption, meaning your data is encrypted before it leaves your device. We never have access to your master password or any of your stored credentials.",
-    },
-    {
-      question: "What happens if I forget my master password?",
-      answer:
-        "For security reasons, we cannot recover your master password. However, Whisperrkeep offers emergency recovery options that you can set up in advance.",
-    },
-    {
-      question: "Can I use Whisperrkeep on all my devices?",
-      answer:
-        "Yes, Whisperrkeep is available on Windows, macOS, Linux, iOS, and Android. Your data syncs automatically across all your devices.",
-    },
-    {
-      question: "Is Whisperrkeep free to use?",
-      answer:
-        "Whisperrkeep offers a free tier with essential features. Premium plans with advanced features start at $2.99/month.",
-    },
-  ];
 
   return (
     <Box sx={{ bgcolor: '#000', minHeight: '100vh', color: 'white', overflowX: 'hidden' }}>
@@ -398,259 +312,11 @@ export default function LandingPage() {
         </Box>
       </Container>
 
-      {/* Features Section */}
-      <Box sx={{ py: 15, bgcolor: 'rgba(255, 255, 255, 0.01)', borderY: '1px solid rgba(255, 255, 255, 0.05)' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 10 }}>
-            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, fontFamily: 'var(--font-space-grotesk)' }}>
-              Security-First Password Management
-            </Typography>
-            <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.5)', maxWidth: '700px', mx: 'auto' }}>
-              Designed with your security and privacy as the top priority.
-            </Typography>
-          </Box>
-
-          <Grid container spacing={4}>
-            {features.map((feature, i) => (
-              <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
-                <Paper sx={{ 
-                  p: 4, 
-                  height: '100%', 
-                  borderRadius: '28px', 
-                  bgcolor: 'rgba(255, 255, 255, 0.02)', 
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  backgroundImage: 'none',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-8px)',
-                    borderColor: alpha('#00F5FF', 0.3),
-                    bgcolor: 'rgba(255, 255, 255, 0.04)'
-                  }
-                }}>
-                  <Box sx={{ 
-                    width: 56, 
-                    height: 56, 
-                    borderRadius: '16px', 
-                    bgcolor: alpha('#00F5FF', 0.1), 
-                    color: '#00F5FF', 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center',
-                    mb: 3
-                  }}>
-                    <feature.icon sx={{ fontSize: 28 }} />
-                  </Box>
-                  <Typography variant="h6" sx={{ fontWeight: 800, mb: 1.5 }}>{feature.title}</Typography>
-                  <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', lineHeight: 1.6 }}>{feature.description}</Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Trust Section */}
-      <Box sx={{ py: 15 }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={8} alignItems="center">
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Typography variant="h3" sx={{ fontWeight: 900, mb: 3, fontFamily: 'var(--font-space-grotesk)' }}>
-                Your Security Is Our Priority
-              </Typography>
-              <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 4, lineHeight: 1.8 }}>
-                With industry-leading encryption and rigorous security practices, Whisperrkeep ensures your digital life remains private and protected.
-              </Typography>
-              <Stack spacing={3}>
-                {[
-                  { icon: ShieldIcon, title: 'Advanced Encryption', desc: 'Military-grade encryption that protects your data at rest and in transit.', color: '#4CAF50' },
-                  { icon: LockIcon, title: 'SOC 2 Certified', desc: 'Our security processes are regularly audited and certified by independent experts.', color: '#2196F3' },
-                  { icon: FingerprintIcon, title: 'Private Access', desc: 'We never see your passwords. Your data is encrypted and decrypted locally.', color: '#9C27B0' },
-                ].map((item, i) => (
-                  <Stack key={i} direction="row" spacing={3} alignItems="flex-start">
-                    <Box sx={{ 
-                      p: 1.5, 
-                      borderRadius: '12px', 
-                      bgcolor: alpha(item.color, 0.1), 
-                      color: item.color 
-                    }}>
-                      <item.icon sx={{ fontSize: 24 }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{item.title}</Typography>
-                      <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>{item.desc}</Typography>
-                    </Box>
-                  </Stack>
-                ))}
-              </Stack>
-            </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Box sx={{ 
-                position: 'relative',
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  top: '-10%',
-                  right: '-10%',
-                  width: '120%',
-                  height: '120%',
-                  background: 'radial-gradient(circle, rgba(0, 245, 255, 0.05) 0%, transparent 70%)',
-                  zIndex: 0
-                }
-              }}>
-                <Paper sx={{ 
-                  p: 1, 
-                  borderRadius: '32px', 
-                  bgcolor: 'rgba(255, 255, 255, 0.02)', 
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  backgroundImage: 'none',
-                  position: 'relative',
-                  zIndex: 1,
-                  overflow: 'hidden'
-                }}>
-                  <Box component="img" src="https://images.unsplash.com/photo-1633265485768-30698f1d11bc?auto=format&fit=crop&q=80&w=1000" sx={{ width: '100%', borderRadius: '24px', display: 'block', opacity: 0.8 }} />
-                </Paper>
-              </Box>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* Testimonials */}
-      <Box sx={{ py: 15, bgcolor: 'rgba(255, 255, 255, 0.01)' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 10 }}>
-            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, fontFamily: 'var(--font-space-grotesk)' }}>
-              Trusted by Thousands
-            </Typography>
-            <Typography variant="h6" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-              See what our users have to say about Whisperrkeep.
-            </Typography>
-          </Box>
-
-          <Grid container spacing={4}>
-            {testimonials.map((t, i) => (
-              <Grid size={{ xs: 12, md: 4 }} key={i}>
-                <Paper sx={{ 
-                  p: 5, 
-                  height: '100%', 
-                  borderRadius: '28px', 
-                  bgcolor: 'rgba(10, 10, 10, 0.5)', 
-                  border: '1px solid rgba(255, 255, 255, 0.05)',
-                  backgroundImage: 'none',
-                  position: 'relative'
-                }}>
-                  <Stack direction="row" spacing={0.5} sx={{ mb: 3 }}>
-                    {[...Array(t.stars)].map((_, j) => (
-                      <StarIcon key={j} sx={{ fontSize: 18, color: "#00F5FF" }} />
-                    ))}
-                  </Stack>
-                  <Typography variant="body1" sx={{ fontStyle: 'italic', mb: 4, color: 'rgba(255, 255, 255, 0.8)', lineHeight: 1.7 }}>
-                    &quot;{t.quote}&quot;
-                  </Typography>
-                  <Box>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>{t.name}</Typography>
-                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.role}</Typography>
-                  </Box>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* FAQ Section */}
-      <Box sx={{ py: 15 }}>
-        <Container maxWidth="md">
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography variant="h3" sx={{ fontWeight: 900, mb: 2, fontFamily: 'var(--font-space-grotesk)' }}>
-              Frequently Asked Questions
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.5)' }}>
-              Everything you need to know about Whisperrkeep
-            </Typography>
-          </Box>
-
-          <Stack spacing={2}>
-            {faqs.map((faq, i) => (
-              <Accordion key={i} sx={{ 
-                bgcolor: 'rgba(255, 255, 255, 0.02)', 
-                backgroundImage: 'none',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                borderRadius: '20px !important',
-                '&::before': { display: 'none' },
-                overflow: 'hidden'
-              }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: "rgba(255, 255, 255, 0.3)" }} />}>
-                  <Typography sx={{ fontWeight: 700, py: 1 }}>{faq.question}</Typography>
-                </AccordionSummary>
-                <AccordionDetails sx={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', pt: 3 }}>
-                  <Typography sx={{ color: 'rgba(255, 255, 255, 0.5)', lineHeight: 1.7 }}>{faq.answer}</Typography>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </Stack>
-        </Container>
-      </Box>
-
-      {/* CTA Section */}
-      <Box sx={{ py: 20, textAlign: 'center', position: 'relative' }}>
-        <Box sx={{
-          position: 'absolute',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '100%',
-          height: '100%',
-          background: 'radial-gradient(circle at bottom, rgba(0, 245, 255, 0.1) 0%, transparent 70%)',
-          zIndex: 0,
-          pointerEvents: 'none'
-        }} />
-        
-        <Container maxWidth="sm" sx={{ position: 'relative', zIndex: 1 }}>
-          <Typography variant="h3" sx={{ fontWeight: 900, mb: 3, fontFamily: 'var(--font-space-grotesk)' }}>
-            Ready to secure your digital life?
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.6)', mb: 6 }}>
-            Join thousands of users who trust Whisperrkeep with their passwords.
-          </Typography>
-          <Button
-            variant="contained"
-            size="large"
-            endIcon={isAuthenticating ? <CircularProgress size={20} color="inherit" /> : <ChevronRightIcon sx={{ fontSize: 20 }} />}
-            onClick={() => {
-              if (user) {
-                router.push("/dashboard");
-                return;
-              }
-              try {
-                openIDMWindow();
-              } catch (err) {
-                alert(err instanceof Error ? err.message : "Failed to open authentication");
-              }
-            }}
-            sx={{
-              bgcolor: '#00F5FF',
-              color: '#000',
-              px: 6,
-              py: 2.5,
-              borderRadius: '20px',
-              fontWeight: 900,
-              fontSize: '1.2rem',
-              '&:hover': {
-                bgcolor: '#00D1DA',
-                transform: 'scale(1.05)',
-                boxShadow: '0 20px 40px rgba(0, 245, 255, 0.4)'
-              },
-              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-            }}
-          >
-            {user ? "Go to Dashboard" : "Get Started Free"}
-          </Button>
-          <Typography variant="caption" sx={{ display: 'block', mt: 3, color: 'rgba(255, 255, 255, 0.3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em' }}>
-            No credit card required • Free forever
-          </Typography>
-        </Container>
-      </Box>
+      <Features />
+      <Trust />
+      <Testimonials />
+      <FAQ />
+      <CTA />
     </Box>
   );
 }
