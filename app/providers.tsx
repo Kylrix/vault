@@ -9,9 +9,11 @@ import { Toaster } from "react-hot-toast";
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material";
 import { darkTheme } from "@/theme/theme";
 import { EcosystemPortal } from "@/components/common/EcosystemPortal";
+import { useEcosystemNode } from "@/hooks/useEcosystemNode";
 
 function GlobalEcosystemHandler() {
   const [open, setOpen] = useState(false);
+  useEcosystemNode('keep');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
