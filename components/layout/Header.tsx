@@ -21,8 +21,10 @@ import {
   MenuItem,
   Divider
 } from "@mui/material";
+import AppsIcon from "@mui/icons-material/Apps";
 import { useAI } from "@/app/context/AIContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import EcosystemPortal from "../common/EcosystemPortal";
 
 // Pages that should use the simplified layout (no sidebar/header)
 const SIMPLIFIED_LAYOUT_PATHS = ["/"];
@@ -37,6 +39,18 @@ export function Header({ onMenuClick }: HeaderProps) {
   const { openAIModal } = useAI();
   const pathname = usePathname();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isEcosystemPortalOpen, setIsEcosystemPortalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.code === 'Space') {
+        e.preventDefault();
+        setIsEcosystemPortalOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Don't render the header on simplified layout pages
   if (SIMPLIFIED_LAYOUT_PATHS.includes(pathname)) {
@@ -121,6 +135,18 @@ export function Header({ onMenuClick }: HeaderProps) {
             </IconButton>
           </Tooltip>
 
+          <Tooltip title="Whisperr Portal (Ctrl+Space)">
+            <IconButton
+              onClick={() => setIsEcosystemPortalOpen(true)}
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.6)', 
+                '&:hover': { color: '#00F5FF', bgcolor: 'rgba(255, 255, 255, 0.05)' } 
+              }}
+            >
+              <AppsIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Tooltip>
+
           <Box>
             <IconButton 
               onClick={handleOpenMenu}
@@ -162,7 +188,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
               <MenuItem 
                 component="a" 
-                href={`https://${process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN}.${process.env.NEXT_PUBLIC_DOMAIN}/settings?source=${encodeURIComponent(window.location.origin)}`}
+                href={`https://${process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN || 'id'}.${process.env.NEXT_PUBLIC_DOMAIN || 'whisperrnote.space'}/settings?source=${encodeURIComponent(window.location.origin)}`}
                 onClick={handleCloseMenu} 
                 sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
               >
@@ -184,6 +210,10 @@ export function Header({ onMenuClick }: HeaderProps) {
           </Box>
         </Box>
       </Toolbar>
+      <EcosystemPortal 
+        open={isEcosystemPortalOpen} 
+        onClose={() => setIsEcosystemPortalOpen(false)} 
+      />
     </AppBar>
   );
 }
