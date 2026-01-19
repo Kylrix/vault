@@ -1,14 +1,16 @@
 "use client";
 
-import PersonIcon from "@mui/icons-material/Person";
-import LogoutIcon from "@mui/icons-material/Logout";
-import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import ShieldIcon from "@mui/icons-material/Shield";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LockIcon from "@mui/icons-material/Lock";
 import Link from "next/link";
 import { useAppwrite } from "@/app/appwrite-provider";
+import {
+  Grip,
+  Sparkles,
+  Key,
+  User as UserIcon,
+  Settings,
+  Lock,
+  LogOut,
+} from "lucide-react";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
@@ -20,7 +22,6 @@ import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
-import AppsIcon from "@mui/icons-material/Apps";
 import { alpha } from "@mui/material/styles";
 import { useState, useEffect } from "react";
 import { DropdownMenu } from "@/components/ui/DropdownMenu";
@@ -123,7 +124,7 @@ export function Navbar() {
                 '&:hover': { color: '#00F5FF', bgcolor: 'rgba(255, 255, 255, 0.05)' } 
               }}
             >
-              <AppsIcon sx={{ fontSize: 20 }} />
+              <Grip size={20} strokeWidth={1.5} />
             </IconButton>
           </Tooltip>
 
@@ -136,7 +137,7 @@ export function Navbar() {
                   '&:hover': { bgcolor: alpha('#00F5FF', 0.1) } 
                 }}
               >
-                <AutoAwesomeIcon sx={{ fontSize: 20 }} />
+                <Sparkles size={20} strokeWidth={1.5} />
               </IconButton>
             </Tooltip>
           )}
@@ -144,7 +145,7 @@ export function Navbar() {
           <DropdownMenu
             trigger={
               <IconButton title="Password Generator" sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}>
-                <VpnKeyIcon sx={{ fontSize: 20 }} />
+                <Key size={20} strokeWidth={1.5} />
               </IconButton>
             }
             width="400px"
@@ -183,7 +184,7 @@ export function Navbar() {
                 variant="text"
                 size="small"
                 onClick={handleOpenMenu}
-                startIcon={<PersonIcon sx={{ fontSize: 18 }} />}
+                startIcon={<UserIcon size={18} strokeWidth={1.5} />}
                 sx={{ 
                   color: 'white',
                   fontWeight: 700,
@@ -227,7 +228,7 @@ export function Navbar() {
                 </Box>
                 <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
                 <MenuItem component={Link} href="/settings" onClick={handleCloseMenu} sx={{ py: 1.5, px: 2.5, gap: 1.5 }}>
-                  <SettingsIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
+                  <Settings size={18} strokeWidth={1.5} color="rgba(255, 255, 255, 0.6)" />
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>Account Settings</Typography>
                 </MenuItem>
                 <MenuItem
@@ -241,7 +242,7 @@ export function Navbar() {
                     handleCloseMenu();
                   }}
                 >
-                  <LockIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
+                  <Lock size={18} strokeWidth={1.5} color="rgba(255, 255, 255, 0.6)" />
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>Lock Vault</Typography>
                 </MenuItem>
                 <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
@@ -252,7 +253,7 @@ export function Navbar() {
                   }}
                   sx={{ py: 1.5, px: 2.5, gap: 1.5, color: '#FF4D4D' }}
                 >
-                  <LogoutIcon sx={{ fontSize: 18 }} />
+                  <LogOut size={18} strokeWidth={1.5} />
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>Logout</Typography>
                 </MenuItem>
               </Menu>
