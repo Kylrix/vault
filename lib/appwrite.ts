@@ -72,6 +72,8 @@ export const appwriteAccount = getAccount();
 export const appwriteDatabases = getDatabases();
 export const appwriteAvatars = getAvatars();
 
+export { ID, Query };
+
 // --- USER SESSION ---
 
 export async function getCurrentUser(): Promise<any | null> {
