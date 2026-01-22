@@ -31,11 +31,11 @@ export default function RootLayout({
         <Providers>
           <EcosystemClient nodeId="keep" />
           <Box sx={{ minHeight: '100vh', width: '100%', bgcolor: '#000' }}>
-            <AppShell>
-              <Suspense fallback={null}>
+            <Suspense fallback={null}>
+              <AppShell>
                 {children}
-              </Suspense>
-            </AppShell>
+              </AppShell>
+            </Suspense>
           </Box>
         </Providers>
       </body>
