@@ -15,7 +15,12 @@ import {
 import {
     Search as SearchIcon,
     Close as CloseIcon,
-    AutoAwesome as PulseIcon,
+    AutoAwesomeOutlined as PulseIcon,
+    DescriptionOutlined as NoteIcon,
+    LockOutlined as KeepIcon,
+    SpeedOutlined as FlowIcon,
+    ChatBubbleOutline as ConnectIcon,
+    ShieldOutlined as IDIcon,
 } from '@mui/icons-material';
 import { ECOSYSTEM_APPS, getEcosystemUrl } from '../../lib/constants';
 import { EcosystemWidgets } from '../../ecosystem/integration/Widgets';
@@ -24,6 +29,17 @@ interface EcosystemPortalProps {
     open: boolean;
     onClose: () => void;
 }
+
+const AppIcon = ({ id, sx }: { id: string, sx?: any }) => {
+    switch (id) {
+        case 'note': return <NoteIcon sx={sx} />;
+        case 'keep': return <KeepIcon sx={sx} />;
+        case 'flow': return <FlowIcon sx={sx} />;
+        case 'connect': return <ConnectIcon sx={sx} />;
+        case 'id': return <IDIcon sx={sx} />;
+        default: return <NoteIcon sx={sx} />;
+    }
+};
 
 export default function EcosystemPortal({ open, onClose }: EcosystemPortalProps) {
     const [search, setSearch] = useState('');
@@ -178,10 +194,9 @@ export default function EcosystemPortal({ open, onClose }: EcosystemPortalProps)
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        fontSize: '1.5rem',
                                         border: `1px solid ${alpha(app.color, 0.2)}`
                                     }}>
-                                        {app.icon}
+                                        <AppIcon id={app.id} sx={{ fontSize: 24, color: app.color }} />
                                     </Box>
                                     <Box>
                                         <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>

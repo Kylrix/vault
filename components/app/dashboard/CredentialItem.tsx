@@ -13,12 +13,12 @@ import {
   useTheme,
   useMediaQuery
 } from "@mui/material";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import PersonIcon from "@mui/icons-material/Person";
-import LockIcon from "@mui/icons-material/Lock";
+import ContentCopyIcon from "@mui/icons-material/ContentCopyOutlined";
+import EditIcon from "@mui/icons-material/EditOutlined";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import MoreVertIcon from "@mui/icons-material/MoreVertOutlined";
+import PersonIcon from "@mui/icons-material/PersonOutlineOutlined";
+import LockIcon from "@mui/icons-material/LockOutlined";
 import type { Credentials } from "@/types/appwrite.d";
 
 export default function CredentialItem({
