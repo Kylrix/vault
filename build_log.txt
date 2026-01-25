@@ -9,7 +9,7 @@
      · optimizePackageImports
 
    Creating an optimized production build ...
- ✓ Compiled successfully in 5.0s
+ ✓ Compiled successfully in 6.0s
    Skipping validation of types
    Skipping linting
    Collecting page data ...
