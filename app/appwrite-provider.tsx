@@ -73,6 +73,13 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         logDebug("[auth] account.get success", { hasAccount: !!account });
 
       if (account) {
+        // Sync to Global Identity Directory (WhisperrConnect)
+        try {
+          const { ensureGlobalIdentity } = await import('@/lib/ecosystem/identity');
+          ensureGlobalIdentity(account);
+        } catch (e) {
+          logWarn('[auth] Ecosystem identity handshake failed', e);
+        }
         // Clear the auth=success param from URL if it exists
         if (typeof window !== 'undefined' && window.location.search.includes('auth=success')) {
           const url = new URL(window.location.href);
@@ -94,10 +101,10 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       return account;
     } catch (err: unknown) {
       const e = err as AppwriteError;
-      
+
       // Check for auth=success signal in URL
       const hasAuthSignal = typeof window !== 'undefined' && window.location.search.includes('auth=success');
-      
+
       if (hasAuthSignal && retryCount < 3) {
         logWarn(`[auth] Auth signal detected but session not found in keep. Retrying... (${retryCount + 1})`);
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -246,14 +253,14 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
 
       if (event.data?.type === "idm:auth-success") {
         logDebug("[auth] Received auth success message from IDM");
-        
+
         // Close the window first for better UX
         closeIDMWindow();
         setIsAuthenticating(false);
-        
+
         // Refresh user state
         const account = await fetchUser(true);
-        
+
         // Redirect to masterpass if authenticated
         if (account) {
           router.replace("/masterpass");
