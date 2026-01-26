@@ -9,7 +9,12 @@ import {
 } from '@/lib/appwrite';
 import { useAppwrite } from '../appwrite-provider';
 
-// ActivityLog type definition for internal use
+interface NotificationMetadata {
+  read?: boolean;
+  readAt?: string;
+  originalDetails?: string | null;
+}
+
 interface ActivityLog {
   $id: string;
   userId: string;
@@ -24,8 +29,8 @@ interface NotificationContextType {
   notifications: ActivityLog[];
   unreadCount: number;
   isLoading: boolean;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -37,6 +42,20 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const { user } = useAppwrite();
 
   const APPWRITE_TABLE_ID_ACTIVITYLOG = "activityLog";
+
+  const parseMetadata = (details: string | null): NotificationMetadata => {
+    if (!details) return { read: false, originalDetails: null };
+    try {
+      if (details.startsWith('{')) {
+        return JSON.parse(details);
+      }
+    } catch (e) {}
+    return { read: false, originalDetails: details };
+  };
+
+  const calculateUnread = useCallback((logs: ActivityLog[]) => {
+    return logs.filter(log => !parseMetadata(log.details).read).length;
+  }, []);
 
   const fetchNotifications = useCallback(async () => {
     if (!user?.$id) return;
@@ -50,13 +69,13 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       );
       const logs = res.documents as unknown as ActivityLog[];
       setNotifications(logs);
-      setUnreadCount(logs.filter(log => !localStorage.getItem(`read_notif_${log.$id}`)).length);
+      setUnreadCount(calculateUnread(logs));
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [user?.$id]);
+  }, [user?.$id, calculateUnread]);
 
   useEffect(() => {
     fetchNotifications();
@@ -69,20 +88,25 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     
     const unsub = realtime.subscribe(channel, (response) => {
       const payload = response.payload as ActivityLog;
-      
       if (payload.userId !== user.$id) return;
 
       const isCreate = response.events.some(e => e.includes('.create'));
+      const isUpdate = response.events.some(e => e.includes('.update'));
 
       if (isCreate) {
         setNotifications(prev => [payload, ...prev]);
-        setUnreadCount(prev => prev + 1);
-        
-        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-          new Notification(`Whisperr ${payload.targetType}`, {
-            body: payload.action,
-          });
+        if (!parseMetadata(payload.details).read) {
+          setUnreadCount(prev => prev + 1);
         }
+        if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+          new Notification(`Whisperr ${payload.targetType}`, { body: payload.action });
+        }
+      } else if (isUpdate) {
+        setNotifications(prev => {
+          const updated = prev.map(n => n.$id === payload.$id ? payload : n);
+          setUnreadCount(calculateUnread(updated));
+          return updated;
+        });
       }
     });
 
@@ -90,16 +114,30 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       if (typeof unsub === 'function') unsub();
       else (unsub as any).unsubscribe?.();
     };
-  }, [user?.$id]);
+  }, [user?.$id, calculateUnread]);
 
-  const markAsRead = (id: string) => {
-    localStorage.setItem(`read_notif_${id}`, 'true');
-    setUnreadCount(prev => Math.max(0, prev - 1));
+  const markAsRead = async (id: string) => {
+    const notification = notifications.find(n => n.$id === id);
+    if (!notification) return;
+
+    const meta = parseMetadata(notification.details);
+    if (meta.read) return;
+
+    const newMetadata = { ...meta, read: true, readAt: new Date().toISOString() };
+
+    try {
+      setNotifications(prev => prev.map(n => n.$id === id ? { ...n, details: JSON.stringify(newMetadata) } : n));
+      await databases.updateDocument(APPWRITE_DATABASE_ID, APPWRITE_TABLE_ID_ACTIVITYLOG, id, {
+        details: JSON.stringify(newMetadata)
+      });
+    } catch (error) {
+      console.error('Cloud sync failed:', error);
+    }
   };
 
-  const markAllAsRead = () => {
-    notifications.forEach(log => localStorage.setItem(`read_notif_${log.$id}`, 'true'));
-    setUnreadCount(0);
+  const markAllAsRead = async () => {
+    const unread = notifications.filter(n => !parseMetadata(n.details).read);
+    unread.forEach(n => markAsRead(n.$id));
   };
 
   return (
