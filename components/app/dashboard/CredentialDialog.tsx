@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
-import { 
-  Eye, 
-  EyeOff, 
-  RefreshCw, 
-  Plus, 
-  X, 
-  Save, 
-  Globe, 
-  Tag as TagIcon, 
-  FileText, 
-  User, 
-  Lock,
-  ChevronDown
-} from "lucide-react";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
+import AddIcon from "@mui/icons-material/Add";
+import CloseIcon from "@mui/icons-material/Close";
+import SaveIcon from "@mui/icons-material/Save";
+import LanguageIcon from "@mui/icons-material/Language";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import DescriptionIcon from "@mui/icons-material/Description";
+import PersonIcon from "@mui/icons-material/Person";
+import LockIcon from "@mui/icons-material/Lock";
 import { 
   Dialog, 
   DialogTitle, 
@@ -194,222 +191,203 @@ export default function CredentialDialog({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '24px',
-          bgcolor: 'rgba(10, 10, 10, 0.95)',
-          backdropFilter: 'blur(32px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '28px',
+          bgcolor: 'rgba(10, 10, 10, 0.8)',
+          backdropFilter: 'blur(25px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           backgroundImage: 'none',
-          boxShadow: '0 32px 64px rgba(0, 0, 0, 0.7)',
-          overflow: 'hidden'
+          boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5)'
         }
       }}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle sx={{ 
-          px: 3, 
-          pt: 3, 
-          pb: 2, 
+          p: 3, 
+          pb: 1, 
           display: 'flex', 
           alignItems: 'center', 
-          justifyContent: 'space-between'
+          justifyContent: 'space-between',
+          fontFamily: 'var(--font-space-grotesk)',
+          fontWeight: 900,
+          fontSize: '1.5rem'
         }}>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 900, letterSpacing: '-0.02em', color: 'white', fontFamily: 'var(--font-space-grotesk)' }}>
-                {initial ? "EDIT CREDENTIAL" : "NEW CREDENTIAL"}
-            </Typography>
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                Secure vault entry
-            </Typography>
-          </Box>
-          <IconButton onClick={onClose} size="small" sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', color: 'rgba(255, 255, 255, 0.4)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.08)' } }}>
-            <X size={18} strokeWidth={1.5} />
+          {initial ? "Edit Credential" : "Add Credential"}
+          <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
+            <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ px: 3, py: 2 }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, mt: 1 }}>
-            <TextField
-              fullWidth
-              placeholder="Application or Service name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-              variant="standard"
-              InputProps={{
-                disableUnderline: true,
-                sx: { 
-                    fontSize: '1.25rem', 
-                    fontWeight: 800,
-                    letterSpacing: '-0.01em',
-                    color: 'white',
-                    fontFamily: 'var(--font-space-grotesk)',
-                    padding: 0,
-                    '&::placeholder': {
-                        opacity: 0.2,
-                    }
-                },
-              }}
-            />
-
-            <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
-
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, p: 2.5, borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <DialogContent sx={{ p: 3, pt: 1 }}>
+          <Grid container spacing={2.5}>
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="USERNAME / EMAIL"
-                placeholder="identity@whisperr.net"
+                label="Name"
+                placeholder="e.g., GitHub, Gmail"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
+                variant="filled"
+                InputProps={{
+                  disableUnderline: true,
+                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                }}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                label="Username/Email"
+                placeholder="john@example.com"
                 value={form.username}
                 onChange={(e) => setForm({ ...form, username: e.target.value })}
                 required
                 variant="filled"
-                size="small"
                 InputProps={{
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <User size={16} strokeWidth={2} color="rgba(255, 255, 255, 0.3)" />
+                      <PersonIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.85rem' }
+                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
                 }}
-                InputLabelProps={{ sx: { fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.3)' } }}
               />
+            </Grid>
 
-              <Box sx={{ display: 'flex', gap: 1.5 }}>
+            <Grid size={{ xs: 12 }}>
+              <Box sx={{ display: 'flex', gap: 1 }}>
                 <TextField
                   fullWidth
-                  label="PASSWORD"
+                  label="Password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Secret key"
+                  placeholder="Enter or generate password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
                   variant="filled"
-                  size="small"
                   InputProps={{
                     disableUnderline: true,
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Lock size={16} strokeWidth={2} color="rgba(255, 255, 255, 0.3)" />
+                        <LockIcon sx={{ fontSize: 18 }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} size="small" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        <IconButton onClick={() => setShowPassword(!showPassword)} size="small">
+                          {showPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                         </IconButton>
                       </InputAdornment>
                     ),
-                    sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.85rem' }
+                    sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
                   }}
-                  InputLabelProps={{ sx: { fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.3)' } }}
                 />
                 <IconButton 
                   onClick={handleGeneratePassword}
                   sx={{ 
-                    bgcolor: 'rgba(0, 245, 255, 0.1)', 
-                    color: '#00F5FF',
-                    borderRadius: '10px',
-                    width: 48,
-                    height: 48,
-                    alignSelf: 'flex-end',
-                    border: '1px solid rgba(0, 245, 255, 0.2)',
-                    '&:hover': { bgcolor: 'rgba(0, 245, 255, 0.2)' }
+                    bgcolor: 'rgba(0, 240, 255, 0.1)', 
+                    color: 'primary.main',
+                    borderRadius: '12px',
+                    width: 56,
+                    height: 56,
+                    '&:hover': { bgcolor: 'rgba(0, 240, 255, 0.2)' }
                   }}
                 >
-                  <RefreshCw size={20} strokeWidth={2} />
+                  <AutorenewIcon sx={{ fontSize: 20 }} />
                 </IconButton>
               </Box>
+            </Grid>
 
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="WEBSITE URL"
+                label="Website URL"
                 type="url"
-                placeholder="https://vault.whisperr.net"
+                placeholder="https://example.com"
                 value={form.url}
                 onChange={(e) => setForm({ ...form, url: e.target.value })}
                 variant="filled"
-                size="small"
                 InputProps={{
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Globe size={16} strokeWidth={2} color="rgba(255, 255, 255, 0.3)" />
+                      <LanguageIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.85rem' }
+                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
                 }}
-                InputLabelProps={{ sx: { fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.3)' } }}
               />
+            </Grid>
 
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="TAGS"
-                placeholder="work, personal, production"
+                label="Tags"
+                placeholder="Comma separated: work, email, important"
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
                 variant="filled"
-                size="small"
                 InputProps={{
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <TagIcon size={16} strokeWidth={2} color="rgba(255, 255, 255, 0.3)" />
+                      <LocalOfferIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.85rem' }
+                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
                 }}
-                InputLabelProps={{ sx: { fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.3)' } }}
               />
+            </Grid>
 
+            <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="NOTES"
+                label="Notes"
                 multiline
                 rows={3}
-                placeholder="Security parameters and context..."
+                placeholder="Additional notes"
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 variant="filled"
-                size="small"
                 InputProps={{
                   disableUnderline: true,
                   startAdornment: (
-                    <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
-                      <FileText size={16} strokeWidth={2} color="rgba(255, 255, 255, 0.3)" />
+                    <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
+                      <DescriptionIcon sx={{ fontSize: 18 }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.85rem' }
+                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
                 }}
-                InputLabelProps={{ sx: { fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.05em', color: 'rgba(255, 255, 255, 0.3)' } }}
               />
-            </Box>
+            </Grid>
 
             {/* Custom Fields */}
-            <Box>
+            <Grid size={{ xs: 12 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 800, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                  Custom Attributes
+                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                  Custom Fields
                 </Typography>
                 <Button
                   size="small"
-                  startIcon={<Plus size={14} strokeWidth={2} />}
+                  startIcon={<AddIcon sx={{ fontSize: 16 }} />}
                   onClick={addCustomField}
-                  sx={{ fontSize: '0.7rem', fontWeight: 800, color: '#00F5FF', borderRadius: '8px', '&:hover': { bgcolor: 'rgba(0, 245, 255, 0.05)' } }}
+                  sx={{ borderRadius: '8px' }}
                 >
-                  ADD FIELD
+                  Add Field
                 </Button>
               </Box>
               
               {customFields.map((field) => (
-                <Box key={field.id} sx={{ display: 'flex', gap: 1.5, mb: 1.5 }}>
+                <Box key={field.id} sx={{ display: 'flex', gap: 1, mb: 1 }}>
                   <TextField
                     size="small"
-                    placeholder="Attribute"
+                    placeholder="Label"
                     value={field.label}
                     onChange={(e) => updateCustomField(field.id, "label", e.target.value)}
                     variant="filled"
-                    InputProps={{ disableUnderline: true, sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.8rem' } }}
+                    InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   />
                   <TextField
                     size="small"
@@ -417,63 +395,46 @@ export default function CredentialDialog({
                     value={field.value}
                     onChange={(e) => updateCustomField(field.id, "value", e.target.value)}
                     variant="filled"
-                    InputProps={{ disableUnderline: true, sx: { borderRadius: '10px', bgcolor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.05)', fontSize: '0.8rem' } }}
+                    InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   />
-                  <IconButton onClick={() => removeCustomField(field.id)} size="small" sx={{ color: 'rgba(255, 77, 77, 0.4)', '&:hover': { color: '#FF4D4D' } }}>
-                    <X size={16} />
+                  <IconButton onClick={() => removeCustomField(field.id)} size="small" color="error">
+                    <CloseIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Box>
               ))}
-            </Box>
-          </Box>
+            </Grid>
+          </Grid>
 
           {error && (
-            <Typography color="error" variant="caption" sx={{ mt: 2, display: 'block', textAlign: 'center', fontWeight: 600 }}>
+            <Typography color="error" variant="caption" sx={{ mt: 2, display: 'block' }}>
               {error}
             </Typography>
           )}
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, py: 3, gap: 1.5, bgcolor: 'rgba(255, 255, 255, 0.01)', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+        <DialogActions sx={{ p: 3, pt: 1, gap: 1.5 }}>
           <Button 
             onClick={onClose} 
-            sx={{ 
-                color: 'rgba(255, 255, 255, 0.4)',
-                fontWeight: 800,
-                letterSpacing: '0.05em',
-                fontSize: '0.7rem',
-                textTransform: 'uppercase',
-                '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
-            }}
+            fullWidth 
+            variant="outlined"
+            sx={{ borderRadius: '12px', py: 1.2, fontWeight: 700 }}
           >
             Cancel
           </Button>
           <Button 
             type="submit" 
+            fullWidth 
             variant="contained" 
             disabled={loading}
+            startIcon={!loading && <SaveIcon sx={{ fontSize: 18 }} />}
             sx={{ 
-              px: 3,
-              py: 1,
               borderRadius: '12px', 
-              fontWeight: 900,
-              letterSpacing: '0.05em',
-              fontSize: '0.7rem',
-              bgcolor: '#00F5FF',
-              color: 'black',
-              textTransform: 'uppercase',
-              boxShadow: '0 8px 20px rgba(0, 245, 255, 0.2)',
-              '&:hover': {
-                  bgcolor: '#00D1DA',
-                  boxShadow: '0 12px 28px rgba(0, 245, 255, 0.3)',
-              },
-              '&.Mui-disabled': {
-                  bgcolor: 'rgba(255, 255, 255, 0.05)',
-                  color: 'rgba(255, 255, 255, 0.1)',
-              }
+              py: 1.2, 
+              fontWeight: 700,
+              boxShadow: '0 8px 20px rgba(0, 240, 255, 0.2)'
             }}
           >
-            {loading ? "SAVING..." : initial ? "UPDATE ENTRY" : "COMMIT TO VAULT"}
+            {loading ? "Saving..." : initial ? "Update" : "Add"}
           </Button>
         </DialogActions>
       </form>
