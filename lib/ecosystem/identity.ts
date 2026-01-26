@@ -56,7 +56,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
                 ];
 
                 // Order of preference for avatar field names in the ecosystem
-                const avatarFieldCandidates = ['avatarFileId', 'profilePicId', 'avatarUrl'];
+                const avatarFieldCandidates = ['profilePicId', 'avatarFileId', 'avatarUrl'];
 
                 for (const field of avatarFieldCandidates) {
                     try {
