@@ -63,7 +63,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const res = await databases.listDocuments(
-        APPWRITE_DATABASE_ID,
+        NOTE_DATABASE_ID,
         APPWRITE_TABLE_ID_ACTIVITYLOG,
         [Query.equal('userId', user.$id), Query.orderDesc('timestamp'), Query.limit(50)]
       );
@@ -84,7 +84,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user?.$id) return;
 
-    const channel = `databases.${APPWRITE_DATABASE_ID}.collections.${APPWRITE_TABLE_ID_ACTIVITYLOG}.documents`;
+    const channel = `databases.${NOTE_DATABASE_ID}.collections.${APPWRITE_TABLE_ID_ACTIVITYLOG}.documents`;
     
     const unsub = realtime.subscribe(channel, (response) => {
       const payload = response.payload as ActivityLog;
@@ -127,7 +127,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     try {
       setNotifications(prev => prev.map(n => n.$id === id ? { ...n, details: JSON.stringify(newMetadata) } : n));
-      await databases.updateDocument(APPWRITE_DATABASE_ID, APPWRITE_TABLE_ID_ACTIVITYLOG, id, {
+      await databases.updateDocument(NOTE_DATABASE_ID, APPWRITE_TABLE_ID_ACTIVITYLOG, id, {
         details: JSON.stringify(newMetadata)
       });
     } catch (error) {

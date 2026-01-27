@@ -21,7 +21,7 @@ import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import CloseIcon from "@mui/icons-material/Close";
 import ShieldIcon from "@mui/icons-material/Shield";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
-import { unlockWithPasskey } from "@/app/(protected)/settings/passkey";
+import { unlockWithPasskey } from "@/lib/passkey";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { AppwriteService } from "@/lib/appwrite";
 import toast from "react-hot-toast";
