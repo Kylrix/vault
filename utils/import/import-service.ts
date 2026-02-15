@@ -268,7 +268,7 @@ export class ImportService {
     }
   }
 
-  async importKylrix VaultData(
+  async importKylrixVaultData(
     jsonData: string,
     userId: string
   ): Promise<ImportResult> {

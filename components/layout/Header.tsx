@@ -126,7 +126,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               color: 'white'
             }}
           >
-            WHISPERR<Box component="span" sx={{ color: '#00F5FF' }}>KEEP</Box>
+            KYLRIX<Box component="span" sx={{ color: '#00F5FF' }}>KEEP</Box>
           </Typography>
         </Box>
 

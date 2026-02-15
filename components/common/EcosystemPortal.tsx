@@ -103,7 +103,7 @@ export default function EcosystemPortal({ open, onClose }: EcosystemPortalProps)
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
                         <PulseIcon sx={{ color: '#00F5FF', fontSize: 24 }} />
                         <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', letterSpacing: '-0.02em', color: 'white' }}>
-                            WHISPERR <Box component="span" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>PORTAL</Box>
+                            KYLRIX <Box component="span" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>PORTAL</Box>
                         </Typography>
                         <Box sx={{ flexGrow: 1 }} />
                         <IconButton onClick={onClose} size="small" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
@@ -219,7 +219,7 @@ export default function EcosystemPortal({ open, onClose }: EcosystemPortalProps)
                 {/* Footer */}
                 <Box sx={{ p: 2, bgcolor: 'rgba(0, 240, 255, 0.03)', display: 'flex', justifyContent: 'center' }}>
                     <Typography variant="caption" sx={{ color: 'rgba(0, 240, 255, 0.4)', fontWeight: 700, letterSpacing: '0.05em' }}>
-                        WHISPERR ECOSYSTEM v1.0
+                        KYLRIX ECOSYSTEM v1.0
                     </Typography>
                 </Box>
             </Paper>
