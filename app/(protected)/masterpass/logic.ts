@@ -1,5 +1,6 @@
 import { logDebug, logError } from "@/lib/logger";
 import { markSudoActive, resetSudo } from "@/lib/sudo-mode";
+import { ecosystemSecurity } from "@/lib/ecosystem/security";
 
 // Enhanced crypto configuration for maximum security with optimal performance
 export class MasterPassCrypto {
@@ -192,6 +193,13 @@ export class MasterPassCrypto {
           true,
           ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
         );
+
+        // ⭐ NEW: Piggyback session if PIN is configured
+        if (ecosystemSecurity.isPinSet()) {
+          // We can't automatically piggyback without the PIN value.
+          // The UI will handle prompting for PIN if needed or we can 
+          // do it during the password unlock flow in the UI components.
+        }
 
         return true;
       } catch (e) {
