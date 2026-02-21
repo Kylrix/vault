@@ -6,7 +6,7 @@ export const APPWRITE_CONFIG = {
     DATABASES: {
         NOTE: '67ff05a9000296822396',
         VAULT: 'passwordManagerDb',
-        FLOW: 'kylrixflow',
+        FLOW: 'whisperrflow',
         CHAT: 'chat'
     },
     TABLES: {
