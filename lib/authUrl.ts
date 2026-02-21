@@ -1,24 +1,12 @@
 import { APPWRITE_CONFIG } from "./appwrite/config";
+import { getEcosystemUrl } from "./constants";
 
 /**
  * Generate the auth/accounts IDM subdomain URL
  * Handles both http and https protocols
  */
 export function getAuthURL(): string {
-  const authSubdomain = APPWRITE_CONFIG.SYSTEM.AUTH_SUBDOMAIN || "accounts";
-  const appSubdomain = APPWRITE_CONFIG.SYSTEM.DOMAIN || "kylrix.space";
-
-  if (!appSubdomain) {
-    throw new Error(
-      "APPWRITE_CONFIG.SYSTEM.DOMAIN is required for auth URL generation",
-    );
-  }
-
-  // Use http/https based on current protocol or default to https
-  const protocol =
-    typeof window !== "undefined" ? window.location.protocol : "https:";
-
-  return `${protocol}//${authSubdomain}.${appSubdomain}`;
+  return getEcosystemUrl('accounts');
 }
 
 /**

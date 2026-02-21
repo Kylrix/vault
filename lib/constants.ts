@@ -24,5 +24,31 @@ export function getEcosystemUrl(subdomain: string) {
   if (!subdomain) {
     return '#';
   }
-  return `https://${subdomain}.${NEXT_PUBLIC_DOMAIN}`;
+
+  if (typeof window === 'undefined') {
+    return `https://${subdomain}.kylrix.space`;
+  }
+
+  const hostname = window.location.hostname;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const isKylrixDomain = hostname.endsWith('kylrix.space');
+
+  if (isLocalhost) {
+    const ports: Record<string, number> = {
+      accounts: 3000,
+      note: 3001,
+      vault: 3002,
+      flow: 3003,
+      connect: 3004
+    };
+    const subdomainToAppId: Record<string, string> = {
+      app: 'note',
+      id: 'accounts',
+      keep: 'vault'
+    };
+    const appId = subdomainToAppId[subdomain] || subdomain;
+    return `http://localhost:${ports[appId] || 3000}`;
+  }
+
+  return `https://${subdomain}.kylrix.space`;
 }
