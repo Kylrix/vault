@@ -33,22 +33,22 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Needed for some libraries/dev mode
-              "style-src 'self' 'unsafe-inline'", // TODO: Remove unsafe-inline, use nonces
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' *.kylrix.space", 
+              "style-src 'self' 'unsafe-inline' https://api.fontshare.com",
               "img-src 'self' data: https:",
-              "font-src 'self' data:",
-              "object-src 'none'", // Disable object/embed/applet
-              "connect-src 'self' https://*.appwrite.io https://*.appwrite.global",
-              "frame-ancestors 'none'",
+              "font-src 'self' data: https://api.fontshare.com",
+              "object-src 'none'",
+              "connect-src 'self' https://*.kylrix.space https://*.appwrite.io https://*.appwrite.global",
+              "frame-ancestors 'self' https://*.kylrix.space",
               "base-uri 'self'",
               "form-action 'self'",
               "upgrade-insecure-requests",
             ].join("; "),
           },
-          // Prevent clickjacking
+          // Prevent clickjacking while allowing same-origin/ecosystem framing
           {
             key: "X-Frame-Options",
-            value: "DENY",
+            value: "SAMEORIGIN",
           },
           // Prevent MIME type sniffing
           {
@@ -75,7 +75,7 @@ const nextConfig: NextConfig = {
               "gyroscope=()",
             ].join(", "),
           },
-          // Force HTTPS (HSTS) - only enable if using HTTPS
+          // Force HTTPS (HSTS)
           {
             key: "Strict-Transport-Security",
             value: "max-age=63072000; includeSubDomains; preload",
