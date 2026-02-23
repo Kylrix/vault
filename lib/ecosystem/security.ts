@@ -11,6 +11,8 @@ export class EcosystemSecurity {
   private masterKey: CryptoKey | null = null;
   private isUnlocked = false;
   private nodeId: string = 'unknown';
+  // SECURITY: Tab-specific secret (RAM-only) to protect against XSS (CVE-KYL-2026-005)
+  private tabSessionSecret: Uint8Array | null = null;
 
   // Constants aligned with Kylrix Vault for backward compatibility
   private static readonly PBKDF2_ITERATIONS = 600000;
@@ -46,6 +48,14 @@ export class EcosystemSecurity {
         this.lock();
       }
     });
+  }
+
+  private getOrCreateSessionSecret(): Uint8Array {
+    if (typeof window === 'undefined') return new Uint8Array(32);
+    if (!this.tabSessionSecret) {
+      this.tabSessionSecret = crypto.getRandomValues(new Uint8Array(32));
+    }
+    return this.tabSessionSecret;
   }
 
   /**
@@ -287,9 +297,17 @@ export class EcosystemSecurity {
 
   private async deriveEphemeralKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
     const encoder = new TextEncoder();
+    const sessionSecret = this.getOrCreateSessionSecret();
+    
+    // Mix PIN with tab-specific Session Secret for entropy (XSS-safe)
+    const pinBytes = encoder.encode(pin);
+    const combined = new Uint8Array(pinBytes.length + sessionSecret.length);
+    combined.set(pinBytes);
+    combined.set(sessionSecret, pinBytes.length);
+
     const keyMaterial = await crypto.subtle.importKey(
       "raw",
-      encoder.encode(pin),
+      combined,
       { name: "PBKDF2" },
       false,
       ["deriveKey"]
