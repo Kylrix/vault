@@ -7,6 +7,7 @@ import {
   APPWRITE_DATABASE_ID,
   Query 
 } from '@/lib/appwrite';
+import { APPWRITE_CONFIG } from '@/lib/appwrite/config';
 import { useAppwrite } from '../appwrite-provider';
 
 interface NotificationMetadata {
@@ -63,15 +64,15 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const res = await databases.listDocuments(
-        NOTE_DATABASE_ID,
-        APPWRITE_TABLE_ID_ACTIVITYLOG,
+        APPWRITE_CONFIG.DATABASES.NOTE,
+        APPWRITE_CONFIG.TABLES.NOTE.ACTIVITY_LOG,
         [Query.equal('userId', user.$id), Query.orderDesc('timestamp'), Query.limit(50)]
       );
       const logs = res.documents as unknown as ActivityLog[];
       setNotifications(logs);
       setUnreadCount(calculateUnread(logs));
     } catch (_error: unknown) {
-      console.error('Failed to fetch notifications:', error);
+      console.error('Failed to fetch notifications:', _error);
     } finally {
       setIsLoading(false);
     }
@@ -84,7 +85,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user?.$id) return;
 
-    const channel = `databases.${NOTE_DATABASE_ID}.collections.${APPWRITE_TABLE_ID_ACTIVITYLOG}.documents`;
+    const channel = `databases.${APPWRITE_CONFIG.DATABASES.NOTE}.collections.${APPWRITE_CONFIG.TABLES.NOTE.ACTIVITY_LOG}.documents`;
     
     const unsub = realtime.subscribe(channel, (response) => {
       const payload = response.payload as ActivityLog;
@@ -127,11 +128,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     try {
       setNotifications(prev => prev.map(n => n.$id === id ? { ...n, details: JSON.stringify(newMetadata) } : n));
-      await databases.updateDocument(NOTE_DATABASE_ID, APPWRITE_TABLE_ID_ACTIVITYLOG, id, {
-        details: JSON.stringify(newMetadata)
-      });
+      await databases.updateDocument(
+        APPWRITE_CONFIG.DATABASES.NOTE, 
+        APPWRITE_CONFIG.TABLES.NOTE.ACTIVITY_LOG, 
+        id, 
+        { details: JSON.stringify(newMetadata) }
+      );
     } catch (_error: unknown) {
-      console.error('Cloud sync failed:', error);
+      console.error('Cloud sync failed:', _error);
     }
   };
 
