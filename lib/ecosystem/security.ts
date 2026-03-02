@@ -129,7 +129,7 @@ export class EcosystemSecurity {
         sigBuffer,
         dataToVerify
       );
-    } catch (e) {
+    } catch (_e: unknown) {
       console.error("[Security] Signature verification failed", e);
       return false;
     }
@@ -213,7 +213,7 @@ export class EcosystemSecurity {
       this.isUnlocked = true;
 
       return true;
-    } catch (e) {
+    } catch (_e: unknown) {
       console.error("[Security] Unlock failed", e);
       return false;
     }
@@ -357,7 +357,7 @@ export class EcosystemSecurity {
 
       this.isUnlocked = true;
       return true;
-    } catch (e) {
+    } catch (_e: unknown) {
       console.error("[Security] PIN unlock failed", e);
       return false;
     }

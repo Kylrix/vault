@@ -75,7 +75,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
       } catch {
         return response.data;
       }
-    } catch (error) {
+    } catch (_error: unknown) {
       console.error("AI Analysis Failed:", error);
       throw error;
     } finally {
@@ -96,7 +96,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
       }
 
       return response.data || "";
-    } catch (error) {
+    } catch (_error: unknown) {
       console.error("AI Query Failed:", error);
       throw error;
     } finally {
@@ -119,7 +119,7 @@ export function AIProvider({ children }: { children: ReactNode }) {
       } catch {
         return { action: "UNKNOWN", response: response.data };
       }
-    } catch (error) {
+    } catch (_error: unknown) {
         console.error("AI Command Failed", error);
         throw error;
     } finally {

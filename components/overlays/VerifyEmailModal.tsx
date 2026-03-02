@@ -55,7 +55,7 @@ export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
         await completeEmailVerification(userId, secret);
         setStatus("success");
         setMessage("Email verified successfully.");
-      } catch (e: unknown) {
+      } catch (_e: unknown) {
         const err = e as { message?: string };
         setStatus("error");
         setMessage(

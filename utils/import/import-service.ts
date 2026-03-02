@@ -169,7 +169,7 @@ export class ImportService {
         if (skippedExisting > 0) {
              console.log(`[ImportService] Skipped ${skippedExisting} existing credentials.`);
         }
-      } catch (e) {
+      } catch (_e: unknown) {
         console.warn("[ImportService] Failed to check existing data, proceeding with import.", e);
       }
 
@@ -249,7 +249,7 @@ export class ImportService {
       });
 
       return result;
-    } catch (error) {
+    } catch (_error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error occurred";
       result.errors.push(errorMessage);
@@ -385,7 +385,7 @@ export class ImportService {
         if (skippedExisting > 0) {
              console.log(`[ImportService] Skipped ${skippedExisting} existing credentials.`);
         }
-      } catch (e) {
+      } catch (_e: unknown) {
         console.warn("[ImportService] Failed to check existing data, proceeding with import.", e);
       }
 
@@ -439,7 +439,7 @@ export class ImportService {
           if (folder.$id) {
             folderIdMapping.set(folder.$id, folderId);
           }
-        } catch (e) {
+        } catch (_e: unknown) {
           console.error("Failed to restore folder", e);
         }
       }
@@ -494,7 +494,7 @@ export class ImportService {
             itemsTotal: totalItems,
             errors: result.errors,
           });
-        } catch (e) {
+        } catch (_e: unknown) {
           const error = e as Error;
           result.summary.errors++;
           const errorMsg = `Failed to restore credential ${cred.name || 'Unknown'}: ${error.message}`;
@@ -544,7 +544,7 @@ export class ImportService {
 
           await createTotpSecret(cleanTotp as any);
           result.summary.totpSecretsCreated++;
-        } catch (e) {
+        } catch (_e: unknown) {
           result.summary.errors++;
           result.errors.push(`Failed to restore TOTP ${totp.issuer}`);
         }
@@ -564,7 +564,7 @@ export class ImportService {
 
       return result;
 
-    } catch (error) {
+    } catch (_error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       result.errors.push(errorMessage);
 
@@ -640,7 +640,7 @@ export class ImportService {
 
         // Also map by name for convenience
         folderIdMapping.set(folder.name, folderId);
-      } catch (error) {
+      } catch (_error: unknown) {
         console.error("Failed to create/map folder:", folders[i].name, error);
         // Continue with other folders
       }
@@ -676,7 +676,7 @@ export class ImportService {
           itemsTotal: folderIdMapping.size + credentials.length,
           errors: errorMessages,
         });
-      } catch (error) {
+      } catch (_error: unknown) {
         errors++;
         const errorMsg = `Failed to import credential "${credentials[i].name}": ${error instanceof Error ? error.message : "Unknown error"}`;
         errorMessages.push(errorMsg);
@@ -720,7 +720,7 @@ export class ImportService {
           itemsTotal: folderIdMapping.size + totpSecrets.length,
           errors: errorMessages,
         });
-      } catch (error) {
+      } catch (_error: unknown) {
         errors++;
         const errorMsg = `Failed to import TOTP secret "${totpSecrets[i].issuer}": ${error instanceof Error ? error.message : "Unknown error"}`;
         errorMessages.push(errorMsg);
@@ -806,7 +806,7 @@ export async function logImportEvent(
       ipAddress,
       userAgent,
     );
-  } catch (error) {
+  } catch (_error: unknown) {
     console.error("Failed to log import event:", error);
   }
 }

@@ -106,7 +106,7 @@ export default function TOTPPage() {
       };
 
       return authenticator.generate(normalized);
-    } catch (err) {
+    } catch (_err: unknown) {
       console.warn("TOTP Generation warning for secret ending in ...", secret?.slice(-4), err);
       if (algorithm?.toLowerCase() !== 'sha1') {
         try {
@@ -132,7 +132,7 @@ export default function TOTPPage() {
       await deleteTotpSecret(id);
       setTotpCodes((codes) => codes.filter((c) => c.$id !== id));
       toast.success("TOTP code deleted.");
-    } catch (e: unknown) {
+    } catch (_e: unknown) {
       const err = e as { message?: string };
       toast.error(err.message || "Failed to delete TOTP code.");
     } finally {
@@ -291,7 +291,7 @@ export default function TOTPPage() {
           fullWidth
           placeholder="Search TOTP codes..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(_e) => setSearch(e.target.value)}
           sx={{
             maxWidth: 400,
             '& .MuiOutlinedInput-root': {

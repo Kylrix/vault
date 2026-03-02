@@ -9,3 +9,37 @@
      · optimizePackageImports
 
    Creating an optimized production build ...
+ ✓ Compiled successfully in 5.0s
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/14) ...
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3000". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+   Generating static pages (3/14) 
+   Generating static pages (6/14) 
+   Generating static pages (10/14) 
+ ✓ Generating static pages (14/14)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    7.53 kB         227 kB
+├ ○ /_not-found                            132 B         101 kB
+├ ƒ /api/ai/generate                       132 B         101 kB
+├ ○ /credentials/new                      6.8 kB         216 kB
+├ ○ /dashboard                           25.1 kB         255 kB
+├ ○ /import                              12.3 kB         215 kB
+├ ○ /masterpass                          7.13 kB         214 kB
+├ ○ /masterpass/reset                    2.87 kB         180 kB
+├ ○ /overview                            5.65 kB         183 kB
+├ ○ /sharing                             2.58 kB         166 kB
+└ ○ /totp                                 147 kB         362 kB
++ First Load JS shared by all             101 kB
+  ├ chunks/750-93e186afeec0b91b.js       44.6 kB
+  ├ chunks/7fc17d94-cf1a4c8d394d339e.js  54.1 kB
+  └ other shared chunks (total)          2.24 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

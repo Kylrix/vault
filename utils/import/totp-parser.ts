@@ -27,7 +27,7 @@ export function parseTotpUri(totpUri: string): TotpParseResult | null {
     }
 
     return null;
-  } catch (error) {
+  } catch (_error: unknown) {
     console.error("Error parsing TOTP URI:", error);
     return null;
   }
@@ -75,7 +75,7 @@ function parseOtpauthUri(uri: string): TotpParseResult | null {
       digits,
       period,
     };
-  } catch (error) {
+  } catch (_error: unknown) {
     console.error("Error parsing otpauth URI:", error);
     return null;
   }

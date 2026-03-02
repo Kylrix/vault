@@ -121,7 +121,7 @@ export async function verifyHMAC(
     );
     const computedHmac = btoa(String.fromCharCode(...new Uint8Array(hmacBuffer)));
     return constantTimeCompare(hmac, computedHmac);
-  } catch (error) {
+  } catch (_error: unknown) {
     logWarn('HMAC verification failed', { error });
     return false;
   }

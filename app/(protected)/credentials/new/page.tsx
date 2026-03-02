@@ -207,7 +207,7 @@ export default function NewCredentialPage() {
         toast.success("TOTP code added!");
         router.push("/totp");
       }
-    } catch (e: unknown) {
+    } catch (_e: unknown) {
       const message =
         e instanceof Error
           ? e.message
@@ -316,7 +316,7 @@ export default function NewCredentialPage() {
                       label="Name"
                       placeholder="e.g., GitHub, Gmail"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(_e) => setFormData({ ...formData, name: e.target.value })}
                       required
                       variant="outlined"
                       sx={{
@@ -334,7 +334,7 @@ export default function NewCredentialPage() {
                       type="url"
                       placeholder="https://example.com"
                       value={formData.url}
-                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                      onChange={(_e) => setFormData({ ...formData, url: e.target.value })}
                       variant="outlined"
                       sx={{
                         '& .MuiOutlinedInput-root': {
@@ -351,7 +351,7 @@ export default function NewCredentialPage() {
                   label="Username/Email"
                   placeholder="john@example.com"
                   value={formData.username}
-                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  onChange={(_e) => setFormData({ ...formData, username: e.target.value })}
                   required
                   variant="outlined"
                   sx={{
@@ -369,7 +369,7 @@ export default function NewCredentialPage() {
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter or generate password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(_e) => setFormData({ ...formData, password: e.target.value })}
                     required
                     variant="outlined"
                     InputProps={{
@@ -399,7 +399,7 @@ export default function NewCredentialPage() {
                       <InputLabel>Folder</InputLabel>
                       <Select
                         value={formData.folder}
-                        onChange={(e) => setFormData({ ...formData, folder: e.target.value as string })}
+                        onChange={(_e) => setFormData({ ...formData, folder: e.target.value as string })}
                         label="Folder"
                         sx={{
                           borderRadius: '16px',
@@ -421,7 +421,7 @@ export default function NewCredentialPage() {
                       label="Tags"
                       placeholder="work, email, important"
                       value={formData.tags}
-                      onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                      onChange={(_e) => setFormData({ ...formData, tags: e.target.value })}
                       variant="outlined"
                       sx={{
                         '& .MuiOutlinedInput-root': {
@@ -440,7 +440,7 @@ export default function NewCredentialPage() {
                   rows={3}
                   placeholder="Additional notes or information"
                   value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  onChange={(_e) => setFormData({ ...formData, notes: e.target.value })}
                   variant="outlined"
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -470,7 +470,7 @@ export default function NewCredentialPage() {
                           fullWidth
                           placeholder="Field name"
                           value={field.label}
-                          onChange={(e) => updateCustomField(field.id, "label", e.target.value)}
+                          onChange={(_e) => updateCustomField(field.id, "label", e.target.value)}
                           variant="outlined"
                           size="small"
                           sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
@@ -479,7 +479,7 @@ export default function NewCredentialPage() {
                           fullWidth
                           placeholder="Field value"
                           value={field.value}
-                          onChange={(e) => updateCustomField(field.id, "value", e.target.value)}
+                          onChange={(_e) => updateCustomField(field.id, "value", e.target.value)}
                           variant="outlined"
                           size="small"
                           sx={{ '& .MuiOutlinedInput-root': { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.02)' } }}
@@ -498,7 +498,7 @@ export default function NewCredentialPage() {
                 label="Folder Name"
                 placeholder="e.g., Work, Personal"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(_e) => setFormData({ ...formData, name: e.target.value })}
                 required
                 variant="outlined"
                 sx={{

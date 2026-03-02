@@ -85,7 +85,7 @@ export default function MasterPassPage() {
               onClick={() => {
                 try {
                   openIDMWindow();
-                } catch (err) {
+                } catch (_err: unknown) {
                   console.error("Failed to open auth popup:", err);
                 }
               }}

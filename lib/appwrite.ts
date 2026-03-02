@@ -141,7 +141,7 @@ export async function getCurrentUserFromRequest(req: { headers: { get(k: string)
     const data = await res.json();
     if (!data || typeof data !== 'object' || !data.$id) return null;
     return data;
-  } catch (e) {
+  } catch (_e: unknown) {
     console.error('getCurrentUserFromRequest error', e);
     return null;
   }
@@ -167,7 +167,7 @@ async function listDocumentsWithRetry(
       collectionId,
       queries,
     );
-  } catch (err) {
+  } catch (_err: unknown) {
     if (!isFetchNetworkError(err)) throw err as Error;
 
     // Try to normalize endpoint then retry once
@@ -184,7 +184,7 @@ async function listDocumentsWithRetry(
         collectionId,
         queries,
       );
-    } catch (err2) {
+    } catch (err2: unknown) {
       // Surface a clearer error with guidance
       const note =
         "Network request to Appwrite failed. Check NEXT_PUBLIC_APPWRITE_ENDPOINT, CORS, and /v1 suffix.";
@@ -1200,7 +1200,7 @@ export class AppwriteService {
         if (this.shouldEncryptField(fieldValue)) {
           try {
             result[field] = await encryptField(String(fieldValue));
-          } catch (error) {
+          } catch (_error: unknown) {
             console.error(`Failed to encrypt field ${field}:`, error);
             throw new Error(`Encryption failed for ${field}: ${error}`);
           }
@@ -1247,7 +1247,7 @@ export class AppwriteService {
               `Decrypting field: ${field} for collection: ${collectionType}`,
             );
             result[field] = await decryptField(fieldValue as string);
-          } catch (error) {
+          } catch (_error: unknown) {
             console.error(`Failed to decrypt field ${field}:`, error);
             result[field] = "[DECRYPTION_FAILED]";
           }
@@ -1264,7 +1264,7 @@ export class AppwriteService {
           );
         }
       }
-    } catch (error) {
+    } catch (_error: unknown) {
       console.error("Decryption module not available:", error);
       // Return original document if decryption module can't be loaded
     }
@@ -1468,7 +1468,7 @@ export async function verifyTotpFactor(otp: string): Promise<boolean> {
     // Use the proper MFA authenticator verification method
     await appwriteAccount.updateMfaAuthenticator(AuthenticatorType.Totp, otp);
     return true;
-  } catch (error) {
+  } catch (_error: unknown) {
     console.error("TOTP verification failed:", error);
     return false;
   }
@@ -1521,7 +1521,7 @@ export async function checkMfaRequired(): Promise<boolean> {
   try {
     await appwriteAccount.get();
     return false; // If account.get() succeeds, no MFA required
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     const err = error as { type?: string };
     if (err.type === "user_more_factors_required") {
       return true; // MFA is required
@@ -1553,7 +1553,7 @@ export async function getMfaAuthenticationStatus(): Promise<{
       needsMfa: false,
       isFullyAuthenticated: true,
     };
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     const err = error as { type?: string; code?: number; message?: string };
     console.log("getMfaAuthenticationStatus: Error caught", {
       error,
@@ -1613,7 +1613,7 @@ export async function addEmailFactor(
       window.location.origin + "/"
     );
     return { email };
-  } catch (error) {
+  } catch (_error: unknown) {
     // Email might already be usable as MFA factor even if this fails
     console.log("Email factor setup note:", error);
     return { email };
@@ -1882,7 +1882,7 @@ export async function resetMasterpassAndWipe(userId: string): Promise<void> {
           response.documents.map((doc) =>
             appwriteDatabases
               .deleteDocument(APPWRITE_DATABASE_ID, collectionId, doc.$id)
-              .catch((e) => console.warn(`Failed to delete doc ${doc.$id}`, e))
+              .catch((_e) => console.warn(`Failed to delete doc ${doc.$id}`, e))
           )
         );
 
@@ -1891,7 +1891,7 @@ export async function resetMasterpassAndWipe(userId: string): Promise<void> {
           hasMore = false;
         }
       }
-    } catch (e) {
+    } catch (_e: unknown) {
       console.error(`Failed to wipe collection ${collectionId}`, e);
     }
   };
@@ -2004,7 +2004,7 @@ export async function getAuthenticationNextRoute(
 
     // Everything is ready, go to dashboard
     return "/dashboard";
-  } catch (error) {
+  } catch (_error: unknown) {
     console.error("Error determining authentication route:", error);
     throw error;
   }
@@ -2096,7 +2096,7 @@ export async function getUnifiedMfaStatus(userId?: string): Promise<{
       try {
         const userDoc = await AppwriteService.getUserDoc(userId);
         isEnforced = userDoc?.twofa === true;
-      } catch (error) {
+      } catch (_error: unknown) {
         console.warn("Could not check user MFA status from database:", error);
         // Fallback: if user has factors, assume MFA should be enforced
         isEnforced = hasAnyFactor;
@@ -2117,7 +2117,7 @@ export async function getUnifiedMfaStatus(userId?: string): Promise<{
             twofa: isEnforced,
           });
         }
-      } catch (error) {
+      } catch (_error: unknown) {
         console.warn("Failed to sync MFA status with database:", error);
       }
     }
@@ -2128,7 +2128,7 @@ export async function getUnifiedMfaStatus(userId?: string): Promise<{
       requiresSetup,
       needsAuthentication,
     };
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     const err = error as { message?: string };
     return {
       isEnforced: false,
@@ -2162,7 +2162,7 @@ export async function getAppwriteMfaStatus(): Promise<{
       isEnforced,
       factors,
     };
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     console.error("Failed to get Appwrite MFA status:", error);
     return {
       isEnforced: false,
@@ -2238,7 +2238,7 @@ export async function syncAndValidateMfaStatus(userId: string): Promise<{
       wasOutOfSync,
       currentStatus: appwriteStatus.isEnforced,
     };
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     console.error("Failed to sync MFA status:", error);
     const err = error as { message?: string };
     return {

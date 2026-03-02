@@ -10,7 +10,7 @@ export async function fetchProfilePreview(fileId?: string | null, width: number 
     const str = url as unknown as string | null;
     previewCache.set(fileId, str);
     return str;
-  } catch (err) {
+  } catch (_err: unknown) {
     previewCache.set(fileId, null);
     return null;
   }

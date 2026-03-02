@@ -38,7 +38,7 @@ export function EventSelectorModal({ isOpen, onClose, onSelect }: EventSelectorM
         try {
           const res = await AppwriteService.listFlowEvents(user.$id);
           setEvents(res.documents);
-        } catch (err) {
+        } catch (_err: unknown) {
           console.error('Failed to fetch events:', err);
         } finally {
           setLoading(false);
@@ -64,7 +64,7 @@ export function EventSelectorModal({ isOpen, onClose, onSelect }: EventSelectorM
           size="small"
           placeholder="Search events..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(_e) => setSearch(e.target.value)}
           variant="outlined"
           sx={{
             mb: 3,
@@ -93,7 +93,7 @@ export function EventSelectorModal({ isOpen, onClose, onSelect }: EventSelectorM
           <Typography variant="body2" sx={{ textAlign: 'center', opacity: 0.5, py: 4 }}>No events found</Typography>
         ) : (
           <List sx={{ maxHeight: '400px', overflowY: 'auto' }}>
-            {filtered.map((event) => (
+            {filtered.map((_event) => (
               <ListItemButton
                 key={event.$id}
                 onClick={() => onSelect(event.$id)}

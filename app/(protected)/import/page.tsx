@@ -81,7 +81,7 @@ export default function ImportPage() {
 
       setPreviewItems(items);
       setIsPreviewOpen(true);
-    } catch (error) {
+    } catch (_error: unknown) {
       throw error;
     }
   };
@@ -102,7 +102,7 @@ export default function ImportPage() {
     setErrorState(null);
     try {
       await parseAndPreview(file);
-    } catch (error) {
+    } catch (_error: unknown) {
       const errorMessage = error instanceof Error ? error.message : "Import failed.";
       setErrorState(errorMessage);
     }

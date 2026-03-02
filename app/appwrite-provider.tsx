@@ -93,7 +93,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         setNeedsMasterPassword(false);
       }
       return account;
-    } catch (err: unknown) {
+    } catch (_err: unknown) {
       const e = err as AppwriteError;
       
       // Check for auth=success signal in URL
@@ -191,7 +191,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         }
         return;
       }
-    } catch (e) {
+    } catch (_e: unknown) {
       // No session, proceed to silent check
     }
 
@@ -207,7 +207,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         }
         return;
       }
-    } catch (e) {
+    } catch (_e: unknown) {
       // Still no session
     }
 
@@ -224,7 +224,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAuthenticating(false);
       }
-    } catch (error) {
+    } catch (_error: unknown) {
       console.error("Failed to open IDM window:", error);
       setIsAuthenticating(false);
     }
@@ -288,7 +288,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       try {
         await fetchUser();
-      } catch (err: unknown) {
+      } catch (_err: unknown) {
         const e = err as AppwriteError;
         if (e.code === 401) {
           await attemptSilentAuth();

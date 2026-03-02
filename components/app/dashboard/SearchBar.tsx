@@ -50,7 +50,7 @@ export default function SearchBar({
         fullWidth
         placeholder="Search passwords, usernames..."
         value={value}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(_e) => handleChange(e.target.value)}
         variant="filled"
         InputProps={{
           disableUnderline: true,

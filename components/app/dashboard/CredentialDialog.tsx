@@ -176,7 +176,7 @@ export default function CredentialDialog({
       }
       onSaved();
       onClose();
-    } catch (e: unknown) {
+    } catch (_e: unknown) {
       const err = e as { message?: string };
       setError(err.message || "Failed to save credential.");
     }
@@ -225,7 +225,7 @@ export default function CredentialDialog({
                 label="Name"
                 placeholder="e.g., GitHub, Gmail"
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(_e) => setForm({ ...form, name: e.target.value })}
                 required
                 variant="filled"
                 InputProps={{
@@ -241,7 +241,7 @@ export default function CredentialDialog({
                 label="Username/Email"
                 placeholder="john@example.com"
                 value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                onChange={(_e) => setForm({ ...form, username: e.target.value })}
                 required
                 variant="filled"
                 InputProps={{
@@ -264,7 +264,7 @@ export default function CredentialDialog({
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter or generate password"
                   value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  onChange={(_e) => setForm({ ...form, password: e.target.value })}
                   required
                   variant="filled"
                   InputProps={{
@@ -307,7 +307,7 @@ export default function CredentialDialog({
                 type="url"
                 placeholder="https://example.com"
                 value={form.url}
-                onChange={(e) => setForm({ ...form, url: e.target.value })}
+                onChange={(_e) => setForm({ ...form, url: e.target.value })}
                 variant="filled"
                 InputProps={{
                   disableUnderline: true,
@@ -327,7 +327,7 @@ export default function CredentialDialog({
                 label="Tags"
                 placeholder="Comma separated: work, email, important"
                 value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                onChange={(_e) => setForm({ ...form, tags: e.target.value })}
                 variant="filled"
                 InputProps={{
                   disableUnderline: true,
@@ -349,7 +349,7 @@ export default function CredentialDialog({
                 rows={3}
                 placeholder="Additional notes"
                 value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                onChange={(_e) => setForm({ ...form, notes: e.target.value })}
                 variant="filled"
                 InputProps={{
                   disableUnderline: true,
@@ -385,7 +385,7 @@ export default function CredentialDialog({
                     size="small"
                     placeholder="Label"
                     value={field.label}
-                    onChange={(e) => updateCustomField(field.id, "label", e.target.value)}
+                    onChange={(_e) => updateCustomField(field.id, "label", e.target.value)}
                     variant="filled"
                     InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   />
@@ -393,7 +393,7 @@ export default function CredentialDialog({
                     size="small"
                     placeholder="Value"
                     value={field.value}
-                    onChange={(e) => updateCustomField(field.id, "value", e.target.value)}
+                    onChange={(_e) => updateCustomField(field.id, "value", e.target.value)}
                     variant="filled"
                     InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   />

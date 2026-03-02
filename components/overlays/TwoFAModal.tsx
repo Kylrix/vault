@@ -78,7 +78,7 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
       const challenge = await createMfaChallenge(factor);
       setChallengeId(challenge.$id);
       setSelectedFactor(factor);
-    } catch (e: unknown) {
+    } catch (_e: unknown) {
       const err = e as { message?: string };
       toast.error(err.message || "Failed to create challenge");
     }
@@ -95,7 +95,7 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
       await completeMfaChallenge(challengeId, code);
       onClose();
       await finalizeAuth({ redirect: true, fallback: "/masterpass" });
-    } catch (e: unknown) {
+    } catch (_e: unknown) {
       const err = e as { message?: string };
       toast.error(err.message || "Invalid code");
     }
@@ -285,7 +285,7 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
                 autoFocus
                 placeholder={selectedFactor === "recoverycode" ? "XXXXX-XXXXX" : "000000"}
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onChange={(_e) => setCode(e.target.value)}
                 inputProps={{ 
                   maxLength: selectedFactor === "recoverycode" ? 11 : 6,
                   style: { 

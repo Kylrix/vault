@@ -134,7 +134,7 @@ export function AIModal({ onClose }: { onClose: () => void }) {
             fullWidth
             size="small"
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={(_e) => setPrompt(e.target.value)}
             placeholder="Type your command..."
             disabled={isLoading}
             autoFocus

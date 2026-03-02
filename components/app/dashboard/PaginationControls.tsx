@@ -52,7 +52,7 @@ export default function PaginationControls({
             <Select
               size="small"
               value={pageSize}
-              onChange={(e) => onPageSizeChange(Number(e.target.value))}
+              onChange={(_e) => onPageSizeChange(Number(e.target.value))}
               disabled={loading}
               sx={{ 
                 height: 32, 

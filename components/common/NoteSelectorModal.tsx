@@ -38,7 +38,7 @@ export function NoteSelectorModal({ isOpen, onClose, onSelect }: NoteSelectorMod
                 try {
                     const res = await AppwriteService.listFlowNotes(user.$id);
                     setNotes(res.documents);
-                } catch (err) {
+                } catch (_err: unknown) {
                     console.error('Failed to fetch notes:', err);
                 } finally {
                     setLoading(false);
@@ -64,7 +64,7 @@ export function NoteSelectorModal({ isOpen, onClose, onSelect }: NoteSelectorMod
                     size="small"
                     placeholder="Search notes..."
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(_e) => setSearch(e.target.value)}
                     variant="outlined"
                     sx={{
                         mb: 3,

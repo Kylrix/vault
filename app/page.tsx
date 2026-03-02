@@ -106,7 +106,7 @@ export default function LandingPage() {
                 }
                 try {
                   openIDMWindow();
-                } catch (err) {
+                } catch (_err: unknown) {
                   alert(err instanceof Error ? err.message : "Failed to open authentication");
                 }
               }}
