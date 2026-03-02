@@ -65,6 +65,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
 
   // Fetch current user and check master password status
   const fetchUser = useCallback(async (isRetry = false, retryCount = 0) => {
+    if (typeof window === 'undefined') return;
     if (!isRetry) setLoading(true);
     try {
       const account = await appwriteAccount.get();
@@ -75,7 +76,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
 
       if (account) {
         // Clear the auth=success param from URL if it exists
-        if (typeof window !== 'undefined' && window.location.search.includes('auth=success')) {
+        if (window.location.search.includes('auth=success')) {
           const url = new URL(window.location.href);
           url.searchParams.delete('auth');
           window.history.replaceState({}, '', url.toString());
@@ -94,10 +95,10 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       }
       return account;
     } catch (_err: unknown) {
-      const e = err as AppwriteError;
+      const e = _err as AppwriteError;
       
       // Check for auth=success signal in URL
-      const hasAuthSignal = typeof window !== 'undefined' && window.location.search.includes('auth=success');
+      const hasAuthSignal = window.location.search.includes('auth=success');
       
       if (hasAuthSignal && retryCount < 3) {
         logWarn(`[auth] Auth signal detected but session not found in keep. Retrying... (${retryCount + 1})`);
@@ -225,7 +226,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         setIsAuthenticating(false);
       }
     } catch (_error: unknown) {
-      console.error("Failed to open IDM window:", error);
+      console.error("Failed to open IDM window:", _error);
       setIsAuthenticating(false);
     }
   }, [pathname, router, isAuthenticating, attemptSilentAuth]);
