@@ -7,7 +7,7 @@ import { AIProvider } from "./context/AIContext";
 import { SudoProvider } from "./context/SudoContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { Toaster } from "react-hot-toast";
-import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material";
+import { ThemeProvider as MuiThemeProvider, CssBaseline, Box } from "@mui/material";
 import { darkTheme } from "@/theme/theme";
 import EcosystemPortal from "@/components/common/EcosystemPortal";
 import { useEcosystemNode } from "@/hooks/useEcosystemNode";
@@ -37,15 +37,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return (
-      <MuiThemeProvider theme={darkTheme}>
-        <CssBaseline />
-        <div style={{ visibility: 'hidden' }}>{children}</div>
-      </MuiThemeProvider>
-    );
-  }
-
   return (
     <MuiThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -55,7 +46,15 @@ export function Providers({ children }: { children: React.ReactNode }) {
             <BackgroundTaskProvider>
               <AIProvider>
                 <GlobalEcosystemHandler />
-                {children}
+                <Box
+                  style={{
+                    visibility: mounted ? "visible" : "hidden",
+                    opacity: mounted ? 1 : 0,
+                    transition: "opacity 0.5s ease-in-out",
+                  }}
+                >
+                  {children}
+                </Box>
                 <Toaster
                   position="bottom-right"
                   toastOptions={{
