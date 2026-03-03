@@ -64,7 +64,7 @@ export function TaskSelectorModal({ isOpen, onClose, onSelect }: TaskSelectorMod
           size="small"
           placeholder="Search tasks..."
           value={search}
-          onChange={(_e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           variant="outlined"
           sx={{
             mb: 3,

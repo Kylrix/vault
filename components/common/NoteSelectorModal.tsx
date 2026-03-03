@@ -64,7 +64,7 @@ export function NoteSelectorModal({ isOpen, onClose, onSelect }: NoteSelectorMod
                     size="small"
                     placeholder="Search notes..."
                     value={search}
-                    onChange={(_e) => setSearch(e.target.value)}
+                    onChange={(e) => setSearch(e.target.value)}
                     variant="outlined"
                     sx={{
                         mb: 3,

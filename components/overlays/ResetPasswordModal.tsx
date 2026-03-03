@@ -50,7 +50,7 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
       );
       toast.success("Password reset email sent! Check your inbox.");
       setEmail("");
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       const err = e as { message?: string };
       toast.error(err.message || "Error sending reset email.");
     }
@@ -68,7 +68,7 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
       await updatePasswordRecovery(userId, secret, password);
       toast.success("Password reset successful! You can now log in.");
       onClose();
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       const err = e as { message?: string };
       toast.error(err.message || "Error resetting password.");
     }
@@ -143,7 +143,7 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
                   label="New Password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(_e) => setPassword(e.target.value)}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
                   variant="outlined"
                   sx={{
@@ -159,7 +159,7 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
                   label="Confirm Password"
                   placeholder="••••••••"
                   value={passwordAgain}
-                  onChange={(_e) => setPasswordAgain(e.target.value)}
+                  onChange={(e) => setPasswordAgain(e.target.value)}
                   required
                   variant="outlined"
                   sx={{
@@ -177,7 +177,7 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
                 label="Email Address"
                 placeholder="name@example.com"
                 value={email}
-                onChange={(_e) => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 variant="outlined"
                 sx={{

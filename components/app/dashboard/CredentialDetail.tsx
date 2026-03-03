@@ -54,7 +54,7 @@ export default function CredentialDetail({
       if (result) {
         setUrlSafety(result);
       }
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       console.error("Failed to check URL safety", e);
     } finally {
       setCheckingUrl(false);

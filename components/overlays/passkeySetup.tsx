@@ -74,7 +74,7 @@ export function PasskeySetup({
         toast.error("Incorrect master password.");
         return false;
       }
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Password verification failed:", error);
       toast.error("Failed to verify master password.");
       return false;
@@ -184,7 +184,7 @@ export function PasskeySetup({
       await AppwriteService.syncPasskeyStatus(userId);
 
       setStep(4);
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Passkey setup failed:", error);
       const err = error as { name?: string; message?: string };
       const message =
@@ -251,8 +251,8 @@ export function PasskeySetup({
                 type={showPassword ? "text" : "password"}
                 placeholder="Master Password"
                 value={masterPassword}
-                onChange={(_e) => setMasterPassword(e.target.value)}
-                onKeyDown={(_e) => e.key === "Enter" && handleContinueToName()}
+                onChange={(e) => setMasterPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleContinueToName()}
                 variant="filled"
                 InputProps={{
                   disableUnderline: true,
@@ -281,8 +281,8 @@ export function PasskeySetup({
                 fullWidth
                 placeholder="Passkey Name"
                 value={passkeyName}
-                onChange={(_e) => setPasskeyName(e.target.value)}
-                onKeyDown={(_e) => e.key === "Enter" && handleContinueToCreate()}
+                onChange={(e) => setPasskeyName(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleContinueToCreate()}
                 variant="filled"
                 autoFocus
                 InputProps={{

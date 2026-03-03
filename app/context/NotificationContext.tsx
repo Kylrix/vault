@@ -50,7 +50,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       if (details.startsWith('{')) {
         return JSON.parse(details);
       }
-    } catch (_e: unknown) {}
+    } catch (e: unknown) {}
     return { read: false, originalDetails: details };
   };
 
@@ -71,7 +71,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       const logs = res.documents as unknown as ActivityLog[];
       setNotifications(logs);
       setUnreadCount(calculateUnread(logs));
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error('Failed to fetch notifications:', _error);
     } finally {
       setIsLoading(false);
@@ -134,7 +134,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         id, 
         { details: JSON.stringify(newMetadata) }
       );
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error('Cloud sync failed:', _error);
     }
   };

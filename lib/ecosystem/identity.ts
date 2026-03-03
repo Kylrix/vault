@@ -34,7 +34,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
                 CONNECT_COLLECTION_ID_USERS,
                 user.$id
             );
-        } catch (_e: unknown) {
+        } catch (e: unknown) {
             if (e.code === 404) {
                 const username = user.prefs?.username || `user${user.$id.slice(0, 6)}`;
                 const profilePicId = user.prefs?.profilePicId || null;
@@ -71,7 +71,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
                             permissions
                         );
                         break;
-                    } catch (_e: unknown) {
+                    } catch (e: unknown) {
                         const msg = (e.message || JSON.stringify(e)).toLowerCase();
                         if (msg.includes('unknown attribute') || msg.includes('invalid document structure')) {
                             continue;
@@ -101,7 +101,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
             localStorage.setItem(PROFILE_SYNC_KEY, Date.now().toString());
             sessionStorage.setItem(SESSION_SYNC_KEY, '1');
         }
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
         console.warn('[Identity] Global identity sync failed:', error);
     }
 }
@@ -133,7 +133,7 @@ export async function searchGlobalUsers(query: string, limit = 10) {
             avatarFileId: doc.avatarFileId,
             apps: doc.appsActive || []
         }));
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
         console.error('[Identity] Global search failed:', error);
         return [];
     }

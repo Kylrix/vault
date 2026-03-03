@@ -118,32 +118,32 @@ export default function CredentialItem({
         {!isMobile ? (
           <>
             <Tooltip title="Copy Username">
-              <IconButton size="small" onClick={(_e) => { e.stopPropagation(); handleCopy(credential.username); }} sx={{ color: 'text.secondary' }}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.username); }} sx={{ color: 'text.secondary' }}>
                 <PersonIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Copy Password">
-              <IconButton size="small" onClick={(_e) => { e.stopPropagation(); handleCopy(credential.password); }} sx={{ color: 'primary.main' }}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.password); }} sx={{ color: 'primary.main' }}>
                 <LockIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Edit">
-              <IconButton size="small" onClick={(_e) => { e.stopPropagation(); onEdit(); }} sx={{ color: 'text.secondary' }}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onEdit(); }} sx={{ color: 'text.secondary' }}>
                 <EditIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Delete">
-              <IconButton size="small" onClick={(_e) => { e.stopPropagation(); onDelete(); }} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); onDelete(); }} sx={{ color: 'text.secondary', '&:hover': { color: 'error.main' } }}>
                 <DeleteIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           </>
         ) : (
           <>
-            <IconButton size="small" onClick={(_e) => { e.stopPropagation(); setCopyAnchorEl(e.currentTarget); }} sx={{ color: 'primary.main' }}>
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); setCopyAnchorEl(e.currentTarget); }} sx={{ color: 'primary.main' }}>
               <ContentCopyIcon sx={{ fontSize: 20 }} />
             </IconButton>
-            <IconButton size="small" onClick={(_e) => { e.stopPropagation(); setAnchorEl(e.currentTarget); }} sx={{ color: 'text.secondary' }}>
+            <IconButton size="small" onClick={(e) => { e.stopPropagation(); setAnchorEl(e.currentTarget); }} sx={{ color: 'text.secondary' }}>
               <MoreVertIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </>

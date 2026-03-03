@@ -123,7 +123,7 @@ export default function PasswordGenerator() {
               <Switch 
                 size="small" 
                 checked={showHistory} 
-                onChange={(_e) => setShowHistory(e.target.checked)}
+                onChange={(e) => setShowHistory(e.target.checked)}
                 sx={{
                   '& .MuiSwitch-switchBase.Mui-checked': { color: '#00F5FF' },
                   '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#00F5FF' }

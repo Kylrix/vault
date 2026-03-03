@@ -130,7 +130,7 @@ export default function DashboardPage() {
     try {
       const credentials = await listAllCredentials(user.$id);
       setAllCredentials(credentials);
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       toast.error("Failed to load credentials. Please try again.");
       console.error("Failed to load credentials:", error);
     } finally {
@@ -175,7 +175,7 @@ export default function DashboardPage() {
         await applyOrganizationChanges(analysisResult);
       }
 
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Smart Organize Failed:", error);
       toast.error("Failed to organize vault.", { id: toastId });
     } finally {
@@ -225,7 +225,7 @@ export default function DashboardPage() {
       toast.success("Vault organized successfully!", { id: toastId });
       // Refresh UI
       window.location.reload();
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Failed to apply changes", error);
       toast.error("Partial failure during organization.", { id: toastId });
     }
@@ -295,7 +295,7 @@ export default function DashboardPage() {
         prev.filter((c) => c.$id !== credentialToDelete.$id),
       );
       toast.success("Credential deleted successfully.");
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       toast.error("Failed to delete credential. Please try again.");
       console.error("Failed to delete credential:", error);
     } finally {
@@ -413,7 +413,7 @@ export default function DashboardPage() {
               variant="outlined"
               startIcon={<FolderIcon sx={{ fontSize: 18 }} />}
               endIcon={<ExpandMoreIcon sx={{ fontSize: 16 }} />}
-              onClick={(_e) => setFolderAnchorEl(e.currentTarget)}
+              onClick={(e) => setFolderAnchorEl(e.currentTarget)}
               sx={{ 
                 borderRadius: '12px', 
                 bgcolor: 'rgba(255, 255, 255, 0.02)',

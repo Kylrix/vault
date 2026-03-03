@@ -64,7 +64,7 @@ export function EventSelectorModal({ isOpen, onClose, onSelect }: EventSelectorM
           size="small"
           placeholder="Search events..."
           value={search}
-          onChange={(_e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           variant="outlined"
           sx={{
             mb: 3,

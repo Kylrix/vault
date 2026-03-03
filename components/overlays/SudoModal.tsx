@@ -97,7 +97,7 @@ export default function SudoModal({
             } else {
                 toast.error("Incorrect master password");
             }
-        } catch (_error: unknown) {
+        } catch (error: unknown) {
             console.error(error);
             toast.error("Verification failed");
         } finally {
@@ -119,7 +119,7 @@ export default function SudoModal({
                 toast.error("Incorrect PIN");
                 setPin("");
             }
-        } catch (_error: unknown) {
+        } catch (error: unknown) {
             console.error(error);
             toast.error("PIN verification failed");
         } finally {
@@ -135,7 +135,7 @@ export default function SudoModal({
             if (success) {
                 onSuccess();
             }
-        } catch (_error: unknown) {
+        } catch (error: unknown) {
             console.error(error);
         } finally {
             setPasskeyLoading(false);
@@ -212,7 +212,7 @@ export default function SudoModal({
                                         type="password"
                                         placeholder="••••"
                                         value={pin}
-                                        onChange={(_e) => {
+                                        onChange={(e) => {
                                             const val = e.target.value.replace(/\D/g, '').slice(0, 4);
                                             setPin(val);
                                             if (val.length === 4) {
@@ -393,7 +393,7 @@ export default function SudoModal({
                                         type="password"
                                         placeholder="Enter your master password"
                                         value={password}
-                                        onChange={(_e) => setPassword(e.target.value)}
+                                        onChange={(e) => setPassword(e.target.value)}
                                         autoFocus
                                         InputProps={{
                                             startAdornment: (

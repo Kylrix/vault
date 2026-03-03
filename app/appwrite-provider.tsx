@@ -192,7 +192,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         }
         return;
       }
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       // No session, proceed to silent check
     }
 
@@ -208,7 +208,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         }
         return;
       }
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       // Still no session
     }
 
@@ -225,7 +225,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       } else {
         setIsAuthenticating(false);
       }
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Failed to open IDM window:", _error);
       setIsAuthenticating(false);
     }

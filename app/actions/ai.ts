@@ -99,7 +99,7 @@ export async function generateAIContent(payload: AIRequestPayload): Promise<AIRe
     text = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
     return { success: true, data: text };
-  } catch (_error: unknown) {
+  } catch (error: unknown) {
     console.error("AI Generation Error:", error);
     return { success: false, error: "Failed to generate AI response" };
   }

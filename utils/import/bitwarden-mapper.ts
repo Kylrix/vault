@@ -176,7 +176,7 @@ export function analyzeBitwardenExport(
         mappedTotpSecrets.push(totpSecret);
         totpCount++;
       }
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Error mapping item:", item.name, error);
       skippedItems++;
     }

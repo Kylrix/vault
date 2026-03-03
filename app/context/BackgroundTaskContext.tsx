@@ -52,7 +52,7 @@ export function BackgroundTaskProvider({ children }: { children: ReactNode }) {
         throw new Error("Unsupported import type");
       }
       setImportResult(result);
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       console.error("Import failed ungracefully:", error);
       // Ensure we set a result even on crash
       setImportResult({

@@ -104,7 +104,7 @@ export default function NewTotpDialog({
         toast.success("TOTP code added!");
       }
       onClose();
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       const err = e as { message?: string };
       toast.error(
         err.message || `Failed to ${initialData ? "update" : "add"} TOTP code.`,
@@ -147,7 +147,7 @@ export default function NewTotpDialog({
             label="Issuer"
             placeholder="e.g. Google, GitHub"
             value={form.issuer}
-            onChange={(_e) => setForm({ ...form, issuer: e.target.value })}
+            onChange={(e) => setForm({ ...form, issuer: e.target.value })}
             required
             variant="outlined"
             sx={{
@@ -165,7 +165,7 @@ export default function NewTotpDialog({
             label="Account Name"
             placeholder="e.g. user@example.com"
             value={form.accountName}
-            onChange={(_e) => setForm({ ...form, accountName: e.target.value })}
+            onChange={(e) => setForm({ ...form, accountName: e.target.value })}
             required
             variant="outlined"
             sx={{
@@ -183,7 +183,7 @@ export default function NewTotpDialog({
             label="Secret Key"
             placeholder="Enter the base32 secret"
             value={form.secretKey}
-            onChange={(_e) => setForm({ ...form, secretKey: e.target.value })}
+            onChange={(e) => setForm({ ...form, secretKey: e.target.value })}
             required
             variant="outlined"
             sx={{
@@ -201,7 +201,7 @@ export default function NewTotpDialog({
             control={
               <Checkbox 
                 checked={showAdvanced} 
-                onChange={(_e) => setShowAdvanced(e.target.checked)}
+                onChange={(e) => setShowAdvanced(e.target.checked)}
                 sx={{ 
                   color: 'rgba(255, 255, 255, 0.2)', 
                   '&.Mui-checked': { color: '#00F5FF' } 

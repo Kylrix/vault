@@ -132,7 +132,7 @@ export default function TOTPPage() {
       await deleteTotpSecret(id);
       setTotpCodes((codes) => codes.filter((c) => c.$id !== id));
       toast.success("TOTP code deleted.");
-    } catch (_e: unknown) {
+    } catch (e: unknown) {
       const err = e as { message?: string };
       toast.error(err.message || "Failed to delete TOTP code.");
     } finally {
@@ -291,7 +291,7 @@ export default function TOTPPage() {
           fullWidth
           placeholder="Search TOTP codes..."
           value={search}
-          onChange={(_e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           sx={{
             maxWidth: 400,
             '& .MuiOutlinedInput-root': {

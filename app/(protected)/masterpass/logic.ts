@@ -121,7 +121,7 @@ export class MasterPassCrypto {
       }
 
       return false;
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError("Failed to unlock vault", error as Error);
       return false;
     }
@@ -202,11 +202,11 @@ export class MasterPassCrypto {
         }
 
         return true;
-      } catch (_e: unknown) {
+      } catch (e: unknown) {
         logDebug("Failed to unwrap key with provided password", { error: e });
         return false;
       }
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError("Error in unlockWithKeychain", error as Error);
       return false;
     }
@@ -261,7 +261,7 @@ export class MasterPassCrypto {
         isBackup: false
       });
 
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError("Failed to create keychain entry", error as Error);
       throw error;
     }
@@ -379,7 +379,7 @@ export class MasterPassCrypto {
       const result = btoa(String.fromCharCode(...combined));
       logDebug("Encryption successful", { resultLength: result.length });
       return result;
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError("Encryption failed", error as Error);
       throw new Error("Failed to encrypt data: " + error);
     }
@@ -421,7 +421,7 @@ export class MasterPassCrypto {
       const decoder = new TextDecoder();
       const plaintext = decoder.decode(decrypted);
       return JSON.parse(plaintext);
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError("Decryption failed", error as Error);
       throw new Error("Failed to decrypt data");
     }

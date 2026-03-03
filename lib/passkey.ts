@@ -23,7 +23,7 @@ export async function unlockWithPasskey(userId: string): Promise<boolean> {
     // If the original logic is needed, it should be restored here.
     
     return false;
-  } catch (_error: unknown) {
+  } catch (error: unknown) {
     logError("Passkey unlock failed", error as Error);
     return false;
   }

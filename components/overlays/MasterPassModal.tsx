@@ -134,7 +134,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           toast.error("Incorrect master password. Please try again.");
         }
       }
-    } catch (_err: unknown) {
+    } catch (err: unknown) {
       const e = err as { message?: string };
       if (
         e?.message?.includes("Vault is locked") ||
@@ -240,11 +240,11 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 type={showPassword ? "text" : "password"}
                 placeholder={isFirstTime ? "Create a strong master password" : "Enter your master password"}
                 value={masterPassword}
-                onChange={(_e) => setMasterPassword(e.target.value)}
+                onChange={(e) => setMasterPassword(e.target.value)}
                 required
                 autoFocus
                 variant="filled"
-                onKeyDown={(_e) => {
+                onKeyDown={(e) => {
                   if ("getModifierState" in e && (e as React.KeyboardEvent).getModifierState("CapsLock")) {
                     setCapsLock(true);
                   } else {
@@ -278,10 +278,10 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirm your master password"
                   value={confirmPassword}
-                  onChange={(_e) => setConfirmPassword(e.target.value)}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   variant="filled"
-                  onKeyDown={(_e) => {
+                  onKeyDown={(e) => {
                     if ("getModifierState" in e && (e as React.KeyboardEvent).getModifierState("CapsLock")) {
                       setConfirmCapsLock(true);
                     } else {

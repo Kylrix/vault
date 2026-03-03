@@ -103,7 +103,7 @@ class AuditLogger {
       if (this.pendingLogs.length >= this.BATCH_SIZE) {
         await this.flush();
       }
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError('Failed to log security event', error as Error, { eventType, userId });
     }
   }
@@ -181,7 +181,7 @@ class AuditLogger {
           })
         )
       );
-    } catch (_error: unknown) {
+    } catch (error: unknown) {
       logError('Failed to flush security logs', error as Error);
       // Put logs back if failed
       this.pendingLogs.unshift(...logsToFlush);
