@@ -1,5 +1,5 @@
 /**
- * Kylrix Ecosystem Mesh Protocol
+ * Kylrix Sync
  * Defines the communication and state synchronization between distributed nodes.
  */
 

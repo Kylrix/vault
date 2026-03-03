@@ -1,5 +1,5 @@
 /**
- * Kylrix Ecosystem Security Protocol (WESP)
+ * Kylrix Security
  * Centralized security and encryption logic for the entire ecosystem.
  * Hosted by the ID node (Identity Management System).
  */

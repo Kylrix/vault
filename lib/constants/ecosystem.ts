@@ -15,7 +15,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
     {
         id: 'note',
         label: 'Kylrix Note',
-        description: 'Advanced knowledge base & research',
+        description: 'Secure notes and research.',
         subdomain: 'note',
         icon: '📝',
         color: '#00F0FF'
@@ -23,7 +23,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
     {
         id: 'vault',
         label: 'Kylrix Vault',
-        description: 'Military-grade vault & credentials',
+        description: 'Passwords and 2FA.',
         subdomain: 'vault',
         icon: '🛡️',
         color: '#FACC15'
@@ -31,7 +31,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
     {
         id: 'flow',
         label: 'Kylrix Flow',
-        description: 'Task orchestration & orchestration',
+        description: 'Tasks and workflows.',
         subdomain: 'flow',
         icon: '🌊',
         color: '#4ADE80'
@@ -39,7 +39,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
     {
         id: 'connect',
         label: 'Kylrix Connect',
-        description: 'High-fidelity communication',
+        description: 'Messages and sharing.',
         subdomain: 'connect',
         icon: '📡',
         color: '#FF00F5'
@@ -47,7 +47,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
     {
         id: 'id',
         label: 'Accounts',
-        description: 'Unified identity & security',
+        description: 'Account settings.',
         subdomain: KYLRIX_AUTH_SUBDOMAIN,
         icon: '🆔',
         color: '#8B5CF6'
