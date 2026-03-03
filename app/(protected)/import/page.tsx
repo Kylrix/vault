@@ -28,7 +28,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import FolderIcon from "@mui/icons-material/Folder";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { validateBitwardenExport } from "@/utils/import/bitwarden-mapper";
 import { useBackgroundTask } from "@/app/context/BackgroundTaskContext";
 import { ImportPreviewModal } from "@/components/import/ImportPreviewModal";
@@ -37,7 +37,7 @@ import { analyzeBitwardenExport } from "@/utils/import/bitwarden-mapper";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 
 export default function ImportPage() {
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const { startImport, isImporting: globalImporting } = useBackgroundTask();
   const [importType, setImportType] = useState<string>("bitwarden");
   const [file, setFile] = useState<File | null>(null);

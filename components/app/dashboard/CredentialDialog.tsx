@@ -28,7 +28,7 @@ import {
 } from "@mui/material";
 import { createCredential, updateCredential } from "@/lib/appwrite";
 import type { Credentials } from "@/types/appwrite";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { generateRandomPassword } from "@/utils/password";
 
 export default function CredentialDialog({
@@ -44,7 +44,7 @@ export default function CredentialDialog({
   onSaved: () => void;
   prefill?: { name?: string; url?: string; username?: string };
 }) {
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const theme = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [customFields, setCustomFields] = useState<

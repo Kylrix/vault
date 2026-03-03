@@ -1,7 +1,7 @@
-import { useAppwrite } from '@/app/appwrite-provider';
+import { useAppwriteVault } from '@/hooks/use-appwrite-vault';
 
 export const useAuth = () => {
-    const { user, loading, isAuthenticated, openIDMWindow, logout } = useAppwrite();
+    const { user, loading, isAuthenticated, openIDMWindow, logout } = useAppwriteVault();
 
     return {
         user,

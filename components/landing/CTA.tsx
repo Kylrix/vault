@@ -2,11 +2,11 @@
 
 import { Box, Container, Typography, Button, CircularProgress } from "@mui/material";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { useRouter } from "next/navigation";
 
 export default function CTA() {
-  const { user, openIDMWindow, isAuthenticating } = useAppwrite();
+  const { user, openIDMWindow, isAuthenticating } = useAppwriteVault();
   const router = useRouter();
 
   return (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import type { Credentials, Folders as FolderDoc } from "@/types/appwrite.d";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import {
   deleteCredential,
   listAllCredentials,
@@ -70,7 +70,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 export default function DashboardPage() {
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const { analyze, registerCreateModal } = useAI();
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('md'));
@@ -313,7 +313,7 @@ export default function DashboardPage() {
       .catch(console.error);
   };
 
-  const { isAuthReady } = useAppwrite();
+  const { isAuthReady } = useAppwriteVault();
 
   // Client-side filtering and search
   const filteredCredentials = useMemo(() => {

@@ -23,7 +23,7 @@ import IconButton from "@mui/material/IconButton";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRef, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
@@ -37,7 +37,7 @@ const FAQ = dynamic(() => import("@/components/landing/FAQ"), { ssr: false });
 const CTA = dynamic(() => import("@/components/landing/CTA"), { ssr: false });
 
 export default function LandingPage() {
-  const { user, openIDMWindow, isAuthenticating } = useAppwrite();
+  const { user, openIDMWindow, isAuthenticating } = useAppwriteVault();
   const router = useRouter();
   const demoRef = useRef<HTMLDivElement>(null);
 

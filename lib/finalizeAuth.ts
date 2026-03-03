@@ -2,7 +2,7 @@
 
 import { getMfaAuthenticationStatus, hasMasterpass } from "@/lib/appwrite";
 import { useRouter } from "next/navigation";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 
 /**
  * Centralized post-auth finalization.
@@ -13,7 +13,7 @@ import { useAppwrite } from "@/app/appwrite-provider";
  */
 export function useFinalizeAuth() {
   const router = useRouter();
-  const { refresh, user, isVaultUnlocked } = useAppwrite();
+  const { refresh, user, isVaultUnlocked } = useAppwriteVault();
 
   const finalize = async (options?: {
     redirect?: boolean;

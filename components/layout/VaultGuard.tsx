@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 
 /**
  * VaultGuard: Wrap protected pages/components with this to enforce
@@ -18,7 +18,7 @@ export default function VaultGuard({
 }: {
   children: React.ReactNode;
 }) {
-  const { isVaultUnlocked, needsMasterPassword, isAuthReady } = useAppwrite();
+  const { isVaultUnlocked, needsMasterPassword, isAuthReady } = useAppwriteVault();
   const router = useRouter();
   const pathname = usePathname();
   const verbose =

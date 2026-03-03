@@ -8,7 +8,7 @@ import {
   Query 
 } from '@/lib/appwrite';
 import { APPWRITE_CONFIG } from '@/lib/appwrite/config';
-import { useAppwrite } from '../appwrite-provider';
+import { useAppwriteVault } from '@/context/appwrite-context';
 
 interface NotificationMetadata {
   read?: boolean;
@@ -40,7 +40,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<ActivityLog[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
 
   const APPWRITE_TABLE_ID_ACTIVITYLOG = "activityLog";
 

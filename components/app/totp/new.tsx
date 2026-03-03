@@ -16,7 +16,7 @@ import {
   alpha
 } from "@mui/material";
 import { createTotpSecret, updateTotpSecret } from "@/lib/appwrite";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -38,7 +38,7 @@ export default function NewTotpDialog({
     folderId?: string | null;
   };
 }) {
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const [form, setForm] = useState({
     issuer: "",
     accountName: "",

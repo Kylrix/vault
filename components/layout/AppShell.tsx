@@ -30,7 +30,7 @@ import {
   alpha,
   useTheme as useMuiTheme
 } from "@mui/material";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { Navbar } from "./Navbar";
 import dynamic from "next/dynamic";
@@ -65,7 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const theme = 'dark' as "light" | "dark" | "system";
   const setTheme = (t: "light" | "dark" | "system") => {};
   const muiTheme = useMuiTheme();
-  const { user, loading, logout, refresh } = useAppwrite();
+  const { user, loading, logout, refresh } = useAppwriteVault();
   const [showPasskeySetup, setShowPasskeySetup] = useState(false);
 
   const isEmbedded = useMemo(() => searchParams?.get('is_embedded') === 'true', [searchParams]);

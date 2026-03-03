@@ -29,7 +29,7 @@ import {
   Trash2,
   AlertTriangle
 } from "lucide-react";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { ecosystemSecurity } from "@/lib/ecosystem/security";
 import { MasterPassModal } from "@/components/overlays/MasterPassModal";
 import { PasskeySetup } from "@/components/overlays/passkeySetup";
@@ -39,7 +39,7 @@ import toast from "react-hot-toast";
 
 export default function SettingsPage() {
   const muiTheme = useTheme();
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const [isUnlocked, setIsUnlocked] = useState(masterPassCrypto.isVaultUnlocked());
   const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [passkeySetupOpen, setPasskeySetupOpen] = useState(false);

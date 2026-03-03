@@ -20,29 +20,10 @@ import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
 import { getAuthOrigin, openAuthPopup } from "@/lib/authUrl";
 import { masterPassCrypto } from "./(protected)/masterpass/logic";
 import { logDebug, logWarn } from "@/lib/logger";
+import { AppwriteContext, type AppwriteContextType } from "@/context/appwrite-context";
 
 // Types
 import type { Models } from "appwrite";
-
-interface AppwriteContextType {
-  user: Models.User<Models.Preferences> | null;
-  loading: boolean;
-  isAuthenticating: boolean;
-  isAuthenticated: boolean;
-  isAuthReady: boolean;
-  isVaultUnlocked: () => boolean;
-  needsMasterPassword: boolean;
-  logout: () => Promise<void>;
-  resetMasterpass: () => Promise<void>;
-  refresh: () => Promise<void>;
-  openIDMWindow: () => Promise<void>;
-  closeIDMWindow: () => void;
-  idmWindowOpen: boolean;
-}
-
-const AppwriteContext = createContext<AppwriteContextType | undefined>(
-  undefined,
-);
 
 interface AppwriteError extends Error {
   code?: number;
@@ -363,11 +344,4 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       {children}
     </AppwriteContext.Provider>
   );
-}
-
-// Custom hook for easy access
-export function useAppwrite() {
-  const ctx = useContext(AppwriteContext);
-  if (!ctx) throw new Error("useAppwrite must be used within AppwriteProvider");
-  return ctx;
 }

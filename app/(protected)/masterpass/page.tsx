@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { MasterPassModal } from "@/components/overlays/MasterPassModal";
 import { 
   Box, 
@@ -17,7 +17,7 @@ import ShieldIcon from "@mui/icons-material/Shield";
 
 export default function MasterPassPage() {
   const [showModal, setShowModal] = useState(false);
-  const { user, isAuthReady, openIDMWindow } = useAppwrite();
+  const { user, isAuthReady, openIDMWindow } = useAppwriteVault();
   const router = useRouter();
   const theme = useTheme();
 

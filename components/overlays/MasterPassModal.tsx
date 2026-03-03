@@ -26,7 +26,7 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import LogoutIcon from "@mui/icons-material/Logout";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { useFinalizeAuth } from "@/lib/finalizeAuth";
 import {
@@ -59,7 +59,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [showPasskeyIncentive, setShowPasskeyIncentive] = useState(false);
 
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const { finalizeAuth } = useFinalizeAuth();
   const router = useRouter();
 

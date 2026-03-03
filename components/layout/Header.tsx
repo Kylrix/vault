@@ -30,7 +30,7 @@ import {
   Menu as MenuIcon,
   Search
 } from "lucide-react";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { useAI } from "@/app/context/AIContext";
 import { useNotifications } from "@/app/context/NotificationContext";
 import { useState, useEffect } from "react";
@@ -45,7 +45,7 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const { user, logout } = useAppwrite();
+  const { user, logout } = useAppwriteVault();
   const { openAIModal } = useAI();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const pathname = usePathname();

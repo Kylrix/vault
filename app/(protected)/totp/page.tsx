@@ -22,7 +22,7 @@ import AddIcon from "@mui/icons-material/Add";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { listTotpSecrets, deleteTotpSecret, listFolders } from "@/lib/appwrite";
 import { authenticator } from "otplib";
 import toast from "react-hot-toast";
@@ -32,7 +32,7 @@ import { useSudo } from "@/app/context/SudoContext";
 
 export default function TOTPPage() {
   const [search, setSearch] = useState("");
-  const { user, isVaultUnlocked } = useAppwrite();
+  const { user, isVaultUnlocked } = useAppwriteVault();
   type TotpItem = {
     $id: string;
     issuer?: string | null;

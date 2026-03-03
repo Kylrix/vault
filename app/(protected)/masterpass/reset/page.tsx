@@ -15,14 +15,14 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SecurityIcon from "@mui/icons-material/Security";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import { resetMasterpassAndWipe } from "@/lib/appwrite";
 import toast from "react-hot-toast";
 import VaultGuard from "@/components/layout/VaultGuard";
 
 export default function MasterpassResetPage() {
   const router = useRouter();
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const [step, setStep] = useState<"reset" | "done">("reset");
   const [loading, setLoading] = useState(false);
 

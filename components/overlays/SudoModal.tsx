@@ -24,6 +24,7 @@ import AppsIcon from "@mui/icons-material/Apps";
 import { AppwriteService } from "@/lib/appwrite";
 import { ecosystemSecurity } from "@/lib/ecosystem/security";
 import { PasskeySetup } from "./passkeySetup";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import toast from "react-hot-toast";
 
 interface SudoModalProps {
@@ -37,7 +38,7 @@ export default function SudoModal({
     onSuccess,
     onCancel,
 }: SudoModalProps) {
-    const { user } = useAppwrite();
+    const { user } = useAppwriteVault();
     const [password, setPassword] = useState("");
     const [pin, setPin] = useState("");
     const [loading, setLoading] = useState(false);

@@ -30,7 +30,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ShieldIcon from "@mui/icons-material/Shield";
 import FolderIcon from "@mui/icons-material/Folder";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import {
   createCredential,
   createFolder,
@@ -45,7 +45,7 @@ import VaultGuard from "@/components/layout/VaultGuard";
 
 export default function NewCredentialPage() {
   const router = useRouter();
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const [showPassword, setShowPassword] = useState(false);
   const [customFields, setCustomFields] = useState<
     Array<{ id: string; label: string; value: string }>

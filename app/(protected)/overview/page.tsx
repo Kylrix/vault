@@ -21,7 +21,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import AddIcon from "@mui/icons-material/Add";
 import DownloadIcon from "@mui/icons-material/Download";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import {
   appwriteDatabases,
   APPWRITE_DATABASE_ID,
@@ -32,7 +32,7 @@ import {
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 
 export default function OverviewPage() {
-  const { user } = useAppwrite();
+  const { user } = useAppwriteVault();
   const [stats, setStats] = useState({ totalCreds: 0, totpCount: 0 });
   const [recent, setRecent] = useState<
     Array<{ $id: string; name: string; username?: string }>

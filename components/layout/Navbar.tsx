@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useAppwrite } from "@/app/appwrite-provider";
+import { useAppwriteVault } from "@/context/appwrite-context";
 import {
   GridViewOutlined as GripIcon,
   AutoAwesomeOutlined as SparklesIcon,
@@ -38,7 +38,7 @@ const PasswordGenerator = dynamic(() => import("@/components/ui/PasswordGenerato
 });
 
 export function Navbar() {
-  const { user, logout, openIDMWindow } = useAppwrite();
+  const { user, logout, openIDMWindow } = useAppwriteVault();
   const { openAIModal } = useAI();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isEcosystemPortalOpen, setIsEcosystemPortalOpen] = useState(false);
