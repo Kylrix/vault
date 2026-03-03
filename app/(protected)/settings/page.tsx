@@ -25,13 +25,9 @@ import {
   Lock, 
   Shield, 
   Smartphone,
-  Key,
   Fingerprint,
-  RefreshCw,
   Trash2,
-  AlertTriangle,
-  Info,
-  CheckCircle
+  AlertTriangle
 } from "lucide-react";
 import { useAppwrite } from "@/app/appwrite-provider";
 import { ecosystemSecurity } from "@/lib/ecosystem/security";
@@ -57,7 +53,6 @@ export default function SettingsPage() {
   // Passkey state
   const [passkeyEntries, setPasskeyEntries] = useState<any[]>([]);
   const [loadingPasskeys, setLoadingPasskeys] = useState(true);
-  const [hasStalePasskeys, setHasStalePasskeys] = useState(false);
 
   useEffect(() => {
     setIsPinSet(ecosystemSecurity.isPinSet());
@@ -86,14 +81,6 @@ export default function SettingsPage() {
         }));
         
         setPasskeyEntries(pkEntries);
-        
-        // Detect stale passkeys (those not for current domain)
-        const stale = pkEntries.some(e => {
-            // If we don't have rpId stored yet, or it's from old domain
-            // For now, any that doesn't match current hostname or is missing rpId in params
-            return !e.params?.rpId || e.params.rpId !== window.location.hostname;
-        });
-        setHasStalePasskeys(stale);
     } catch (e) {
         console.error("Failed to load passkeys", e);
     } finally {
@@ -251,75 +238,36 @@ export default function SettingsPage() {
                     </Button>
                 </Box>
 
-                {hasStalePasskeys && (
-                    <Alert 
-                        severity="warning" 
-                        icon={<AlertTriangle size={20} />}
-                        sx={{ 
-                            mb: 3, 
-                            borderRadius: '16px', 
-                            bgcolor: alpha(muiTheme.palette.warning.main, 0.05),
-                            border: `1px solid ${alpha(muiTheme.palette.warning.main, 0.1)}`,
-                            '& .MuiAlert-message': { width: '100%' }
-                        }}
-                    >
-                        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>Stale Passkeys Detected</Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.8, mb: 1 }}>
-                            Some passkeys were registered on a different domain (likely before the rebrand to kylrix.space) and are no longer active.
-                        </Typography>
-                        <Button 
-                            size="small" 
-                            color="warning" 
-                            onClick={() => {
-                                const staleIds = passkeyEntries.filter(e => !e.params?.rpId || e.params.rpId !== window.location.hostname).map(e => e.$id);
-                                Promise.all(staleIds.map(id => AppwriteService.deleteKeychainEntry(id))).then(() => {
-                                    toast.success("Stale passkeys cleared");
-                                    loadPasskeys();
-                                });
-                            }}
-                            sx={{ fontWeight: 700, textTransform: 'none' }}
-                        >
-                            Clear Stale Passkeys
-                        </Button>
-                    </Alert>
-                )}
-
                 <List sx={{ bgcolor: 'rgba(255, 255, 255, 0.03)', borderRadius: '16px', p: 0, overflow: 'hidden' }}>
-                    {passkeyEntries.length === 0 ? (
-                        <Box sx={{ p: 3, textAlign: 'center', opacity: 0.5 }}>
-                            <Typography variant="body2">No passkeys registered yet.</Typography>
-                        </Box>
-                    ) : (
-                        passkeyEntries.map((pk, idx) => (
-                            <React.Fragment key={pk.$id}>
-                                <ListItem 
-                                    secondaryAction={
-                                        <IconButton edge="end" color="error" onClick={() => handleRemovePasskey(pk.$id)}>
-                                            <Trash2 size={18} />
-                                        </IconButton>
-                                    }
-                                >
-                                    <ListItemIcon>
-                                        <Fingerprint size={20} color={pk.params?.rpId === window.location.hostname ? muiTheme.palette.primary.main : "#666"} />
-                                    </ListItemIcon>
-                                    <ListItemText 
-                                        primary={pk.params?.name || `Passkey ${idx + 1}`}
-                                        secondary={
-                                            pk.params?.rpId !== window.location.hostname 
-                                                ? "Inactive (Registered on old domain)" 
-                                                : `Added on ${new Date(pk.$createdAt).toLocaleDateString()}`
-                                        }
-                                        primaryTypographyProps={{ fontWeight: 700 }}
-                                        secondaryTypographyProps={{ 
-                                            sx: { color: pk.params?.rpId !== window.location.hostname ? 'error.main' : 'inherit' }
-                                        }}
-                                    />
-                                </ListItem>
-                                {idx < passkeyEntries.length - 1 && <Divider sx={{ opacity: 0.05 }} />}
-                            </React.Fragment>
-                        ))
-                    )}
+                {passkeyEntries.length === 0 ? (
+                    <Box sx={{ p: 3, textAlign: 'center', opacity: 0.5 }}>
+                        <Typography variant="body2">No passkeys registered yet.</Typography>
+                    </Box>
+                ) : (
+                    passkeyEntries.map((pk, idx) => (
+                        <React.Fragment key={pk.$id}>
+                            <ListItem 
+                                secondaryAction={
+                                    <IconButton edge="end" color="error" onClick={() => handleRemovePasskey(pk.$id)}>
+                                        <Trash2 size={18} />
+                                    </IconButton>
+                                }
+                            >
+                                <ListItemIcon>
+                                    <Fingerprint size={20} color={muiTheme.palette.primary.main} />
+                                </ListItemIcon>
+                                <ListItemText 
+                                    primary={pk.params?.name || `Passkey ${idx + 1}`}
+                                    secondary={`Added on ${new Date(pk.$createdAt).toLocaleDateString()}`}
+                                    primaryTypographyProps={{ fontWeight: 700 }}
+                                />
+                            </ListItem>
+                            {idx < passkeyEntries.length - 1 && <Divider sx={{ opacity: 0.05 }} />}
+                        </React.Fragment>
+                    ))
+                )}
                 </List>
+
               </Box>
 
               <Divider sx={{ opacity: 0.05 }} />
