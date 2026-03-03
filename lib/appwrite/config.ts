@@ -48,6 +48,17 @@ export const APPWRITE_CONFIG = {
         BACKUPS: 'backups',
         TEMP_UPLOADS: 'temp_uploads'
     },
+    FUNCTIONS: {
+        SEARCH_USERS: '69a582720012957d2027',
+        SYNC_USER_PROFILE: '69a583ac002b674685b0',
+        NOTIFY_ON_SHARE: '69a58c1c001c39695bf6',
+        NOTIFY_ON_SOCIAL_ACTIVITY: '69a6bf6200180e70aca1',
+        FLOW_EVENT_SYNC: '69a6c28f003bb7d7e054',
+        LOG_SECURITY_EVENT: '69a6c45a002085baa8dd',
+        SYNC_SUBSCRIPTION_STATUS: '69a6c56d00203438232c',
+        ACCOUNT_CLEANUP: '69a6c6fc001dc877979d',
+        CONNECT_CALL_CLEANUP: '69a6c841000b2c5aaae3'
+    },
     SYSTEM: {
         DOMAIN: 'kylrix.space',
         AUTH_SUBDOMAIN: 'accounts',
