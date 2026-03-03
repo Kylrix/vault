@@ -201,6 +201,10 @@ export class EcosystemSecurity {
     }
   }
 
+  getMasterKey(): CryptoKey | null {
+    return this.masterKey;
+  }
+
   async setupPin(pin: string): Promise<boolean> {
     if (!this.masterKey || typeof window === "undefined") return false;
 
