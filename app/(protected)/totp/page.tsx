@@ -106,7 +106,7 @@ export default function TOTPPage() {
       };
 
       return authenticator.generate(normalized);
-    } catch (_err: unknown) {
+    } catch (err: unknown) {
       console.warn("TOTP Generation warning for secret ending in ...", secret?.slice(-4), err);
       if (algorithm?.toLowerCase() !== 'sha1') {
         try {

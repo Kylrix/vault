@@ -94,8 +94,8 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         setNeedsMasterPassword(false);
       }
       return account;
-    } catch (_err: unknown) {
-      const e = _err as AppwriteError;
+    } catch (err: unknown) {
+      const e = err as AppwriteError;
       
       // Check for auth=success signal in URL
       const hasAuthSignal = window.location.search.includes('auth=success');
@@ -226,7 +226,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         setIsAuthenticating(false);
       }
     } catch (error: unknown) {
-      console.error("Failed to open IDM window:", _error);
+      console.error("Failed to open IDM window:", error);
       setIsAuthenticating(false);
     }
   }, [pathname, router, isAuthenticating, attemptSilentAuth]);
@@ -289,7 +289,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     const initAuth = async () => {
       try {
         await fetchUser();
-      } catch (_err: unknown) {
+      } catch (err: unknown) {
         const e = err as AppwriteError;
         if (e.code === 401) {
           await attemptSilentAuth();

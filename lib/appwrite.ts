@@ -167,7 +167,7 @@ async function listDocumentsWithRetry(
       collectionId,
       queries,
     );
-  } catch (_err: unknown) {
+  } catch (err: unknown) {
     if (!isFetchNetworkError(err)) throw err as Error;
 
     // Try to normalize endpoint then retry once

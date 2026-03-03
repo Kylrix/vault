@@ -72,7 +72,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       setNotifications(logs);
       setUnreadCount(calculateUnread(logs));
     } catch (error: unknown) {
-      console.error('Failed to fetch notifications:', _error);
+      console.error('Failed to fetch notifications:', error);
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +135,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         { details: JSON.stringify(newMetadata) }
       );
     } catch (error: unknown) {
-      console.error('Cloud sync failed:', _error);
+      console.error('Cloud sync failed:', error);
     }
   };
 

@@ -38,7 +38,7 @@ export function NoteSelectorModal({ isOpen, onClose, onSelect }: NoteSelectorMod
                 try {
                     const res = await AppwriteService.listFlowNotes(user.$id);
                     setNotes(res.documents);
-                } catch (_err: unknown) {
+                } catch (err: unknown) {
                     console.error('Failed to fetch notes:', err);
                 } finally {
                     setLoading(false);
