@@ -232,12 +232,12 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           width: 64, 
           height: 64, 
           borderRadius: '18px', 
-          bgcolor: 'primary.main', 
+          bgcolor: '#A855F7', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center',
-          boxShadow: '0 8px 32px rgba(0, 240, 255, 0.3)',
-          color: 'black'
+          boxShadow: '0 8px 32px rgba(168, 85, 247, 0.3)',
+          color: 'white'
         }}>
           <LockIcon sx={{ fontSize: 32 }} />
         </Paper>
@@ -246,7 +246,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       <DialogTitle sx={{ textAlign: 'center', pt: 5, pb: 1 }}>
         {user && (
           <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'primary.main' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#A855F7' }}>
               {user.name || user.email}
             </Typography>
             {user.email && user.name && (

@@ -75,7 +75,7 @@ export default function CredentialItem({
         alignItems: 'center',
         '&:hover': {
           bgcolor: 'rgba(255, 255, 255, 0.04)',
-          borderColor: 'rgba(255, 255, 255, 0.15)',
+          borderColor: 'rgba(168, 85, 247, 0.4)',
           transform: 'translateY(-2px)',
           boxShadow: '0 8px 24px rgba(0, 0, 0, 0.4)'
         }
