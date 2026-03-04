@@ -338,10 +338,9 @@ export function Header({ onMenuClick }: HeaderProps) {
             <MenuItem 
               onClick={() => {
                 const domain = process.env.NEXT_PUBLIC_DOMAIN || 'kylrix.space';
-                const idSubdomain = process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN || 'accounts';
-                window.location.href = `https://${idSubdomain}.${domain}/settings?source=${encodeURIComponent(window.location.origin)}`;
-                setAnchorElAccount(null);
-              }}
+              const idSubdomain = process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN || 'accounts';
+              window.location.href = `https://${idSubdomain}.${domain}/settings?source=${encodeURIComponent(window.location.origin)}`;
+            }}
               sx={{ py: 1.5, px: 3, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' } }}
             >
               <ListItemIcon><Settings size={18} strokeWidth={1.5} color="rgba(255, 255, 255, 0.4)" /></ListItemIcon>
