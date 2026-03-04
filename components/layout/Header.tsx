@@ -15,7 +15,8 @@ import {
   ListItemIcon,
   ListItemText,
   Avatar,
-  InputBase
+  InputBase,
+  Button
 } from "@mui/material";
 import { 
   Bell, 
@@ -35,6 +36,7 @@ import { useAI } from "@/app/context/AIContext";
 import { useNotifications } from "@/app/context/NotificationContext";
 import { useState, useEffect } from "react";
 import EcosystemPortal from "../common/EcosystemPortal";
+import { KYLRIX_AUTH_URI } from "@/lib/constants/ecosystem";
 
 // Pages that should use the simplified layout (no sidebar/header)
 const SIMPLIFIED_LAYOUT_PATHS = ["/"];
@@ -260,29 +262,47 @@ export function Header({ onMenuClick }: HeaderProps) {
             </IconButton>
           </Tooltip>
 
-          <IconButton 
-            onClick={(e) => setAnchorElAccount(e.currentTarget)}
-            sx={{ 
-              p: 0.5,
-              '&:hover': { transform: 'scale(1.05)' },
-              transition: 'transform 0.2s'
-            }}
-          >
-            <Avatar 
+          {user ? (
+            <IconButton 
+              onClick={(e) => setAnchorElAccount(e.currentTarget)}
               sx={{ 
-                width: 38, 
-                height: 38, 
-                bgcolor: '#00F5FF',
-                fontSize: '0.875rem',
-                fontWeight: 800,
-                color: '#000',
-                border: '2px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px'
+                p: 0.5,
+                '&:hover': { transform: 'scale(1.05)' },
+                transition: 'transform 0.2s'
               }}
             >
-              {user?.name ? user.name[0].toUpperCase() : 'U'}
-            </Avatar>
-          </IconButton>
+              <Avatar 
+                sx={{ 
+                  width: 38, 
+                  height: 38, 
+                  bgcolor: '#00F5FF',
+                  fontSize: '0.875rem',
+                  fontWeight: 800,
+                  color: '#000',
+                  border: '2px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '12px'
+                }}
+              >
+                {user?.name ? user.name[0].toUpperCase() : 'U'}
+              </Avatar>
+            </IconButton>
+          ) : (
+            <Button
+              href={`${KYLRIX_AUTH_URI}/login?source=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : ''}`}
+              variant="contained"
+              size="small"
+              sx={{
+                ml: 1,
+                bgcolor: '#00F5FF',
+                color: '#000',
+                fontWeight: 800,
+                borderRadius: '10px',
+                '&:hover': { bgcolor: alpha('#00F5FF', 0.8) }
+              }}
+            >
+              Connect
+            </Button>
+          )}
         </Box>
 
         {/* Account Menu */}

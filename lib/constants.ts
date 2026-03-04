@@ -17,7 +17,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
   { id: 'vault', label: 'Vault', subdomain: 'vault', type: 'app', icon: '🔐', color: '#8b5cf6', description: 'Passwords, 2FA, and keys.' },
   { id: 'flow', label: 'Flow', subdomain: 'flow', type: 'app', icon: '🚀', color: '#10b981', description: 'Tasks and workflows.' },
   { id: 'connect', label: 'Connect', subdomain: 'connect', type: 'app', icon: '💬', color: '#ec4899', description: 'Secure messages and sharing.' },
-  { id: 'id', label: 'Identity', subdomain: 'accounts', type: 'accounts', icon: '🛡️', color: '#ef4444', description: 'Your Kylrix account.' },
+  { id: 'accounts', label: 'Identity', subdomain: 'accounts', type: 'accounts', icon: '🛡️', color: '#ef4444', description: 'Your Kylrix account.' },
 ];
 
 export function getEcosystemUrl(subdomain: string) {
@@ -25,13 +25,8 @@ export function getEcosystemUrl(subdomain: string) {
     return '#';
   }
 
-  if (typeof window === 'undefined') {
-    return `https://${subdomain}.kylrix.space`;
-  }
-
-  const hostname = window.location.hostname;
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
   const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-  const isKylrixDomain = hostname.endsWith('kylrix.space');
 
   if (isLocalhost) {
     const ports: Record<string, number> = {
@@ -41,13 +36,7 @@ export function getEcosystemUrl(subdomain: string) {
       flow: 3003,
       connect: 3004
     };
-    const subdomainToAppId: Record<string, string> = {
-      app: 'note',
-      id: 'accounts',
-      keep: 'vault'
-    };
-    const appId = subdomainToAppId[subdomain] || subdomain;
-    return `http://localhost:${ports[appId] || 3000}`;
+    return `http://localhost:${ports[subdomain] || ports['accounts']}`;
   }
 
   return `https://${subdomain}.kylrix.space`;
