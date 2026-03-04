@@ -77,14 +77,14 @@ export function Navbar() {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'rgba(10, 10, 10, 0.8)',
+        bgcolor: 'rgba(5, 5, 5, 0.03)',
         backdropFilter: 'blur(25px) saturate(180%)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         boxShadow: 'none',
         backgroundImage: 'none'
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 72 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 88 }}>
         <Logo 
           size={32} 
           app="vault" 
@@ -92,20 +92,26 @@ export function Navbar() {
           href="/" 
           sx={{ 
             color: 'inherit',
-            '&:hover': { opacity: 0.8 }
+            '&:hover': { opacity: 0.8 },
+            fontFamily: 'var(--font-clash)',
+            fontWeight: 900,
+            letterSpacing: '-0.04em'
           }} 
         />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Tooltip title="Kylrix Portal (Ctrl+Space)">
             <IconButton
               onClick={() => setIsEcosystemPortalOpen(true)}
               sx={{ 
                 color: 'rgba(255, 255, 255, 0.6)', 
-                '&:hover': { color: '#00F5FF', bgcolor: 'rgba(255, 255, 255, 0.05)' } 
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                '&:hover': { color: '#00F5FF', bgcolor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(0, 245, 255, 0.2)' } 
               }}
             >
-              <GripIcon sx={{ fontSize: 22 }} />
+              <GripIcon sx={{ fontSize: 20 }} />
             </IconButton>
           </Tooltip>
 
@@ -115,24 +121,33 @@ export function Navbar() {
                 onClick={openAIModal}
                 sx={{ 
                   color: '#00F5FF', 
-                  '&:hover': { bgcolor: alpha('#00F5FF', 0.1) } 
+                  bgcolor: 'rgba(0, 245, 255, 0.05)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(0, 245, 255, 0.1)',
+                  '&:hover': { bgcolor: alpha('#00F5FF', 0.1), border: '1px solid rgba(0, 245, 255, 0.3)' } 
                 }}
               >
-                <SparklesIcon sx={{ fontSize: 22 }} />
+                <SparklesIcon sx={{ fontSize: 20 }} />
               </IconButton>
             </Tooltip>
           )}
 
           <DropdownMenu
             trigger={
-              <IconButton title="Password Generator" sx={{ color: 'rgba(255, 255, 255, 0.6)', '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' } }}>
-                <KeyIcon sx={{ fontSize: 22 }} />
+              <IconButton title="Password Generator" sx={{ 
+                color: 'rgba(255, 255, 255, 0.6)', 
+                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)' } 
+              }}>
+                <KeyIcon sx={{ fontSize: 20 }} />
               </IconButton>
             }
             width="400px"
             align="right"
           >
-            <Box sx={{ p: 2 }}>
+            <Box sx={{ p: 3, bgcolor: 'rgba(5, 5, 5, 0.03)', backdropFilter: 'blur(25px)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '24px' }}>
               <PasswordGenerator />
             </Box>
           </DropdownMenu>
@@ -140,21 +155,21 @@ export function Navbar() {
           {!user ? (
             <Button
               variant="contained"
-              size="small"
+              size="large"
               onClick={() => {
-                try {
-                  openIDMWindow();
-                } catch (err: unknown) {
-                  alert(err instanceof Error ? err.message : "Failed to open authentication");
-                }
+                window.location.href = `https://accounts.kylrix.space/login?source=${encodeURIComponent(window.location.origin)}`;
               }}
               sx={{ 
-                bgcolor: '#00F5FF', 
+                background: 'linear-gradient(135deg, #00F5FF 0%, #00D1DA 100%)',
                 color: '#000',
                 fontWeight: 800,
-                borderRadius: '12px',
-                px: 3,
-                '&:hover': { bgcolor: '#00D1DA' }
+                fontFamily: 'var(--font-satoshi)',
+                borderRadius: '14px',
+                textTransform: 'none',
+                px: 4,
+                py: 1,
+                boxShadow: '0 8px 20px rgba(0, 245, 255, 0.15)',
+                '&:hover': { background: 'linear-gradient(135deg, #00E5FF 0%, #00C1CA 100%)', transform: 'translateY(-1px)' }
               }}
             >
               Connect
@@ -163,16 +178,19 @@ export function Navbar() {
             <Box>
               <Button
                 variant="text"
-                size="small"
                 onClick={handleOpenMenu}
                 startIcon={<UserIcon size={18} strokeWidth={1.5} />}
                 sx={{ 
                   color: 'white',
                   fontWeight: 700,
+                  fontFamily: 'var(--font-satoshi)',
                   textTransform: 'none',
-                  px: 2,
-                  borderRadius: '12px',
-                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                  px: 2.5,
+                  py: 1,
+                  borderRadius: '14px',
+                  bgcolor: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)' }
                 }}
               >
                 <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'inline' }, fontWeight: 700 }}>
@@ -185,41 +203,42 @@ export function Navbar() {
                 onClose={handleCloseMenu}
                 PaperProps={{
                   sx: {
-                    mt: 1.5,
-                    minWidth: 240,
-                    bgcolor: 'rgba(10, 10, 10, 0.95)',
-                    backdropFilter: 'blur(25px) saturate(180%)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '20px',
-                    boxShadow: '0 20px 40px rgba(0,0,0,0.6)',
+                    mt: 2,
+                    minWidth: 260,
+                    bgcolor: 'rgba(5, 5, 5, 0.05)',
+                    backdropFilter: 'blur(30px) saturate(180%)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '24px',
+                    boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
                     backgroundImage: 'none',
-                    color: 'white'
+                    color: 'white',
+                    p: 1
                   }
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
               >
-                <Box sx={{ px: 2.5, py: 2 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'white' }}>
+                <Box sx={{ px: 2.5, py: 2.5 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'white', fontFamily: 'var(--font-satoshi)' }}>
                     {user.name || user.email}
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>
                     {user.email}
                   </Typography>
                 </Box>
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)', my: 1 }} />
                 <MenuItem 
                   onClick={() => {
                     window.location.href = `https://accounts.kylrix.space/settings?source=${encodeURIComponent(window.location.origin)}`;
                     handleCloseMenu();
                   }} 
-                  sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
+                  sx={{ py: 1.8, px: 2.5, gap: 2, borderRadius: '14px', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                 >
                   <SettingsIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>Account Settings</Typography>
                 </MenuItem>
                 <MenuItem
-                  sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
+                  sx={{ py: 1.8, px: 2.5, gap: 2, borderRadius: '14px', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   onClick={() => {
                     import("@/app/(protected)/masterpass/logic").then(({ masterPassCrypto }) => {
                       masterPassCrypto.lockNow();
@@ -232,13 +251,13 @@ export function Navbar() {
                   <LockIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>Lock Vault</Typography>
                 </MenuItem>
-                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+                <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)', my: 1 }} />
                 <MenuItem
                   onClick={async () => {
                     handleCloseMenu();
                     await logout();
                   }}
-                  sx={{ py: 1.5, px: 2.5, gap: 1.5, color: '#FF4D4D' }}
+                  sx={{ py: 1.8, px: 2.5, gap: 2, borderRadius: '14px', color: '#FF4D4D', '&:hover': { bgcolor: 'rgba(255, 77, 77, 0.05)' } }}
                 >
                   <LogOutIcon sx={{ fontSize: 18 }} />
                   <Typography variant="body2" sx={{ fontWeight: 700 }}>Logout</Typography>

@@ -194,23 +194,23 @@ export default function SudoModal({
             TransitionComponent={Fade}
             PaperProps={{
                 sx: {
-                    borderRadius: '28px',
-                    bgcolor: 'rgba(10, 10, 10, 0.95)',
+                    borderRadius: '32px',
+                    bgcolor: 'rgba(5, 5, 5, 0.03)',
                     backdropFilter: 'blur(25px) saturate(180%)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
                     backgroundImage: 'none',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
                     overflow: 'hidden'
                 }
             }}
         >
-            <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 1, position: 'relative' }}>
+            <DialogTitle sx={{ textAlign: 'center', pt: 5, pb: 1, position: 'relative' }}>
                 <IconButton
                     onClick={onCancel}
                     sx={{
                         position: 'absolute',
-                        right: 16,
-                        top: 16,
+                        right: 20,
+                        top: 20,
                         color: 'rgba(255, 255, 255, 0.3)',
                         '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
                     }}
@@ -220,23 +220,24 @@ export default function SudoModal({
 
                 <Box sx={{ 
                     display: 'inline-flex', 
-                    p: 1.5, 
-                    borderRadius: '16px', 
-                    bgcolor: alpha('#00F5FF', 0.1),
+                    p: 2, 
+                    borderRadius: '20px', 
+                    bgcolor: alpha('#00F5FF', 0.05),
                     color: '#00F5FF',
-                    mb: 2
+                    border: '1px solid rgba(0, 245, 255, 0.1)',
+                    mb: 3
                 }}>
-                    <ShieldIcon sx={{ fontSize: 32 }} />
+                    <ShieldIcon sx={{ fontSize: 36 }} />
                 </Box>
                 <Typography variant="h5" sx={{ 
                     fontWeight: 900, 
-                    letterSpacing: '-0.03em',
-                    fontFamily: 'var(--font-space-grotesk)',
+                    letterSpacing: '-0.04em',
+                    fontFamily: 'var(--font-clash)',
                     color: 'white'
                 }}>
                     Security Check
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', mt: 1, fontFamily: 'var(--font-satoshi)' }}>
                     Please verify your identity to continue
                 </Typography>
             </DialogTitle>
@@ -433,36 +434,40 @@ export default function SudoModal({
                                     variant="contained"
                                     disabled={loading || !password}
                                     sx={{
-                                        py: 1.5,
-                                        borderRadius: '14px',
-                                        bgcolor: '#00F5FF',
+                                        py: 1.8,
+                                        borderRadius: '16px',
+                                        background: 'linear-gradient(135deg, #00F5FF 0%, #00D1DA 100%)',
                                         color: '#000',
-                                        fontWeight: 700,
+                                        fontWeight: 800,
+                                        fontFamily: 'var(--font-satoshi)',
+                                        textTransform: 'none',
                                         '&:hover': {
-                                            bgcolor: '#00D1DA',
+                                            background: 'linear-gradient(135deg, #00E5FF 0%, #00C1CA 100%)',
                                             transform: 'translateY(-1px)',
-                                            boxShadow: '0 8px 20px rgba(0, 245, 255, 0.3)'
+                                            boxShadow: '0 8px 25px rgba(0, 245, 255, 0.25)'
                                         }
                                     }}
                                 >
-                                    {loading ? <CircularProgress size={24} color="inherit" /> : "Confirm Password"}
+                                    {loading ? <CircularProgress size={24} color="inherit" /> : "Confirm Security Entry"}
                                 </Button>
                             </Stack>
                         </form>
 
                         {hasPasskey && (
                             <>
-                                <Box sx={{ width: '100%', position: 'relative', py: 1 }}>
-                                    <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+                                <Box sx={{ width: '100%', position: 'relative', py: 1.5 }}>
+                                    <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.05)' }} />
                                     <Typography variant="caption" sx={{ 
                                         position: 'relative', 
-                                        bgcolor: 'rgba(10, 10, 10, 1)', 
-                                        px: 2, 
+                                        bgcolor: 'rgba(5, 5, 5, 1)', 
+                                        px: 2.5, 
                                         mx: 'auto', 
                                         display: 'table',
-                                        color: 'rgba(255, 255, 255, 0.3)',
+                                        color: 'rgba(255, 255, 255, 0.25)',
                                         textTransform: 'uppercase',
-                                        letterSpacing: '0.1em'
+                                        letterSpacing: '0.15em',
+                                        fontFamily: 'var(--font-mono)',
+                                        fontSize: '0.65rem'
                                     }}>
                                         Or
                                     </Typography>
@@ -473,7 +478,16 @@ export default function SudoModal({
                                     variant="text"
                                     startIcon={<FingerprintIcon sx={{ fontSize: 18 }} />}
                                     onClick={() => setMode("passkey")}
-                                    sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                                    sx={{ 
+                                        color: 'rgba(255, 255, 255, 0.6)', 
+                                        py: 1.5,
+                                        borderRadius: '16px',
+                                        border: '1px solid rgba(255, 255, 255, 0.05)',
+                                        textTransform: 'none',
+                                        fontFamily: 'var(--font-satoshi)',
+                                        fontWeight: 600,
+                                        '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.15)' } 
+                                    }}
                                 >
                                     Use Passkey
                                 </Button>
