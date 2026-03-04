@@ -317,15 +317,15 @@ export function PasskeySetup({
                 <Box sx={{ 
                   p: 2, 
                   borderRadius: '16px', 
-                  bgcolor: 'rgba(0, 240, 255, 0.05)', 
-                  border: '1px dashed rgba(0, 240, 255, 0.2)',
+                  bgcolor: 'rgba(168, 85, 247, 0.05)', 
+                  border: '1px dashed rgba(168, 85, 247, 0.2)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   gap: 1
                 }}>
-                  <FingerprintIcon sx={{ fontSize: 32, color: muiTheme.palette.primary.main }} />
-                  <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 600 }}>
+                  <FingerprintIcon sx={{ fontSize: 32, color: '#A855F7' }} />
+                  <Typography variant="caption" sx={{ color: '#A855F7', fontWeight: 600 }}>
                     Face ID • Touch ID • Windows Hello
                   </Typography>
                 </Box>
