@@ -210,9 +210,7 @@ export function Navbar() {
                 <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
                 <MenuItem 
                   onClick={() => {
-                    const domain = process.env.NEXT_PUBLIC_DOMAIN || 'kylrix.space';
-                    const idSubdomain = process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN || 'accounts';
-                    window.location.href = `https://${idSubdomain}.${domain}/settings?source=${encodeURIComponent(window.location.origin)}`;
+                    window.location.href = `https://accounts.kylrix.space/settings?source=${encodeURIComponent(window.location.origin)}`;
                     handleCloseMenu();
                   }} 
                   sx={{ py: 1.5, px: 2.5, gap: 1.5 }}
