@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Menu, MenuItem, Box, Divider, alpha } from "@mui/material";
+import { Menu, MenuItem, Box, Divider } from "@mui/material";
 
 interface DropdownMenuProps {
   trigger: React.ReactNode;

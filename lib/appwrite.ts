@@ -1811,7 +1811,7 @@ export function getProfilePicturePreview(fileId: string, width: number = 64, hei
  * Delete user account and all associated data.
  * This is a hard delete and is irreversible.
  */
-export async function deleteUserAccount(userId: string) {
+export async function deleteUserAccount(_userId: string) {
   // Delete all user data from the database first
   const [creds, totps, folders, logs, userDoc] = await Promise.all([
     AppwriteService.listAllCredentials(userId), // Use listAllCredentials to ensure all are deleted

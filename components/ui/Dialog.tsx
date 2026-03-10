@@ -1,17 +1,17 @@
 import { ReactNode } from "react";
-import { Dialog as MuiDialog, DialogContent, IconButton, Box, alpha } from "@mui/material";
+import { Dialog as MuiDialog, DialogContent, IconButton } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 
 export function Dialog({
   open,
   onClose,
   children,
-  className = "",
+  _className = "",
 }: {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
-  className?: string;
+  _className?: string;
 }) {
   return (
     <MuiDialog

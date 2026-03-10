@@ -10,13 +10,11 @@ import {
   TextField,
   IconButton,
   Typography,
-  Box,
-  Stack,
-  CircularProgress,
-  alpha,
+  Box, 
+  Stack, 
+  CircularProgress, 
   useTheme
-} from "@mui/material";
-import { startRegistration } from "@simplewebauthn/browser";
+  } from "@mui/material";import { startRegistration } from "@simplewebauthn/browser";
 import { AppwriteService } from "@/lib/appwrite";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -52,7 +50,6 @@ export function PasskeySetup({
   onSuccess,
   trustUnlocked = false,
 }: PasskeySetupProps) {
-  const muiTheme = useTheme();
   const router = useRouter();
   const [step, setStep] = useState(trustUnlocked && masterPassCrypto.isVaultUnlocked() ? 2 : 1);
   const [loading, setLoading] = useState(false);
@@ -85,8 +82,8 @@ export function PasskeySetup({
         toast.error("Incorrect master password.");
         return false;
       }
-    } catch (error: unknown) {
-      console.error("Password verification failed:", error);
+    } catch (_error: unknown) {
+      console.error("Password verification failed:", _error);
       toast.error("Failed to verify master password.");
       return false;
     } finally {
@@ -196,9 +193,9 @@ export function PasskeySetup({
       await AppwriteService.syncPasskeyStatus(userId);
 
       setStep(4);
-    } catch (error: unknown) {
-      console.error("Passkey setup failed:", error);
-      const err = error as { name?: string; message?: string };
+    } catch (_error: unknown) {
+      console.error("Passkey setup failed:", _error);
+      const err = _error as { name?: string; message?: string };
       const message =
         err.name === "InvalidStateError"
           ? "This passkey is already registered."

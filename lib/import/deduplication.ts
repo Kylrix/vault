@@ -1,4 +1,3 @@
-import { Credentials } from "@/types/appwrite";
 
 export interface ImportItem {
   name?: string;

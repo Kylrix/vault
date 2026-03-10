@@ -21,7 +21,7 @@ import FingerprintIcon from "@mui/icons-material/Fingerprint";
 import CloseIcon from "@mui/icons-material/Close";
 import ShieldIcon from "@mui/icons-material/Shield";
 import AppsIcon from "@mui/icons-material/Apps";
-import { AppwriteService, hasMasterpass as checkMasterpassFlag } from "@/lib/appwrite";
+import { AppwriteService } from "@/lib/appwrite";
 import { ecosystemSecurity } from "@/lib/ecosystem/security";
 import { PasskeySetup } from "./passkeySetup";
 import { useAppwriteVault } from "@/context/appwrite-context";
@@ -29,6 +29,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { unlockWithPasskey } from "@/lib/passkey";
+import React, { useCallback } from "react";
 
 interface SudoModalProps {
     isOpen: boolean;
@@ -53,6 +54,22 @@ export default function SudoModal({
     const [mode, setMode] = useState<"passkey" | "password" | "pin" | null>(null);
     const [isDetecting, setIsDetecting] = useState(true);
     const [showPasskeyIncentive, setShowPasskeyIncentive] = useState(false);
+
+    const handlePasskeyVerify = useCallback(async () => {
+        if (!user?.$id || !isOpen) return;
+        setPasskeyLoading(true);
+        try {
+            const success = await unlockWithPasskey(user.$id);
+            if (success && isOpen) {
+                toast.success("Verified via Passkey");
+                onSuccess();
+            }
+        } catch (_error: unknown) {
+            console.error("Passkey verification failed or cancelled", _error);
+        } finally {
+            setPasskeyLoading(false);
+        }
+    }, [user?.$id, isOpen, onSuccess]);
 
     // Check if user has passkey and PIN set up
     useEffect(() => {
@@ -88,7 +105,7 @@ export default function SudoModal({
             setPasskeyLoading(false);
             setIsDetecting(true);
         }
-    }, [isOpen, user]);
+    }, [isOpen, user?.$id, handlePasskeyVerify]);
 
     const handlePasswordVerify = async (e?: React.FormEvent) => {
         e?.preventDefault();
@@ -116,8 +133,8 @@ export default function SudoModal({
             } else {
                 toast.error("Incorrect master password");
             }
-        } catch (error: unknown) {
-            console.error(error);
+        } catch (_error: unknown) {
+            console.error(_error);
             toast.error("Verification failed");
         } finally {
             setLoading(false);
@@ -141,35 +158,11 @@ export default function SudoModal({
                 toast.error("Incorrect PIN");
                 setPin("");
             }
-        } catch (error: unknown) {
-            console.error(error);
+        } catch (_error: unknown) {
+            console.error(_error);
             toast.error("PIN verification failed");
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value.replace(/\D/g, '').slice(0, 4);
-        setPin(val);
-        if (val.length === 4) {
-            handlePinVerify(val);
-        }
-    };
-
-    const handlePasskeyVerify = async () => {
-        if (!user?.$id || !isOpen) return;
-        setPasskeyLoading(true);
-        try {
-            const success = await unlockWithPasskey(user.$id);
-            if (success && isOpen) {
-                toast.success("Verified via Passkey");
-                onSuccess();
-            }
-        } catch (error: unknown) {
-            console.error("Passkey verification failed or cancelled", error);
-        } finally {
-            setPasskeyLoading(false);
         }
     };
 

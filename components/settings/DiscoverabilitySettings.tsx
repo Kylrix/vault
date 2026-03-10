@@ -1,21 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
     Box, 
     Typography, 
     Paper, 
     Stack, 
     Switch, 
-    FormControlLabel, 
     Divider,
     CircularProgress,
     alpha,
     useTheme
 } from '@mui/material';
-import { User, Search } from 'lucide-react';
+import { User } from 'lucide-react';
 import { useAppwriteVault } from '@/context/appwrite-context';
-import { appwriteDatabases, Query } from '@/lib/appwrite';
+import { appwriteDatabases } from '@/lib/appwrite';
 import toast from 'react-hot-toast';
 
 // Constants match connect/lib/appwrite/config.ts
@@ -29,23 +28,23 @@ export const DiscoverabilitySettings = () => {
     const [saving, setSaving] = useState(false);
     const [profile, setProfile] = useState<any>(null);
 
-    useEffect(() => {
-        if (user?.$id) {
-            loadProfile();
-        }
-    }, [user]);
-
-    const loadProfile = async () => {
+    const loadProfile = useCallback(async () => {
         try {
             // Document ID in the users table is mapped to the Appwrite Account ID
             const p = await appwriteDatabases.getDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user!.$id);
             setProfile(p);
-        } catch (e) {
-            console.error("Failed to load profile from Connect", e);
+        } catch (_e) {
+            console.error("Failed to load profile from Connect", _e);
         } finally {
             setLoading(false);
         }
-    };
+    }, [user?.$id]);
+
+    useEffect(() => {
+        if (user?.$id) {
+            loadProfile();
+        }
+    }, [user?.$id, loadProfile]);
 
     const handleToggleDiscoverability = async (checked: boolean) => {
         if (!user?.$id || !profile) return;
@@ -60,7 +59,7 @@ export const DiscoverabilitySettings = () => {
             });
             setProfile({ ...profile, appsActive });
             toast.success(checked ? "Discovery enabled across Kylrix" : "Discovery disabled");
-        } catch (e) {
+        } catch (_e) {
             toast.error("Failed to update discovery preference");
         } finally {
             setSaving(false);

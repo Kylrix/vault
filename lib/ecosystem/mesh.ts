@@ -70,8 +70,8 @@ export const MeshProtocol = {
     try {
       const { ecosystemSecurity } = await import('./security');
       signature = await ecosystemSecurity.signMessage(message.payload, timestamp, msgId);
-    } catch (e: unknown) {
-      console.warn("[Mesh] Broadcast signing failed, sending unsigned", e);
+    } catch (_e: unknown) {
+      console.warn("[Mesh] Broadcast signing failed, sending unsigned", _e);
     }
 
     const fullMessage: MeshMessage = {
@@ -108,7 +108,7 @@ export const MeshProtocol = {
             console.error(`[Mesh] SECURE DISCARD: Invalid signature from ${msg.sourceNode}`, msg.id);
             return;
           }
-        } catch (e: unknown) {
+        } catch (_e: unknown) {
           console.warn("[Mesh] Verification system unavailable, processing with caution");
         }
       } else if (msg.type === 'COMMAND') {

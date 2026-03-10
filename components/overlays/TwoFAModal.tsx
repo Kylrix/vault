@@ -8,15 +8,13 @@ import {
   DialogContent,
   Typography,
   Button,
-  TextField,
-  Box,
-  IconButton,
-  CircularProgress,
-  Stack,
-  Fade,
-  alpha,
-} from "@mui/material";
-import {
+  TextField, 
+  Box, 
+  CircularProgress, 
+  Stack, 
+  Fade, 
+  alpha, 
+  } from "@mui/material";import {
   Smartphone as SmartphoneIcon,
   Mail as MailIcon,
   Phone as PhoneIcon,
@@ -78,8 +76,8 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
       const challenge = await createMfaChallenge(factor);
       setChallengeId(challenge.$id);
       setSelectedFactor(factor);
-    } catch (e: unknown) {
-      const err = e as { message?: string };
+    } catch (_e: unknown) {
+      const err = _e as { message?: string };
       toast.error(err.message || "Failed to create challenge");
     }
     setLoading(false);
@@ -95,8 +93,8 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
       await completeMfaChallenge(challengeId, code);
       onClose();
       await finalizeAuth({ redirect: true, fallback: "/masterpass" });
-    } catch (e: unknown) {
-      const err = e as { message?: string };
+    } catch (_e: unknown) {
+      const err = _e as { message?: string };
       toast.error(err.message || "Invalid code");
     }
     setLoading(false);

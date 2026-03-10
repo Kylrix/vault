@@ -1,12 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { 
   Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
   Button, 
   TextField, 
   Box, 
@@ -18,7 +15,6 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MailIcon from "@mui/icons-material/Mail";
-import LockIcon from "@mui/icons-material/Lock";
 import VpnKeyIcon from "@mui/icons-material/VpnKey";
 import { createPasswordRecovery, updatePasswordRecovery } from "@/lib/appwrite";
 import toast from "react-hot-toast";
@@ -50,8 +46,8 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
       );
       toast.success("Password reset email sent! Check your inbox.");
       setEmail("");
-    } catch (e: unknown) {
-      const err = e as { message?: string };
+    } catch (_e: unknown) {
+      const err = _e as { message?: string };
       toast.error(err.message || "Error sending reset email.");
     }
     setLoading(false);
@@ -68,8 +64,8 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
       await updatePasswordRecovery(userId, secret, password);
       toast.success("Password reset successful! You can now log in.");
       onClose();
-    } catch (e: unknown) {
-      const err = e as { message?: string };
+    } catch (_e: unknown) {
+      const err = _e as { message?: string };
       toast.error(err.message || "Error resetting password.");
     }
     setLoading(false);

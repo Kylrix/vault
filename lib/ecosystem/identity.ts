@@ -1,4 +1,4 @@
-import { appwriteDatabases, appwriteAccount } from '../appwrite';
+import { appwriteDatabases } from '../appwrite';
 import { Query } from 'appwrite';
 
 const CONNECT_DATABASE_ID = 'chat';
