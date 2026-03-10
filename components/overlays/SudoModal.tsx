@@ -50,7 +50,7 @@ export default function SudoModal({
     const [hasPasskey, setHasPasskey] = useState(false);
     const [hasPin, setHasPin] = useState(false);
     const [hasMasterpass, setHasMasterpass] = useState<boolean | null>(null);
-    const [mode, setMode] = useState<"passkey" | "password" | "pin">("password");
+    const [mode, setMode] = useState<"passkey" | "password" | "pin" | null>(null);
     const [isDetecting, setIsDetecting] = useState(true);
     const [showPasskeyIncentive, setShowPasskeyIncentive] = useState(false);
 
@@ -249,12 +249,19 @@ export default function SudoModal({
             </DialogTitle>
 
             <DialogContent sx={{ pb: 4 }}>
-                {isDetecting ? (
+                {isDetecting || passkeyLoading ? (
                     <Stack spacing={3} sx={{ mt: 4, mb: 2, alignItems: 'center' }}>
                         <CircularProgress size={48} sx={{ color: '#A855F7' }} />
-                        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600 }}>
-                            PREPARING SECURITY CHECK...
-                        </Typography>
+                        <Box sx={{ textAlign: 'center' }}>
+                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600, letterSpacing: '0.1em' }}>
+                                {passkeyLoading ? "AUTHENTICATING..." : "PREPARING SECURITY CHECK..."}
+                            </Typography>
+                            {passkeyLoading && (
+                                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', mt: 1, display: 'block' }}>
+                                    Please confirm on your device
+                                </Typography>
+                            )}
+                        </Box>
                     </Stack>
                 ) : mode === "pin" ? (
                     <Stack spacing={3} sx={{ mt: 2 }}>
