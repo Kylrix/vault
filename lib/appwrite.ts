@@ -1377,7 +1377,7 @@ export class AppwriteService {
     );
   }
 
-  static async listCloudBackups(userId: string): Promise<Models.FileList> {
+  static async listCloudBackups(_userId: string): Promise<Models.FileList> {
     return await appwriteStorage.listFiles(
       APPWRITE_BUCKET_BACKUPS_ID,
       [Query.orderDesc("$createdAt")]

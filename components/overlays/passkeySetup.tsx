@@ -12,8 +12,7 @@ import {
   Typography,
   Box, 
   Stack, 
-  CircularProgress, 
-  useTheme
+  CircularProgress
   } from "@mui/material";import { startRegistration } from "@simplewebauthn/browser";
 import { AppwriteService } from "@/lib/appwrite";
 import { useRouter } from "next/navigation";

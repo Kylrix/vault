@@ -166,6 +166,14 @@ export default function SudoModal({
         }
     };
 
+    const handlePinChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value.replace(/\D/g, '').slice(0, 4);
+        setPin(val);
+        if (val.length === 4) {
+            handlePinVerify(val);
+        }
+    };
+
     if (showPasskeyIncentive && user) {
         return (
             <PasskeySetup

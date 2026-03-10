@@ -56,9 +56,6 @@ export class EcosystemSecurity {
     // public key in localStorage and keep the private key in memory (or derive it).
     // To survive refreshes, we'll store the pair if possible.
     
-    // Check if we already have keys in storage (simplified for prototype)
-    localStorage.getItem(`kylrix_node_pubkey_${this.nodeId}`);
-    
     // For now, we generate a new pair per session if not found
     this.signingKey = await crypto.subtle.generateKey(
       {
@@ -448,8 +445,8 @@ export class EcosystemSecurity {
 
       this.isUnlocked = true;
       return true;
-    } catch (e: unknown) {
-      console.error("[Security] PIN unlock failed", e);
+    } catch (_e: unknown) {
+      console.error("[Security] PIN unlock failed", _e);
       return false;
     }
   }

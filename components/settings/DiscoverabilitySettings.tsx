@@ -20,7 +20,7 @@ import {
     Tooltip,
     useTheme
 } from '@mui/material';
-import { User, Edit2, Check, X, ShieldAlert } from 'lucide-react';
+import { Edit2, Check, X, ShieldAlert } from 'lucide-react';
 import { useAppwriteVault } from '@/context/appwrite-context';
 import { appwriteDatabases, Query, Permission, Role } from '@/lib/appwrite';
 import toast from 'react-hot-toast';
@@ -52,7 +52,7 @@ export const DiscoverabilitySettings = () => {
         } finally {
             setLoading(false);
         }
-    }, [user?.$id]);
+    }, [user]);
 
     useEffect(() => {
         if (user?.$id) {

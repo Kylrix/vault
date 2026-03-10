@@ -61,6 +61,22 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const { finalizeAuth } = useFinalizeAuth();
   const router = useRouter();
 
+  const handlePasskeyUnlock = useCallback(async () => {
+    if (!user) return;
+    setPasskeyLoading(true);
+    try {
+        const success = await unlockWithPasskey(user.$id);
+        if (success) {
+            toast.success("Identity verified via Passkey");
+            onSuccess();
+        }
+    } catch (e) {
+        console.error("Passkey verification failed or cancelled", e);
+    } finally {
+        setPasskeyLoading(false);
+    }
+  }, [user, onSuccess]);
+
   useEffect(() => {
     if (!user || !isOpen) return;
     setLoading(true);
@@ -83,7 +99,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       .finally(() => {
         setLoading(false);
       });
-  }, [user, isOpen]);
+  }, [user, isOpen, handlePasskeyUnlock]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -170,22 +186,6 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
     setLoading(false);
     onClose();
     router.replace("/");
-  };
-
-  const handlePasskeyUnlock = async () => {
-    if (!user?.$id || !isOpen) return;
-    setPasskeyLoading(true);
-    try {
-      const success = await unlockWithPasskey(user.$id);
-      if (success && isOpen) {
-        onClose();
-        await finalizeAuth({ redirect: true, fallback: "/masterpass" });
-      }
-    } catch (e) {
-      console.error("Passkey unlock failed or cancelled", e);
-    } finally {
-      setPasskeyLoading(false);
-    }
   };
 
   if (showPasskeyIncentive && user) {
