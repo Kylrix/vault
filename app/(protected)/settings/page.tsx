@@ -89,7 +89,7 @@ export default function SettingsPage() {
         await AppwriteService.deleteKeychainEntry(id);
         toast.success("Passkey removed");
         loadPasskeys();
-    } catch (e) {
+    } catch (_e) {
         toast.error("Failed to remove passkey");
     }
   };

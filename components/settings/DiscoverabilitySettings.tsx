@@ -268,57 +268,56 @@ export const DiscoverabilitySettings = () => {
                             </Box>
                         )}
                     </Box>
-                </Box>
-            </Stack>
-        </Paper>
+                </Stack>
+            </Paper>
 
             {/* Confirmation Dialog */ }
-    <Dialog
-        open={showConfirm}
-        onClose={() => setShowConfirm(false)}
-        PaperProps={{
-            sx: {
-                borderRadius: '24px',
-                bgcolor: 'rgba(10, 10, 10, 0.95)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                width: '100%',
-                maxWidth: '400px'
-            }
-        }}
-    >
-        <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 800, color: 'white' }}>
-            <ShieldAlert color={theme.palette.primary.main} />
-            Confirm Identity Change
-        </DialogTitle>
-        <DialogContent>
-            <Typography variant="body2" sx={{ opacity: 0.7, color: 'white', mb: 3 }}>
-                Updating your universal handle will sync across all Kylrix apps. This action is immediate and public.
-            </Typography>
-            <Box sx={{ p: 2, borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px dotted rgba(255, 255, 255, 0.2)' }}>
-                <Typography variant="caption" sx={{ opacity: 0.5, display: 'block', mb: 0.5 }}>NEW UNIVERSAL HANDLE</Typography>
-                <Typography sx={{ fontFamily: 'var(--font-jetbrains-mono)', fontWeight: 800, color: theme.palette.primary.main }}>@{newUsername.toLowerCase().trim()}</Typography>
-            </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 0 }}>
-            <Button onClick={() => setShowConfirm(false)} sx={{ color: 'white', opacity: 0.6 }}>Cancel</Button>
-            <Button
-                onClick={handleSaveUsername}
-                variant="contained"
-                disabled={saving}
-                sx={{
-                    borderRadius: '12px',
-                    bgcolor: theme.palette.primary.main,
-                    color: 'white',
-                    fontWeight: 700,
-                    px: 3,
-                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.8) }
+            <Dialog
+                open={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: '24px',
+                        bgcolor: 'rgba(10, 10, 10, 0.95)',
+                        backdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        width: '100%',
+                        maxWidth: '400px'
+                    }
                 }}
             >
-                {saving ? <CircularProgress size={20} color="inherit" /> : "Confirm & Update"}
-            </Button>
-        </DialogActions>
-    </Dialog>
-        </Box >
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontWeight: 800, color: 'white' }}>
+                    <ShieldAlert color={theme.palette.primary.main} />
+                    Confirm Identity Change
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" sx={{ opacity: 0.7, color: 'white', mb: 3 }}>
+                        Updating your universal handle will sync across all Kylrix apps. This action is immediate and public.
+                    </Typography>
+                    <Box sx={{ p: 2, borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px dotted rgba(255, 255, 255, 0.2)' }}>
+                        <Typography variant="caption" sx={{ opacity: 0.5, display: 'block', mb: 0.5 }}>NEW UNIVERSAL HANDLE</Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-jetbrains-mono)', fontWeight: 800, color: theme.palette.primary.main }}>@{newUsername.toLowerCase().trim()}</Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Button onClick={() => setShowConfirm(false)} sx={{ color: 'white', opacity: 0.6 }}>Cancel</Button>
+                    <Button
+                        onClick={handleSaveUsername}
+                        variant="contained"
+                        disabled={saving}
+                        sx={{
+                            borderRadius: '12px',
+                            bgcolor: theme.palette.primary.main,
+                            color: 'white',
+                            fontWeight: 700,
+                            px: 3,
+                            '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.8) }
+                        }}
+                    >
+                        {saving ? <CircularProgress size={20} color="inherit" /> : "Confirm & Update"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </Box>
     );
 };

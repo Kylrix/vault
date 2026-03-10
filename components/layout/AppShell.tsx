@@ -24,8 +24,7 @@ import {
   Divider, 
   Typography, 
   Paper,
-  alpha,
-  useTheme as useMuiTheme
+  alpha
 } from "@mui/material";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";

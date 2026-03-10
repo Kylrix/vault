@@ -1814,11 +1814,11 @@ export function getProfilePicturePreview(fileId: string, width: number = 64, hei
 export async function deleteUserAccount(_userId: string) {
   // Delete all user data from the database first
   const [creds, totps, folders, logs, userDoc] = await Promise.all([
-    AppwriteService.listAllCredentials(userId), // Use listAllCredentials to ensure all are deleted
-    AppwriteService.listTOTPSecrets(userId),
-    AppwriteService.listFolders(userId),
-    AppwriteService.listSecurityLogs(userId),
-    AppwriteService.getUserDoc(userId),
+    AppwriteService.listAllCredentials(_userId), // Use listAllCredentials to ensure all are deleted
+    AppwriteService.listTOTPSecrets(_userId),
+    AppwriteService.listFolders(_userId),
+    AppwriteService.listSecurityLogs(_userId),
+    AppwriteService.getUserDoc(_userId),
   ]);
 
   await Promise.all([
