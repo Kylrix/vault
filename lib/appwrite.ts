@@ -95,7 +95,7 @@ export const APPWRITE_BUCKET_BACKUPS_ID = "backups";
 export const APPWRITE_BUCKET_ENCRYPTED_BACKUPS_ID = "encryptedDataBackups";
 export const APPWRITE_BUCKET_SECURE_DOCUMENTS_ID = "secureDocuments";
 
-export { ID, Query };
+export { ID, Query, Permission, Role };
 
 // --- USER SESSION ---
 
