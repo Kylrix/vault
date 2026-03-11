@@ -23,6 +23,7 @@ import {
 import { Edit2, Check, X, ShieldAlert } from 'lucide-react';
 import { useAppwriteVault } from '@/context/appwrite-context';
 import { appwriteDatabases, Query, Permission, Role } from '@/lib/appwrite';
+import { ecosystemSecurity } from '@/lib/ecosystem/security';
 import toast from 'react-hot-toast';
 
 // Constants match connect/lib/appwrite/config.ts
@@ -40,15 +41,31 @@ export const DiscoverabilitySettings = () => {
     const [showConfirm, setShowConfirm] = useState(false);
 
     const loadProfile = useCallback(async () => {
+        if (!user?.$id) return;
         try {
-            // Document ID in the users table is mapped to the Appwrite Account ID
-            const p = await appwriteDatabases.getDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user!.$id);
-            setProfile(p);
-            setNewUsername(p.username || '');
-        } catch (e: any) {
-            if (e.code !== 404) {
-                console.error("Failed to load profile from Connect", e);
+            try {
+                // Document ID in the users table is mapped to the Appwrite Account ID
+                const p = await appwriteDatabases.getDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user.$id);
+                setProfile(p);
+                setNewUsername(p.username || '');
+            } catch (e: any) {
+                const search = await appwriteDatabases.listDocuments(CONNECT_DB_ID, CONNECT_USERS_TABLE, [
+                    Query.or([
+                        Query.equal('userId', user.$id),
+                        Query.equal('$id', user.$id)
+                    ]),
+                    Query.limit(1)
+                ]);
+                if (search.documents.length > 0) {
+                    const p = search.documents[0];
+                    setProfile(p);
+                    setNewUsername(p.username || '');
+                } else {
+                    setProfile(null);
+                }
             }
+        } catch (e: any) {
+            console.error("Failed to load profile from Connect", e);
         } finally {
             setLoading(false);
         }
@@ -76,7 +93,7 @@ export const DiscoverabilitySettings = () => {
                 ? Array.from(new Set([...currentApps, 'vault', 'connect']))
                 : currentApps.filter((a: string) => a !== 'vault' && a !== 'connect');
 
-            await appwriteDatabases.updateDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user.$id, {
+            await appwriteDatabases.updateDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, profile.$id, {
                 appsActive,
                 updatedAt: new Date().toISOString()
             });
@@ -106,27 +123,41 @@ export const DiscoverabilitySettings = () => {
                     Query.equal('username', normalized),
                     Query.limit(1)
                 ]);
-                if (existing.total > 0 && existing.documents[0].$id !== user.$id) {
+                if (existing.total > 0 && existing.documents[0].userId !== user.$id && existing.documents[0].$id !== user.$id) {
                     toast.error("Username already taken");
                     setSaving(false);
                     return;
                 }
             }
 
-            const data = {
+            let publicKeyStr: string | undefined;
+            try {
+                if (ecosystemSecurity.status.isUnlocked) {
+                    const pub = await ecosystemSecurity.ensureE2EIdentity(user.$id);
+                    if (pub) publicKeyStr = pub;
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+
+            const data: any = {
                 username: normalized,
                 displayName: profile?.displayName || user.name || normalized,
                 updatedAt: new Date().toISOString(),
                 appsActive: profile?.appsActive || ['vault', 'connect'],
                 bio: profile?.bio || "",
             };
+            if (publicKeyStr) {
+                data.publicKey = publicKeyStr;
+            }
 
             if (profile) {
-                await appwriteDatabases.updateDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user.$id, data);
+                await appwriteDatabases.updateDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, profile.$id, data);
                 setProfile({ ...profile, ...data });
                 toast.success("Handle updated");
             } else {
                 await appwriteDatabases.createDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user.$id, {
+                    userId: user.$id,
                     ...data,
                     createdAt: new Date().toISOString()
                 }, [
@@ -271,7 +302,7 @@ export const DiscoverabilitySettings = () => {
                 </Stack>
             </Paper>
 
-            {/* Confirmation Dialog */ }
+            {/* Confirmation Dialog */}
             <Dialog
                 open={showConfirm}
                 onClose={() => setShowConfirm(false)}
