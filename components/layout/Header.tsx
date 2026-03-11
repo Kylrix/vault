@@ -36,7 +36,7 @@ import { useAI } from "@/app/context/AIContext";
 import { useNotifications } from "@/app/context/NotificationContext";
 import { useState, useEffect } from "react";
 import EcosystemPortal from "../common/EcosystemPortal";
-import { KYLRIX_AUTH_URI } from "@/lib/constants/ecosystem";
+import { getEcosystemUrl } from "@/lib/constants/ecosystem";
 
 // Pages that should use the simplified layout (no sidebar/header)
 const SIMPLIFIED_LAYOUT_PATHS = ["/"];
@@ -289,7 +289,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             </IconButton>
           ) : (
             <Button
-              href={`${KYLRIX_AUTH_URI}/login?source=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : ''}`}
+              href={`${getEcosystemUrl('accounts')}/login?source=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : ''}`}
               variant="contained"
               size="small"
               sx={{
