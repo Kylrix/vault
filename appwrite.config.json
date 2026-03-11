@@ -3432,12 +3432,16 @@
         {
             "$id": "users",
             "$permissions": [
-                "create(\"users\")"
+                "create(\"users\")",
+                "read(\"users\")",
+                "update(\"users\")",
+                "delete(\"users\")",
+                "read(\"any\")"
             ],
             "databaseId": "chat",
             "name": "users",
             "enabled": true,
-            "rowSecurity": true,
+            "rowSecurity": false,
             "columns": [
                 {
                     "key": "username",
@@ -3507,6 +3511,14 @@
                     "array": false,
                     "default": null,
                     "format": ""
+                },
+                {
+                    "key": "publicKey",
+                    "type": "text",
+                    "required": false,
+                    "array": false,
+                    "default": null,
+                    "encrypt": false
                 }
             ],
             "indexes": [
