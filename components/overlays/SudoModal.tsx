@@ -246,18 +246,13 @@ export default function SudoModal({
             </DialogTitle>
 
             <DialogContent sx={{ pb: 4 }}>
-                {isDetecting || passkeyLoading ? (
+                {isDetecting ? (
                     <Stack spacing={3} sx={{ mt: 4, mb: 2, alignItems: 'center' }}>
                         <CircularProgress size={48} sx={{ color: '#A855F7' }} />
                         <Box sx={{ textAlign: 'center' }}>
                             <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600, letterSpacing: '0.1em' }}>
-                                {passkeyLoading ? "AUTHENTICATING..." : "PREPARING SECURITY CHECK..."}
+                                PREPARING SECURITY CHECK...
                             </Typography>
-                            {passkeyLoading && (
-                                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', mt: 1, display: 'block' }}>
-                                    Please confirm on your device
-                                </Typography>
-                            )}
                         </Box>
                     </Stack>
                 ) : mode === "initialize" ? (
@@ -426,13 +421,13 @@ export default function SudoModal({
                                 height: 80,
                                 borderRadius: '50%',
                                 border: '2px dashed',
-                                borderColor: passkeyLoading ? '#A855F7' : 'rgba(255, 255, 255, 0.2)',
+                                borderColor: 'rgba(255, 255, 255, 0.2)',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
                                 transition: 'all 0.3s ease',
-                                animation: passkeyLoading ? 'pulse 2s infinite' : 'none',
+                                animation: 'none',
                                 '&:hover': {
                                     borderColor: '#A855F7',
                                     bgcolor: alpha('#A855F7', 0.05)
@@ -444,7 +439,7 @@ export default function SudoModal({
                                 }
                             }}
                         >
-                            <FingerprintIcon sx={{ fontSize: 40, color: passkeyLoading ? '#A855F7' : 'rgba(255, 255, 255, 0.4)' }} />
+                            <FingerprintIcon sx={{ fontSize: 40, color: 'rgba(255, 255, 255, 0.4)' }} />
                         </Box>
 
                         <Box sx={{ textAlign: 'center' }}>
@@ -460,7 +455,7 @@ export default function SudoModal({
                             fullWidth
                             variant="contained"
                             onClick={handlePasskeyVerify}
-                            disabled={passkeyLoading}
+                            disabled={false}
                             sx={{
                                 py: 1.5,
                                 borderRadius: '14px',
@@ -478,12 +473,7 @@ export default function SudoModal({
                                 }
                             }}
                         >
-                            {passkeyLoading ? (
-                                <Stack direction="row" spacing={1} alignItems="center">
-                                    <CircularProgress size={20} color="inherit" />
-                                    <span>Waiting for Passkey...</span>
-                                </Stack>
-                            ) : "Verify with Passkey"}
+                            Verify with Passkey
                         </Button>
 
                         <Box sx={{ width: '100%', position: 'relative', py: 1 }}>

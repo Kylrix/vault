@@ -50,8 +50,8 @@ export const DiscoverabilitySettings = () => {
                 const p = await appwriteDatabases.getDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, user.$id);
                 setProfile(p);
                 setNewUsername(p.username || '');
-            } catch (e: any) {
-                const search = await appwriteDatabases.listDocuments(CONNECT_DB_ID, CONNECT_USERS_TABLE, [
+                } catch (_e: any) {
+                const search = await databases.listDocuments(CONNECT_DB_ID, CONNECT_USERS_TABLE, [
                     Query.or([
                         Query.equal('userId', user.$id),
                         Query.equal('$id', user.$id)
