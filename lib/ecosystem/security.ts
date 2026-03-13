@@ -17,7 +17,7 @@ export class EcosystemSecurity {
   private nodeId: string = 'vault';
   // SECURITY: Tab-specific secret (RAM-only) to protect against XSS (CVE-KYL-2026-005)
   private tabSessionSecret: Uint8Array | null = null;
-  
+
   // Asymmetric keys for node identity (CVE-KYL-2026-006: Mesh Spoofing Mitigation)
   private signingKey: CryptoKeyPair | null = null;
   private nodeKeyRegistry: Map<string, CryptoKey> = new Map();
@@ -59,7 +59,7 @@ export class EcosystemSecurity {
     // and marked as non-extractable. For this prototype, we'll generate and store the 
     // public key in localStorage and keep the private key in memory (or derive it).
     // To survive refreshes, we'll store the pair if possible.
-    
+
     // For now, we generate a new pair per session if not found
     this.signingKey = await crypto.subtle.generateKey(
       {
@@ -74,7 +74,7 @@ export class EcosystemSecurity {
     const pubKeyBuffer = await crypto.subtle.exportKey("spki", this.signingKey.publicKey);
     const pubKeyBase64 = btoa(String.fromCharCode(...new Uint8Array(pubKeyBuffer)));
     localStorage.setItem(`kylrix_node_pubkey_${this.nodeId}`, pubKeyBase64);
-    
+
     return this.signingKey;
   }
 
@@ -83,7 +83,7 @@ export class EcosystemSecurity {
    */
   async signMessage(payload: any, timestamp: number, msgId: string): Promise<string> {
     if (!this.signingKey) await this.getOrCreateNodeKeys();
-    
+
     const dataToSign = new TextEncoder().encode(JSON.stringify(payload) + timestamp + msgId + this.nodeId);
     const signature = await crypto.subtle.sign(
       { name: "ECDSA", hash: { name: "SHA-256" } },
@@ -103,7 +103,7 @@ export class EcosystemSecurity {
 
       // 1. Get the sender's public key
       let pubKey = this.nodeKeyRegistry.get(msg.sourceNode);
-      
+
       if (!pubKey) {
         // Mock: Try to fetch from shared storage (in reality, would be a secure ID node registry)
         const stored = localStorage.getItem(`kylrix_node_pubkey_${msg.sourceNode}`);
@@ -123,7 +123,7 @@ export class EcosystemSecurity {
       // 2. Verify signature
       const dataToVerify = new TextEncoder().encode(JSON.stringify(msg.payload) + msg.timestamp + msg.id + msg.sourceNode);
       const sigBuffer = new Uint8Array(atob(msg.signature).split("").map(c => c.charCodeAt(0)));
-      
+
       return await crypto.subtle.verify(
         { name: "ECDSA", hash: { name: "SHA-256" } },
         pubKey,
@@ -202,7 +202,7 @@ export class EcosystemSecurity {
     const authKey = await this.deriveKey(password, salt);
     const mekBytes = await crypto.subtle.exportKey("raw", mek);
     const iv = crypto.getRandomValues(new Uint8Array(EcosystemSecurity.IV_SIZE));
-    
+
     const encryptedMek = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
       authKey,
@@ -222,7 +222,7 @@ export class EcosystemSecurity {
   public async unwrapMEK(wrappedKeyBase64: string, password: string, saltBase64: string): Promise<CryptoKey> {
     const salt = new Uint8Array(atob(saltBase64).split("").map(c => c.charCodeAt(0)));
     const authKey = await this.deriveKey(password, salt);
-    
+
     const wrappedKeyBytes = new Uint8Array(atob(wrappedKeyBase64).split("").map(c => c.charCodeAt(0)));
     const iv = wrappedKeyBytes.slice(0, EcosystemSecurity.IV_SIZE);
     const ciphertext = wrappedKeyBytes.slice(EcosystemSecurity.IV_SIZE);
@@ -274,7 +274,7 @@ export class EcosystemSecurity {
       // 1. Create PIN Verifier (for future login verification)
       const salt = crypto.getRandomValues(new Uint8Array(EcosystemSecurity.PIN_SALT_SIZE));
       const hash = await this.derivePinHash(pin, salt);
-      
+
       const verifier = {
         salt: btoa(String.fromCharCode(...salt)),
         hash: btoa(String.fromCharCode(...new Uint8Array(hash)))
@@ -284,7 +284,7 @@ export class EcosystemSecurity {
       // 2. Create Ephemeral Session (wrap MEK with PIN)
       const sessionSalt = crypto.getRandomValues(new Uint8Array(EcosystemSecurity.SESSION_SALT_SIZE));
       const ephemeralKey = await this.deriveEphemeralKey(pin, sessionSalt);
-      
+
       const rawMek = await crypto.subtle.exportKey("raw", this.masterKey);
       const iv = crypto.getRandomValues(new Uint8Array(EcosystemSecurity.IV_SIZE));
       const wrappedMek = await crypto.subtle.encrypt(
@@ -552,7 +552,7 @@ export class EcosystemSecurity {
   private async deriveEphemeralKey(pin: string, salt: Uint8Array): Promise<CryptoKey> {
     const encoder = new TextEncoder();
     const sessionSecret = this.getOrCreateSessionSecret();
-    
+
     // Mix PIN with tab-specific Session Secret for entropy (XSS-safe)
     const pinBytes = encoder.encode(pin);
     const combined = new Uint8Array(pinBytes.length + sessionSecret.length);
@@ -605,22 +605,22 @@ export class EcosystemSecurity {
         const decryptedPriv = await this.decrypt(doc.passkeyBlob);
         const privKeyBytes = new Uint8Array(atob(decryptedPriv).split("").map(c => c.charCodeAt(0)));
 
-        const privKey = await crypto.subtle.importKey("pkcs8", privKeyBytes, { name: "ECDH", namedCurve: "X25519" }, true, ["deriveKey", "deriveBits"]);
+        const privKey = await crypto.subtle.importKey("pkcs8", privKeyBytes, { name: "X25519" }, true, ["deriveKey", "deriveBits"]);
         const pubKeyBytes = new Uint8Array(atob(doc.publicKey).split("").map(c => c.charCodeAt(0)));
-        const pubKey = await crypto.subtle.importKey("raw", pubKeyBytes, { name: "ECDH", namedCurve: "X25519" }, true, []);
+        const pubKey = await crypto.subtle.importKey("raw", pubKeyBytes, { name: "X25519" }, true, []);
 
         this.identityKeyPair = { publicKey: pubKey, privateKey: privKey };
 
         try {
           try {
-              const uDoc = await tablesDB.getDocument(CHAT_DB, CHAT_USERS_TABLE, userId);
-              if (uDoc) {
-                  await tablesDB.updateDocument(CHAT_DB, CHAT_USERS_TABLE, uDoc.$id, {
-                    publicKey: doc.publicKey
-                  });
-              }
+            const uDoc = await tablesDB.getDocument(CHAT_DB, CHAT_USERS_TABLE, userId);
+            if (uDoc) {
+              await tablesDB.updateDocument(CHAT_DB, CHAT_USERS_TABLE, uDoc.$id, {
+                publicKey: doc.publicKey
+              });
+            }
           } catch (_e) {
-              // Ignore if document not found
+            // Ignore if document not found
           }
         } catch (_e) {
           console.warn("Failed to publish existing public key to chat.users", _e);
@@ -630,7 +630,7 @@ export class EcosystemSecurity {
       }
 
       // Generate new pair
-      const pair = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "X25519" }, true, ["deriveKey", "deriveBits"]);
+      const pair = (await crypto.subtle.generateKey({ name: "X25519" }, true, ["deriveKey", "deriveBits"])) as CryptoKeyPair;
       const privExport = await crypto.subtle.exportKey("pkcs8", pair.privateKey);
       const pubExport = await crypto.subtle.exportKey("raw", pair.publicKey);
 
@@ -651,14 +651,14 @@ export class EcosystemSecurity {
 
       try {
         try {
-            const uDoc = await tablesDB.getDocument(CHAT_DB, CHAT_USERS_TABLE, userId);
-            if (uDoc) {
-                await tablesDB.updateDocument(CHAT_DB, CHAT_USERS_TABLE, uDoc.$id, {
-                  publicKey: pubBase64
-                });
-            }
+          const uDoc = await tablesDB.getDocument(CHAT_DB, CHAT_USERS_TABLE, userId);
+          if (uDoc) {
+            await tablesDB.updateDocument(CHAT_DB, CHAT_USERS_TABLE, uDoc.$id, {
+              publicKey: pubBase64
+            });
+          }
         } catch (_e) {
-            // Ignore if document not found
+          // Ignore if document not found
         }
       } catch (_e) {
         console.warn("Failed to publish public key to chat.users", _e);
@@ -676,10 +676,10 @@ export class EcosystemSecurity {
     this.identityKeyPair = null;
     this.isUnlocked = false;
     if (typeof sessionStorage !== "undefined") {
-        sessionStorage.removeItem("kylrix_vault_unlocked");
-        // We DO NOT remove kylrix_ephemeral_session here, 
-        // as the PIN is meant to unlock the system when it's locked.
-        // It should only be purged on "Purge" (tab close/process exit).
+      sessionStorage.removeItem("kylrix_vault_unlocked");
+      // We DO NOT remove kylrix_ephemeral_session here, 
+      // as the PIN is meant to unlock the system when it's locked.
+      // It should only be purged on "Purge" (tab close/process exit).
     }
   }
 
