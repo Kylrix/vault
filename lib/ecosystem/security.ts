@@ -5,12 +5,16 @@
  */
 
 import { MeshProtocol } from './mesh';
+import { tablesDB } from '../appwrite';
+import { APPWRITE_CONFIG } from '../appwrite/config';
+import { Query, ID } from 'appwrite';
 
 export class EcosystemSecurity {
   private static instance: EcosystemSecurity;
   private masterKey: CryptoKey | null = null;
+  private identityKeyPair: CryptoKeyPair | null = null;
   private isUnlocked = false;
-  private nodeId: string = 'unknown';
+  private nodeId: string = 'vault';
   // SECURITY: Tab-specific secret (RAM-only) to protect against XSS (CVE-KYL-2026-005)
   private tabSessionSecret: Uint8Array | null = null;
   
@@ -370,14 +374,22 @@ export class EcosystemSecurity {
 
   async encrypt(data: string): Promise<string> {
     if (!this.masterKey) throw new Error("Security vault locked");
-    
+    return this.encryptWithKey(data, this.masterKey);
+  }
+
+  async decrypt(encryptedData: string): Promise<string> {
+    if (!this.masterKey) throw new Error("Security vault locked");
+    return this.decryptWithKey(encryptedData, this.masterKey);
+  }
+
+  async encryptWithKey(data: string, key: CryptoKey): Promise<string> {
     const encoder = new TextEncoder();
-    const plaintext = encoder.encode(JSON.stringify(data));
+    const plaintext = encoder.encode(data);
     const iv = crypto.getRandomValues(new Uint8Array(EcosystemSecurity.IV_SIZE));
 
     const encrypted = await crypto.subtle.encrypt(
       { name: "AES-GCM", iv: iv },
-      this.masterKey,
+      key,
       plaintext,
     );
 
@@ -388,9 +400,7 @@ export class EcosystemSecurity {
     return btoa(String.fromCharCode(...combined));
   }
 
-  async decrypt(encryptedData: string): Promise<string> {
-    if (!this.masterKey) throw new Error("Security vault locked");
-
+  async decryptWithKey(encryptedData: string, key: CryptoKey): Promise<string> {
     const combined = new Uint8Array(
       atob(encryptedData).split("").map((char) => char.charCodeAt(0)),
     );
@@ -400,12 +410,12 @@ export class EcosystemSecurity {
 
     const decrypted = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: iv },
-      this.masterKey,
+      key,
       encrypted,
     );
 
     const decoder = new TextDecoder();
-    return JSON.parse(decoder.decode(decrypted));
+    return decoder.decode(decrypted);
   }
 
   /**
@@ -571,8 +581,99 @@ export class EcosystemSecurity {
     );
   }
 
+  /**
+   * Generates or retrieves the user's E2E Identity (X25519)
+   */
+  async ensureE2EIdentity(userId: string): Promise<string | null> {
+    if (!this.masterKey) throw new Error("Unlock required for E2E Identity");
+
+    const PW_DB = APPWRITE_CONFIG.DATABASES.VAULT || 'passwordManagerDb';
+    const IDENTITIES_TABLE = 'identities';
+    const CHAT_DB = APPWRITE_CONFIG.DATABASES.CHAT || 'chat';
+    const CHAT_USERS_TABLE = 'users';
+
+    try {
+      const res = await tablesDB.listDocuments(PW_DB, IDENTITIES_TABLE, [
+        Query.equal('userId', userId),
+        Query.equal('identityType', 'e2e_connect'),
+        Query.limit(1)
+      ]);
+
+      if (res.total > 0) {
+        const doc = res.documents[0];
+        // Unwrap private key
+        const decryptedPriv = await this.decrypt(doc.passkeyBlob);
+        const privKeyBytes = new Uint8Array(atob(decryptedPriv).split("").map(c => c.charCodeAt(0)));
+
+        const privKey = await crypto.subtle.importKey("pkcs8", privKeyBytes, { name: "ECDH", namedCurve: "X25519" }, true, ["deriveKey", "deriveBits"]);
+        const pubKeyBytes = new Uint8Array(atob(doc.publicKey).split("").map(c => c.charCodeAt(0)));
+        const pubKey = await crypto.subtle.importKey("raw", pubKeyBytes, { name: "ECDH", namedCurve: "X25519" }, true, []);
+
+        this.identityKeyPair = { publicKey: pubKey, privateKey: privKey };
+
+        try {
+          try {
+              const uDoc = await tablesDB.getDocument(CHAT_DB, CHAT_USERS_TABLE, userId);
+              if (uDoc) {
+                  await tablesDB.updateDocument(CHAT_DB, CHAT_USERS_TABLE, uDoc.$id, {
+                    publicKey: doc.publicKey
+                  });
+              }
+          } catch (_e) {
+              // Ignore if document not found
+          }
+        } catch (_e) {
+          console.warn("Failed to publish existing public key to chat.users", _e);
+        }
+
+        return doc.publicKey;
+      }
+
+      // Generate new pair
+      const pair = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "X25519" }, true, ["deriveKey", "deriveBits"]);
+      const privExport = await crypto.subtle.exportKey("pkcs8", pair.privateKey);
+      const pubExport = await crypto.subtle.exportKey("raw", pair.publicKey);
+
+      const pubBase64 = btoa(String.fromCharCode(...new Uint8Array(pubExport)));
+      const privBase64 = btoa(String.fromCharCode(...new Uint8Array(privExport)));
+      const encryptedPriv = await this.encrypt(privBase64);
+
+      await tablesDB.createDocument(PW_DB, IDENTITIES_TABLE, ID.unique(), {
+        userId,
+        identityType: 'e2e_connect',
+        label: 'Connect E2E Identity',
+        publicKey: pubBase64,
+        passkeyBlob: encryptedPriv,
+        createdAt: new Date().toISOString()
+      });
+
+      this.identityKeyPair = pair;
+
+      try {
+        try {
+            const uDoc = await tablesDB.getDocument(CHAT_DB, CHAT_USERS_TABLE, userId);
+            if (uDoc) {
+                await tablesDB.updateDocument(CHAT_DB, CHAT_USERS_TABLE, uDoc.$id, {
+                  publicKey: pubBase64
+                });
+            }
+        } catch (_e) {
+            // Ignore if document not found
+        }
+      } catch (_e) {
+        console.warn("Failed to publish public key to chat.users", _e);
+      }
+
+      return pubBase64;
+    } catch (_e: unknown) {
+      console.error('[Security] Identity sync failed:', _e);
+      return null;
+    }
+  }
+
   lock() {
     this.masterKey = null;
+    this.identityKeyPair = null;
     this.isUnlocked = false;
     if (typeof sessionStorage !== "undefined") {
         sessionStorage.removeItem("kylrix_vault_unlocked");
@@ -585,7 +686,8 @@ export class EcosystemSecurity {
   get status() {
     return {
       isUnlocked: this.isUnlocked,
-      hasKey: !!this.masterKey
+      hasKey: !!this.masterKey,
+      hasIdentity: !!this.identityKeyPair
     };
   }
 }

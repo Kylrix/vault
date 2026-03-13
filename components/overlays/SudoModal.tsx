@@ -57,6 +57,19 @@ export default function SudoModal({
         toast.error("Passkey authentication not available here yet.");
     };
 
+    const handleSuccessWithSync = React.useCallback(async () => {
+        if (user?.$id) {
+            try {
+                // Sudo Hook: Ensure E2E Identity is created and published upon successful MasterPass unlock
+                console.log("Synchronizing Identity...");
+                await ecosystemSecurity.ensureE2EIdentity(user.$id);
+            } catch (e) {
+                console.error("Failed to sync identity on unlock", e);
+            }
+        }
+        onSuccess();
+    }, [user?.$id, onSuccess]);
+
     const handleInitializeMasterPass = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user?.$id || !user?.email) return;
@@ -98,7 +111,7 @@ export default function SudoModal({
             await masterPassCrypto.unlockWithImportedKey();
 
             toast.success("MasterPass initialized successfully");
-            onSuccess();
+            handleSuccessWithSync();
         } catch (err) {
             console.error(err);
             toast.error("Initialization failed");
@@ -124,7 +137,7 @@ export default function SudoModal({
                     setShowPasskeyIncentive(true);
                 } else {
                     toast.success("Verified");
-                    onSuccess();
+                    handleSuccessWithSync();
                 }
             } else {
                 toast.error("Incorrect master password");
@@ -148,7 +161,7 @@ export default function SudoModal({
                     setShowPasskeyIncentive(true);
                 } else {
                     toast.success("Verified via PIN");
-                    onSuccess();
+                    handleSuccessWithSync();
                 }
             } else {
                 toast.error("Incorrect PIN");
@@ -176,12 +189,12 @@ export default function SudoModal({
                 isOpen={true}
                 onClose={() => {
                     setShowPasskeyIncentive(false);
-                    onSuccess();
+                    handleSuccessWithSync();
                 }}
                 userId={user.$id}
                 onSuccess={() => {
                     setShowPasskeyIncentive(false);
-                    onSuccess();
+                    handleSuccessWithSync();
                 }}
                 trustUnlocked={true}
             />

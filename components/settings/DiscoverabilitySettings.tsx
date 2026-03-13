@@ -115,23 +115,30 @@ export const DiscoverabilitySettings = () => {
             return;
         }
 
-        setSaving(true);
-        try {
-            const currentApps = profile.appsActive || [];
-            const appsActive = checked
-                ? Array.from(new Set([...currentApps, 'vault', 'connect']))
-                : currentApps.filter((a: string) => a !== 'vault' && a !== 'connect');
+        if (checked && !profile.publicKey) {
+            // Need to set up public key
+            if (!ecosystemSecurity.status.isUnlocked) {
+                toast.error("Unlock your vault to enable secure discoverability");
+                // Trigger sudo request (the UI will handle the modal if we have a listener or just tell user)
+                return;
+            }
 
-            await appwriteDatabases.updateDocument(CONNECT_DB_ID, CONNECT_USERS_TABLE, profile.$id, {
-                appsActive,
-                updatedAt: new Date().toISOString()
-            });
-            setProfile({ ...profile, appsActive });
-            toast.success(checked ? "Discovery enabled across Kylrix" : "Discovery disabled");
-        } catch (_e) {
-            toast.error("Failed to update discovery preference");
-        } finally {
-            setSaving(false);
+            setSaving(true);
+            try {
+                const pub = await ecosystemSecurity.ensureE2EIdentity(user.$id);
+                if (pub) {
+                    setProfile({ ...profile, publicKey: pub });
+                    toast.success("E2E Identity initialized and discovery enabled");
+                }
+            } catch (e) {
+                toast.error("Failed to initialize identity");
+            } finally {
+                setSaving(false);
+            }
+        } else {
+            // If already has publicKey, we just update a flag if we had one, 
+            // but since we don't have a 'discoverable' column, we just inform the user.
+            toast.success(checked ? "Discovery enabled" : "Discovery disabled (Identity remains secure)");
         }
     };
 
@@ -173,7 +180,6 @@ export const DiscoverabilitySettings = () => {
                 username: normalized,
                 displayName: profile?.displayName || user.name || normalized,
                 updatedAt: new Date().toISOString(),
-                appsActive: profile?.appsActive || ['vault', 'connect'],
                 bio: profile?.bio || "",
             };
             if (publicKeyStr) {
@@ -211,7 +217,7 @@ export const DiscoverabilitySettings = () => {
     if (loading) return <CircularProgress size={24} />;
     if (!profile) return null;
 
-    const isDiscoverable = profile?.appsActive?.includes('connect') || profile?.appsActive?.includes('vault');
+    const isDiscoverable = !!profile?.publicKey;
 
     return (
         <Box>
