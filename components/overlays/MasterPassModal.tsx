@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -14,10 +14,10 @@ import {
   Box,
   Stack,
   CircularProgress,
-  Paper, 
-  alpha, 
+  Paper,
+  alpha,
   useTheme
-  } from "@mui/material";import VisibilityIcon from "@mui/icons-material/Visibility";
+} from "@mui/material"; import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import LockIcon from "@mui/icons-material/Lock";
 import ShieldIcon from "@mui/icons-material/Shield";
@@ -70,28 +70,28 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
     if (!user) return;
     setPasskeyLoading(true);
     try {
-        const success = await unlockWithPasskey(user.$id);
-        if (success) {
-            toast.success("Identity verified via Passkey");
-            onSuccess();
-        }
+      const success = await unlockWithPasskey(user.$id);
+      if (success) {
+        toast.success("Identity verified via Passkey");
+        onSuccess();
+      }
     } catch (e) {
-        console.error("Passkey verification failed or cancelled", e);
+      console.error("Passkey verification failed or cancelled", e);
     } finally {
-        setPasskeyLoading(false);
+      setPasskeyLoading(false);
     }
   }, [user, onSuccess]);
 
   useEffect(() => {
     if (!user || !isOpen) return;
     setLoading(true);
-    
+
     // Check for passkeys and auto-trigger if they exist
     Promise.all([hasMasterpass(user.$id), AppwriteService.hasPasskey(user.$id)])
       .then(([masterpassPresent, passkeyPresent]) => {
         setIsFirstTime(!masterpassPresent);
         setHasPasskey(passkeyPresent);
-        
+
         // Auto-start passkey auth ONLY if modal is open, not first time, and passkey exists
         if (isOpen && masterpassPresent && passkeyPresent) {
           handlePasskeyUnlock();
@@ -195,10 +195,10 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
 
   if (showPasskeyIncentive && user) {
     return (
-      <PasskeySetup 
-        isOpen={true} 
-        onClose={onSuccess} 
-        userId={user.$id} 
+      <PasskeySetup
+        isOpen={true}
+        onClose={onSuccess}
+        userId={user.$id}
         onSuccess={onSuccess}
         trustUnlocked={true}
       />
@@ -206,9 +206,9 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   }
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onClose={() => {}} // Prevent closing by clicking outside
+    <Dialog
+      open={isOpen}
+      onClose={() => { }} // Prevent closing by clicking outside
       PaperProps={{
         sx: {
           borderRadius: '32px',
@@ -223,13 +223,13 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       }}
     >
       <Box sx={{ position: 'absolute', top: -32, left: '50%', transform: 'translateX(-50%)' }}>
-        <Paper sx={{ 
-          width: 64, 
-          height: 64, 
-          borderRadius: '18px', 
-          bgcolor: '#A855F7', 
-          display: 'flex', 
-          alignItems: 'center', 
+        <Paper sx={{
+          width: 64,
+          height: 64,
+          borderRadius: '18px',
+          bgcolor: '#A855F7',
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           boxShadow: '0 8px 32px rgba(168, 85, 247, 0.3)',
           color: 'white'
@@ -349,10 +349,10 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
             )}
 
             {isFirstTime && (
-              <Paper sx={{ 
-                p: 2, 
-                borderRadius: '16px', 
-                bgcolor: alpha(muiTheme.palette.info.main, 0.05), 
+              <Paper sx={{
+                p: 2,
+                borderRadius: '16px',
+                bgcolor: alpha(muiTheme.palette.info.main, 0.05),
                 border: `1px solid ${alpha(muiTheme.palette.info.main, 0.2)}`,
                 display: 'flex',
                 gap: 1.5
@@ -364,10 +364,10 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               </Paper>
             )}
 
-            <Button 
-              type="submit" 
-              variant="contained" 
-              fullWidth 
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
               disabled={loading}
               sx={{ borderRadius: '16px', py: 1.5, fontWeight: 800, fontSize: '1rem' }}
             >
@@ -385,9 +385,9 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
             onClick={handlePasskeyUnlock}
             disabled={passkeyLoading || loading}
             startIcon={passkeyLoading ? <CircularProgress size={18} /> : <FingerprintIcon sx={{ fontSize: 18 }} />}
-            sx={{ 
-              borderRadius: '16px', 
-              py: 1.5, 
+            sx={{
+              borderRadius: '16px',
+              py: 1.5,
               fontWeight: 700,
               bgcolor: 'rgba(255, 255, 255, 0.02)',
               borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -401,9 +401,9 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           </Button>
         )}
 
-        <Button 
-          variant="text" 
-          size="small" 
+        <Button
+          variant="text"
+          size="small"
           onClick={handleLogout}
           startIcon={<LogoutIcon sx={{ fontSize: 14 }} />}
           sx={{ color: 'text.secondary', fontWeight: 600 }}
