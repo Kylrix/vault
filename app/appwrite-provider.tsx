@@ -75,7 +75,12 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
         
         // Only set needsMasterPassword if we have a valid account AND they have a masterpass set (or need one)
-        setNeedsMasterPassword(!hasMp || (!unlocked && !isAuthPage));
+        // If it's an auth page, we don't need to force the modal
+        if (isAuthPage) {
+          setNeedsMasterPassword(false);
+        } else {
+          setNeedsMasterPassword(!hasMp || !unlocked);
+        }
       } else {
         // Explicitly clear everything on failure
         setUser(null);
@@ -302,7 +307,12 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     const unlocked = masterPassCrypto.isVaultUnlocked();
     const hasMp = user ? await hasMasterpass(user.$id) : false;
     const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
-    setNeedsMasterPassword(!hasMp || (!unlocked && !isAuthPage));
+    
+    if (isAuthPage) {
+      setNeedsMasterPassword(false);
+    } else {
+      setNeedsMasterPassword(!hasMp || !unlocked);
+    }
   };
 
   const logout = async () => {
@@ -310,6 +320,11 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     setNeedsMasterPassword(false);
     masterPassCrypto.lock();
     
+    // Clear ecosystem status as well
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.removeItem("kylrix_vault_unlocked");
+    }
+
     // 2. Perform the actual Appwrite logout
     await logoutAppwrite();
     

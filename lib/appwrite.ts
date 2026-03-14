@@ -2049,7 +2049,8 @@ export async function logoutAppwrite() {
   } catch { }
   // Clear vault/session data
   if (typeof window !== "undefined") {
-    sessionStorage.clear();
+    sessionStorage.removeItem("vault_unlocked");
+    sessionStorage.removeItem("kylrix_vault_unlocked");
     localStorage.removeItem("vault_timeout_minutes");
     // Optionally clear other app-specific keys here
   }

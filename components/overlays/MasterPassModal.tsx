@@ -63,7 +63,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const [hasPin, setHasPin] = useState(false);
   const [hasMasterpassLocal, setHasMasterpassLocal] = useState<boolean | null>(null);
 
-  const { user } = useAppwriteVault();
+  const { user, logout } = useAppwriteVault();
   const { finalizeAuth } = useFinalizeAuth();
   const router = useRouter();
 
@@ -275,7 +275,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
 
   const handleLogout = async () => {
     setLoading(true);
-    await logoutAppwrite();
+    await logout();
     setLoading(false);
     onClose();
     router.replace("/");
@@ -533,6 +533,23 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
             }}
           >
             Use Master Password
+          </Button>
+        )}
+
+        {!isFirstTime && (
+          <Button
+            variant="text"
+            fullWidth
+            onClick={() => router.push("/masterpass/reset")}
+            sx={{
+              borderRadius: '16px',
+              py: 1,
+              fontWeight: 700,
+              color: 'error.main',
+              '&:hover': { bgcolor: alpha(muiTheme.palette.error.main, 0.1) }
+            }}
+          >
+            Reset Master Password
           </Button>
         )}
 

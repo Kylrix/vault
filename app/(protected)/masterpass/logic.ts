@@ -81,6 +81,9 @@ export class MasterPassCrypto {
     this.isUnlocked = true;
     if (typeof sessionStorage !== "undefined") {
       sessionStorage.setItem("vault_unlocked", Date.now().toString());
+      // CRITICAL FIX: Ensure ecosystem sync is reflected in sessionStorage immediately
+      // EcosystemSecurity uses this key to track unlock status across apps.
+      sessionStorage.setItem("kylrix_vault_unlocked", "true");
     }
     markSudoActive();
     return true;
@@ -115,6 +118,10 @@ export class MasterPassCrypto {
           sessionStorage.setItem("vault_unlocked", Date.now().toString());
           // Ensure we don't have stale login data
           sessionStorage.removeItem("vault_login_check");
+          
+          // CRITICAL FIX: Ensure ecosystem sync is reflected in sessionStorage immediately
+          // EcosystemSecurity uses this key to track unlock status across apps.
+          sessionStorage.setItem("kylrix_vault_unlocked", "true");
         }
         markSudoActive();
         return true;
@@ -135,6 +142,9 @@ export class MasterPassCrypto {
         this.isUnlocked = true;
         if (typeof sessionStorage !== "undefined") {
           sessionStorage.setItem("vault_unlocked", Date.now().toString());
+          // CRITICAL FIX: Ensure ecosystem sync is reflected in sessionStorage immediately
+          // EcosystemSecurity uses this key to track unlock status across apps.
+          sessionStorage.setItem("kylrix_vault_unlocked", "true");
         }
         markSudoActive();
         return true;
@@ -289,6 +299,7 @@ export class MasterPassCrypto {
     this.isUnlocked = false;
     if (typeof sessionStorage !== "undefined") {
       sessionStorage.removeItem("vault_unlocked");
+      sessionStorage.removeItem("kylrix_vault_unlocked");
     }
     resetSudo();
   }
@@ -331,32 +342,24 @@ export class MasterPassCrypto {
 
   // Check if vault is unlocked with dynamic timeout
   isVaultUnlocked(): boolean {
-    if (typeof sessionStorage === "undefined") return this.isUnlocked && !!this.masterKey;
-    
-    const unlockTime = sessionStorage.getItem("vault_unlocked");
-    if (!unlockTime) {
-      if (this.isUnlocked) {
-        logWarn("Vault internal state is unlocked but session storage is missing. Locking.");
-        this.lockApplication();
+    if (this.isUnlocked && !!this.masterKey) {
+      // If memory is unlocked, verify timeout
+      if (typeof sessionStorage !== "undefined") {
+        const unlockTime = sessionStorage.getItem("vault_unlocked");
+        if (unlockTime) {
+          const elapsed = Date.now() - parseInt(unlockTime);
+          const timeout = this.getTimeoutSetting();
+          if (elapsed > timeout) {
+            logDebug("Vault timeout reached", { elapsed, timeout });
+            this.lockApplication();
+            return false;
+          }
+        }
       }
-      return false;
+      return true;
     }
 
-    const elapsed = Date.now() - parseInt(unlockTime);
-    const timeout = this.getTimeoutSetting();
-    if (elapsed > timeout) {
-      logDebug("Vault timeout reached", { elapsed, timeout });
-      this.lockApplication();
-      return false;
-    }
-
-    // If session says we're unlocked but memory doesn't, we need to recover
-    // (This usually happens on page refresh)
-    if (!this.isUnlocked || !this.masterKey) {
-       return false;
-    }
-
-    return true;
+    return false;
   }
 
   // Encrypt data before sending to database
@@ -465,6 +468,7 @@ export class MasterPassCrypto {
     // Clear session storage
     if (typeof sessionStorage !== "undefined") {
       sessionStorage.removeItem("vault_unlocked");
+      sessionStorage.removeItem("kylrix_vault_unlocked");
     }
 
     // Clear any cached decrypted data

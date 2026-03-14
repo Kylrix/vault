@@ -23,7 +23,7 @@ import VaultGuard from "@/components/layout/VaultGuard";
 export default function MasterpassResetPage() {
   const router = useRouter();
   const { user } = useAppwriteVault();
-  const [step, setStep] = useState<"reset" | "done">("reset");
+  const [step, setStep] = useState<"reset" | "confirm" | "done">("reset");
   const [loading, setLoading] = useState(false);
 
   // Redirect to masterpass if not logged in
@@ -75,11 +75,11 @@ export default function MasterpassResetPage() {
             display: 'inline-flex', 
             p: 2, 
             borderRadius: '20px', 
-            bgcolor: alpha(step === 'reset' ? '#FF4D4D' : '#6366F1', 0.1),
-            color: step === 'reset' ? '#FF4D4D' : '#6366F1',
+            bgcolor: alpha(step === 'done' ? '#6366F1' : '#FF4D4D', 0.1),
+            color: step === 'done' ? '#6366F1' : '#FF4D4D',
             mb: 3
           }}>
-            {step === 'reset' ? <SecurityIcon sx={{ fontSize: 40 }} /> : <CheckCircleIcon sx={{ fontSize: 40 }} />}
+            {step === 'done' ? <CheckCircleIcon sx={{ fontSize: 40 }} /> : <SecurityIcon sx={{ fontSize: 40 }} />}
           </Box>
 
           <Typography variant="h4" sx={{ 
@@ -89,12 +89,14 @@ export default function MasterpassResetPage() {
             color: 'white',
             mb: 1
           }}>
-            {step === 'reset' ? "Reset Master Password" : "Vault Wiped"}
+            {step === 'reset' ? "Reset Master Password" : step === 'confirm' ? "Are you sure?" : "Vault Wiped"}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', mb: 4 }}>
             {step === "reset"
               ? "This action is irreversible and will wipe all your encrypted data."
+              : step === "confirm"
+              ? "This is your last chance. Once confirmed, your data is gone forever."
               : "Your master password and all encrypted data have been successfully wiped."}
           </Typography>
 
@@ -119,8 +121,7 @@ export default function MasterpassResetPage() {
               <Button
                 fullWidth
                 variant="contained"
-                onClick={handleReset}
-                disabled={loading}
+                onClick={() => setStep("confirm")}
                 sx={{
                   py: 1.8,
                   borderRadius: '14px',
@@ -131,14 +132,10 @@ export default function MasterpassResetPage() {
                     bgcolor: '#D32F2F',
                     transform: 'translateY(-1px)',
                     boxShadow: '0 8px 20px rgba(255, 77, 77, 0.3)'
-                  },
-                  '&.Mui-disabled': {
-                    bgcolor: 'rgba(255, 77, 77, 0.2)',
-                    color: 'rgba(255, 255, 255, 0.3)'
                   }
                 }}
               >
-                {loading ? <CircularProgress size={24} color="inherit" /> : "Reset & Wipe Everything"}
+                Reset & Wipe Everything
               </Button>
 
               <Button
@@ -146,13 +143,54 @@ export default function MasterpassResetPage() {
                 variant="text"
                 startIcon={<ArrowBackIcon sx={{ fontSize: 18 }} />}
                 onClick={() => router.back()}
-                disabled={loading}
                 sx={{ 
                   color: 'rgba(255, 255, 255, 0.5)',
                   '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)' }
                 }}
               >
                 Cancel and Go Back
+              </Button>
+            </Stack>
+          )}
+
+          {step === "confirm" && (
+            <Stack spacing={2}>
+              <Box sx={{ p: 2, borderRadius: '16px', bgcolor: alpha('#FF4D4D', 0.1), border: '1px solid #FF4D4D' }}>
+                <Typography variant="body2" sx={{ color: 'white', fontWeight: 700 }}>
+                  I understand that resetting my master password will delete all my stored data permanently.
+                </Typography>
+              </Box>
+
+              <Button
+                fullWidth
+                variant="contained"
+                onClick={handleReset}
+                disabled={loading}
+                sx={{
+                  py: 1.8,
+                  borderRadius: '14px',
+                  bgcolor: '#FF4D4D',
+                  color: 'white',
+                  fontWeight: 800,
+                  border: '2px solid white',
+                  '&:hover': {
+                    bgcolor: '#D32F2F',
+                    transform: 'scale(1.02)',
+                    boxShadow: '0 0 30px rgba(255, 77, 77, 0.5)'
+                  }
+                }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "CONFIRM RESET & WIPE"}
+              </Button>
+
+              <Button
+                fullWidth
+                variant="text"
+                onClick={() => setStep("reset")}
+                disabled={loading}
+                sx={{ color: 'rgba(255, 255, 255, 0.5)' }}
+              >
+                Wait, take me back
               </Button>
             </Stack>
           )}
