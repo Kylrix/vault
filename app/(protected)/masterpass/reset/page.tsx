@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   Box,
   Typography,
@@ -23,17 +23,23 @@ import SudoModal from "@/components/overlays/SudoModal";
 
 export default function MasterpassResetPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAppwriteVault();
   const [step, setStep] = useState<"reset" | "confirm" | "done">("reset");
   const [loading, setLoading] = useState(false);
   const [isSudoOpen, setIsSudoOpen] = useState(false);
 
+  const callbackUrl = searchParams.get("callbackUrl");
+
   // Redirect to masterpass if not logged in
   useEffect(() => {
     if (user === null) {
-      router.replace("/masterpass");
+      const target = callbackUrl 
+        ? `/masterpass?callbackUrl=${encodeURIComponent(callbackUrl)}` 
+        : "/masterpass";
+      router.replace(target);
     }
-  }, [user, router]);
+  }, [user, router, callbackUrl]);
 
   const handleStartReset = () => {
     setIsSudoOpen(true);
@@ -224,7 +230,12 @@ export default function MasterpassResetPage() {
             <Button
               fullWidth
               variant="contained"
-              onClick={() => router.replace("/masterpass")}
+              onClick={() => {
+                const target = callbackUrl 
+                  ? `/masterpass?callbackUrl=${encodeURIComponent(callbackUrl)}` 
+                  : "/masterpass";
+                router.replace(target);
+              }}
               sx={{
                 py: 1.8,
                 borderRadius: '14px',

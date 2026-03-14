@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { MasterPassModal } from "@/components/overlays/MasterPassModal";
 import { 
@@ -19,7 +19,10 @@ export default function MasterPassPage() {
   const [showModal, setShowModal] = useState(false);
   const { user, isAuthReady, openIDMWindow } = useAppwriteVault();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const theme = useTheme();
+
+  const callbackUrl = searchParams.get("callbackUrl");
 
   return (
     <Box sx={{ 
@@ -30,7 +33,16 @@ export default function MasterPassPage() {
       bgcolor: 'background.default',
       p: 3
     }}>
-      <MasterPassModal isOpen={true} onClose={() => router.replace("/dashboard")} />
+      <MasterPassModal 
+        isOpen={true} 
+        onClose={() => {
+          if (callbackUrl) {
+            window.location.href = callbackUrl;
+          } else {
+            router.replace("/dashboard");
+          }
+        }} 
+      />
     </Box>
   );
 }
