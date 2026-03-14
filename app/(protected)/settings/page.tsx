@@ -155,6 +155,29 @@ export default function SettingsPage() {
     toast.success("PIN reset successful. You can now set a new one.");
   };
 
+  const handleResetMasterPassword = async () => {
+    if (!window.confirm("CRITICAL: This will PERMANENTLY delete all your Vault items, Connect DMs, and Passkeys. Your Notes and Flow tasks will be preserved. Are you absolutely sure?")) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const success = await (masterPassCrypto as any).resetMasterPassword();
+      if (success) {
+        toast.success("Vault Reset & Data Purge Complete");
+        setIsUnlocked(false);
+        // Force refresh to setup state
+        window.location.reload();
+      } else {
+        toast.error("Reset failed. Please try again or contact support.");
+      }
+    } catch (_e) {
+      toast.error("An error occurred during reset.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLock = () => {
     masterPassCrypto.lockNow();
     setIsUnlocked(false);
@@ -402,10 +425,12 @@ export default function SettingsPage() {
             <Button 
               variant="outlined" 
               color="error" 
-              startIcon={<Trash2 size={18} />}
+              startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <Trash2 size={18} />}
+              onClick={handleResetMasterPassword}
+              disabled={loading}
               sx={{ borderRadius: '14px', fontWeight: 700, borderColor: alpha('#FF4D4D', 0.3) }}
             >
-              Reset Vault & Wipe Data
+              {loading ? "Wiping Data..." : "Reset Vault & Wipe Data"}
             </Button>
           </Paper>
         </Box>

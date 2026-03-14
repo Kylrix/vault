@@ -56,38 +56,45 @@ export default function SudoModal({
     const [mode, setMode] = useState<"passkey" | "password" | "pin" | "initialize" | null>(null);
     const [isDetecting, setIsDetecting] = useState(true);
     const [showPasskeyIncentive, setShowPasskeyIncentive] = useState(false);
-    const [isResetting, setIsResetting] = useState(false);
-    const [resetStep, setResetStep] = useState(1);
+    const [confirmPhase, setConfirmPhase] = useState(0);
+
+    const handleConfirmStep = () => {
+        if (confirmPhase < 2) {
+            setConfirmPhase(prev => prev + 1);
+        } else {
+            handleSuccessWithSync();
+        }
+    };
 
     const handleSuccessWithSync = useCallback(async () => {
+        onSuccess();
+
         if (user?.$id) {
             try {
                 // Sudo Hook: Ensure E2E Identity is created and published upon successful MasterPass unlock
                 console.log("Synchronizing Identity...");
                 await ecosystemSecurity.ensureE2EIdentity(user.$id);
 
+                if (intent === "reset") {
+                    // If reset intent, we already called onSuccess above
+                    return;
+                }
+
                 // Incentive: If user doesn't have a passkey, show incentive (7-day snooze)
                 const entries = await AppwriteService.listKeychainEntries(user.$id);
                 const hasPasskey = entries.some((e: any) => e.type === 'passkey');
-                
-                if (intent === "reset") {
-                    setResetStep(2); // Move to second phase of reset
-                    return;
-                }
 
                 if (!hasPasskey) {
                     const lastSkip = localStorage.getItem(`passkey_skip_${user.$id}`);
                     const sevenDays = 7 * 24 * 60 * 60 * 1000;
                     if (!lastSkip || (Date.now() - parseInt(lastSkip)) > sevenDays) {
                         setShowPasskeyIncentive(true);
-                        return; // Don't call onSuccess yet, PasskeySetup will handle it
                     }
                 }
             } catch (e) {
                 console.error("Failed to sync identity on unlock", e);
             }
         }
-        onSuccess();
     }, [user?.$id, onSuccess, intent]);
 
     const handlePasskeyVerify = useCallback(async () => {
@@ -260,8 +267,19 @@ export default function SudoModal({
                 }
 
                 if (intent === "reset") {
-                    setIsResetting(true);
-                    setMode(passkeyPresent ? "passkey" : "password");
+                    const hasPasskey = entries.some((e: any) => e.type === 'passkey');
+                    const hasPin = entries.some((e: any) => e.type === 'pin') || pinSet;
+                    
+                    if (hasPasskey) {
+                        setMode("passkey");
+                    } else if (hasPin) {
+                        setMode("pin");
+                    } else {
+                        // If no passkey or PIN, we fall back to password for verification
+                        // (Usually a reset requires stronger verification but if those aren't set, 
+                        // we use what we have, or the reset flow will handle its own logic)
+                        setMode("password"); 
+                    }
                     setIsDetecting(false);
                     return;
                 }
@@ -290,6 +308,7 @@ export default function SudoModal({
             setLoading(false);
             setPasskeyLoading(false);
             setIsDetecting(true);
+            setConfirmPhase(0);
         }
     }, [isOpen, user?.$id, intent]);
 
@@ -305,12 +324,12 @@ export default function SudoModal({
                 isOpen={true}
                 onClose={() => {
                     setShowPasskeyIncentive(false);
-                    handleSuccessWithSync();
+                    onSuccess(); // Use the original onSuccess when skipping incentive
                 }}
                 userId={user.$id}
                 onSuccess={() => {
                     setShowPasskeyIncentive(false);
-                    handleSuccessWithSync();
+                    onSuccess(); // Use original onSuccess after setup too
                 }}
                 trustUnlocked={true}
             />
@@ -408,7 +427,7 @@ export default function SudoModal({
             </DialogTitle>
 
             <DialogContent sx={{ pb: 4 }}>
-                {isResetting && resetStep === 2 ? (
+                {intent === "reset" && mode === "password" ? (
                     <Stack spacing={3} sx={{ mt: 2 }}>
                         <Box sx={{
                             p: 2,
@@ -417,66 +436,46 @@ export default function SudoModal({
                             border: '1px solid rgba(239, 68, 68, 0.2)',
                         }}>
                             <Typography variant="body2" sx={{ color: '#ef4444', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <KeyRoundIcon sx={{ fontSize: 16 }} /> RESET MASTERPASS
+                                <ShieldIcon sx={{ fontSize: 16 }} /> RESET CONFIRMATION
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5, display: 'block' }}>
-                                This will replace your current master password. Your encrypted data will remain accessible with the new password.
+                                {confirmPhase === 0 
+                                    ? "Resetting your master password will permanently wipe all your encrypted data (Tier 2)." 
+                                    : confirmPhase === 1 
+                                    ? "This action is irreversible. You will lose access to all your credentials and secrets."
+                                    : "Final Step: Once you click below, your data will be queued for deletion."}
                             </Typography>
                         </Box>
 
-                        <form onSubmit={handleFinalReset}>
-                            <Stack spacing={2.5}>
-                                <Box>
-                                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, mb: 1, display: 'block' }}>
-                                        ENTER NEW MASTERPASS
-                                    </Typography>
-                                    <TextField
-                                        fullWidth
-                                        type="password"
-                                        placeholder="New master password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        autoFocus
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <LockIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.3)" }} />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{
-                                            '& .MuiOutlinedInput-root': {
-                                                borderRadius: '14px',
-                                                bgcolor: 'rgba(255, 255, 255, 0.03)',
-                                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                                '&.Mui-focused fieldset': { borderColor: '#ef4444' },
-                                            },
-                                            '& .MuiInputBase-input': { color: 'white' }
-                                        }}
-                                    />
-                                </Box>
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            onClick={handleConfirmStep}
+                            disabled={loading}
+                            sx={{
+                                py: 1.5,
+                                borderRadius: '14px',
+                                bgcolor: '#ef4444',
+                                color: '#fff',
+                                fontWeight: 700,
+                                '&:hover': { bgcolor: alpha('#ef4444', 0.8) }
+                            }}
+                        >
+                            {confirmPhase === 0 
+                                ? "I understand, continue" 
+                                : confirmPhase === 1 
+                                ? "Yes, I am sure"
+                                : "Proceed to Wipe Everything"}
+                        </Button>
 
-                                <Button
-                                    fullWidth
-                                    type="submit"
-                                    variant="contained"
-                                    disabled={loading || !password || password.length < 8}
-                                    sx={{
-                                        py: 1.5,
-                                        borderRadius: '14px',
-                                        bgcolor: '#ef4444',
-                                        color: '#fff',
-                                        fontWeight: 700,
-                                        '&:hover': {
-                                            bgcolor: alpha('#ef4444', 0.8),
-                                        }
-                                    }}
-                                >
-                                    {loading ? <CircularProgress size={24} color="inherit" /> : "Reset and Update Vault"}
-                                </Button>
-                            </Stack>
-                        </form>
+                        <Button 
+                            variant="text" 
+                            size="small" 
+                            onClick={onCancel} 
+                            sx={{ color: 'rgba(255, 255, 255, 0.5)' }}
+                        >
+                            Wait, cancel this
+                        </Button>
                     </Stack>
                 ) : isDetecting || passkeyLoading ? (
                     <Stack spacing={3} sx={{ mt: 4, mb: 2, alignItems: 'center' }}>
@@ -827,7 +826,7 @@ export default function SudoModal({
                             </Button>
                         )}
 
-                        {mode === "password" && (
+                        {mode === "password" && intent !== "reset" && (
                             <Button
                                 fullWidth
                                 variant="text"

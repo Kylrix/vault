@@ -305,15 +305,30 @@ export class MasterPassCrypto {
   }
 
   // Reset master password (clear vault and force new setup)
-  resetMasterPassword(): void {
-    this.lockApplication();
+  async resetMasterPassword(): Promise<boolean> {
+    try {
+      this.lockApplication();
 
-    // Clear any setup flags
-    if (typeof window !== "undefined") {
-      const userId = sessionStorage.getItem("current_user_id");
-      if (userId) {
-        localStorage.removeItem(`masterpass_setup_${userId}`);
+      // Trigger server-side purge of Tier 2 data
+      const response = await fetch('/api/reset-purge', { method: 'POST' });
+      if (!response.ok) {
+        logError("Failed to trigger server-side purge during reset");
+        return false;
       }
+
+      // Clear any setup flags
+      if (typeof window !== "undefined") {
+        const userId = sessionStorage.getItem("current_user_id");
+        if (userId) {
+          localStorage.removeItem(`masterpass_setup_${userId}`);
+        }
+      }
+
+      logDebug("Master password reset and data purge successful");
+      return true;
+    } catch (error: unknown) {
+      logError("Critical failure during master password reset", error as Error);
+      return false;
     }
   }
 
