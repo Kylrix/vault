@@ -357,7 +357,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               border: '3px solid #0a0a0a',
               zIndex: 1
             }}>
-              <ShieldIcon sx={{ fontSize: 14 }} />
+              <LockIcon sx={{ fontSize: 14 }} />
             </Box>
           </Box>
         </Box>
@@ -371,8 +371,8 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
         }}>
           {user?.name || "User"}
         </Typography>
-        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', mt: 1, fontFamily: 'var(--font-satoshi)' }}>
-          Security verification required
+        <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', mt: 1, fontFamily: 'var(--font-satoshi)', fontWeight: 600 }}>
+          Enter MasterPass to continue
         </Typography>
       </DialogTitle>
 
@@ -615,7 +615,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 }
               }}
             >
-              {loading ? <CircularProgress size={24} color="inherit" /> : (isFirstTime ? "Set Master Password" : "Confirm Security Entry")}
+              {loading ? <CircularProgress size={24} color="inherit" /> : (isFirstTime ? "Set Master Password" : "Verify Identity")}
             </Button>
 
             {hasPasskey && mode !== "passkey" && !isFirstTime && (
