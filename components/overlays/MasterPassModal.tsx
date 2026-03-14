@@ -37,6 +37,7 @@ import { checkRateLimit, getBlockedDuration } from "@/lib/rate-limiter";
 import toast from "react-hot-toast";
 import { unlockWithPasskey } from "@/lib/passkey";
 import { PasskeySetup } from "./passkeySetup";
+import { ecosystemSecurity } from "@/lib/ecosystem/security";
 
 interface MasterPassModalProps {
   isOpen: boolean;
@@ -57,14 +58,59 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const [passkeyLoading, setPasskeyLoading] = useState(false);
   const [showPasskeyIncentive, setShowPasskeyIncentive] = useState(false);
 
+  const [mode, setMode] = useState<"passkey" | "password" | "pin" | "initialize" | null>(null);
+  const [pin, setPin] = useState("");
+  const [hasPin, setHasPin] = useState(false);
+  const [hasMasterpassLocal, setHasMasterpassLocal] = useState<boolean | null>(null);
+
   const { user } = useAppwriteVault();
   const { finalizeAuth } = useFinalizeAuth();
   const router = useRouter();
 
   const onSuccess = useCallback(async () => {
+    if (user?.$id) {
+      try {
+        // Sudo Hook: Ensure E2E Identity is created and published upon successful MasterPass unlock
+        console.log("Synchronizing Identity...");
+        await ecosystemSecurity.ensureE2EIdentity(user.$id);
+      } catch (e) {
+        console.error("Failed to sync identity on unlock", e);
+      }
+    }
     onClose();
     await finalizeAuth({ redirect: true, fallback: "/masterpass" });
-  }, [onClose, finalizeAuth]);
+  }, [user?.$id, onClose, finalizeAuth]);
+
+  const handleSuccessWithSync = onSuccess;
+
+  const handlePinChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/[^0-9]/g, "");
+    setPin(val);
+    if (val.length === 4 && user?.$id) {
+      setLoading(true);
+      try {
+        const success = await ecosystemSecurity.unlockWithPin(val);
+        if (success) {
+          // Sync with MasterPassCrypto singleton for Vault access
+          const rawMek = await crypto.subtle.exportKey("raw", ecosystemSecurity.getMasterKey()!);
+          await masterPassCrypto.importKey(rawMek);
+          await masterPassCrypto.unlockWithImportedKey();
+
+          handleSuccessWithSync();
+        } else {
+          toast.error("Invalid PIN");
+          setPin("");
+        }
+      } catch (_e: unknown) {
+        toast.error("Verification failed");
+        setPin("");
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+
 
   const handlePasskeyUnlock = useCallback(async () => {
     if (!user) return;
@@ -73,6 +119,12 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       const success = await unlockWithPasskey(user.$id);
       if (success) {
         toast.success("Identity verified via Passkey");
+
+        // Sync with MasterPassCrypto singleton
+        const rawMek = await crypto.subtle.exportKey("raw", ecosystemSecurity.getMasterKey()!);
+        await masterPassCrypto.importKey(rawMek);
+        await masterPassCrypto.unlockWithImportedKey();
+
         onSuccess();
       }
     } catch (e) {
@@ -86,42 +138,61 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
     if (!user || !isOpen) return;
     setLoading(true);
 
-    // Check for passkeys and auto-trigger if they exist
-    Promise.all([hasMasterpass(user.$id), AppwriteService.hasPasskey(user.$id)])
-      .then(([masterpassPresent, passkeyPresent]) => {
-        setIsFirstTime(!masterpassPresent);
-        setHasPasskey(passkeyPresent);
+    const pinSet = ecosystemSecurity.isPinSet();
+    setHasPin(pinSet);
 
-        // Auto-start passkey auth ONLY if modal is open, not first time, and passkey exists
-        if (isOpen && masterpassPresent && passkeyPresent) {
+    // Check for keychain entries to determine mode
+    AppwriteService.listKeychainEntries(user.$id)
+      .then((entries) => {
+        const passkeyPresent = entries.some((e: any) => e.type === 'passkey');
+        const passwordPresent = entries.some((e: any) => e.type === 'password');
+
+        setHasPasskey(passkeyPresent);
+        setHasMasterpassLocal(passwordPresent);
+        setIsFirstTime(!passwordPresent);
+
+        if (!passwordPresent) {
+          setMode("initialize");
+        } else if (passkeyPresent) {
+          setMode("passkey");
           handlePasskeyUnlock();
+        } else if (pinSet) {
+          setMode("pin");
+        } else {
+          setMode("password");
         }
       })
       .catch(() => {
         setIsFirstTime(true);
-        setHasPasskey(false);
+        setMode("initialize");
       })
       .finally(() => {
         setLoading(false);
       });
+
+    // Reset state on open
+    setMasterPassword("");
+    setConfirmPassword("");
+    setPin("");
   }, [user, isOpen, handlePasskeyUnlock]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user?.$id) return;
     setLoading(true);
 
-    if (user) {
-      const rateLimitKey = `unlock_${user.$id}`;
-      if (!checkRateLimit(rateLimitKey)) {
-        const remainingTime = getBlockedDuration(rateLimitKey);
-        toast.error(`Too many attempts. Please try again in ${remainingTime} seconds.`);
-        setLoading(false);
-        return;
-      }
+    const rateLimitKey = `unlock_${user.$id}`;
+    if (!checkRateLimit(rateLimitKey)) {
+      const remainingTime = getBlockedDuration(rateLimitKey);
+      toast.error(
+        `Too many attempts. Please try again in ${remainingTime} seconds.`
+      );
+      setLoading(false);
+      return;
     }
 
     try {
-      if (isFirstTime) {
+      if (mode === "initialize" || isFirstTime) {
         if (masterPassword !== confirmPassword) {
           toast.error("Passwords don't match");
           setLoading(false);
@@ -135,19 +206,22 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
 
         const success = await masterPassCrypto.unlock(
           masterPassword,
-          user?.$id || "",
-          true,
+          user.$id,
+          true
         );
 
         if (success) {
-          if (user) {
-            await setMasterpassFlag(user.$id, user.email);
+          // Sync MasterPassCrypto MEK back to EcosystemSecurity for identity logic
+          const mekBuffer = await masterPassCrypto.exportKey();
+          if (mekBuffer) {
+            await ecosystemSecurity.importMasterKey(mekBuffer);
           }
+
+          await setMasterpassFlag(user.$id, user.email);
           if (!hasPasskey) {
             setShowPasskeyIncentive(true);
           } else {
-            onClose();
-            await finalizeAuth({ redirect: true, fallback: "/masterpass" });
+            onSuccess();
           }
         } else {
           toast.error("Failed to set master password");
@@ -155,16 +229,30 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       } else {
         const success = await masterPassCrypto.unlock(
           masterPassword,
-          user?.$id || "",
-          false,
+          user.$id,
+          false
         );
 
         if (success) {
-          if (!hasPasskey) {
+          // Sync MasterPassCrypto MEK back to EcosystemSecurity
+          const mekBuffer = await masterPassCrypto.exportKey();
+          if (mekBuffer) {
+            await ecosystemSecurity.importMasterKey(mekBuffer);
+          }
+
+          const skipTimestamp = localStorage.getItem(
+            `passkey_skip_${user.$id}`
+          );
+          const sevenDays = 7 * 24 * 60 * 60 * 1000;
+          const shouldShowIncentive =
+            !hasPasskey &&
+            (!skipTimestamp ||
+              Date.now() - parseInt(skipTimestamp) > sevenDays);
+
+          if (shouldShowIncentive) {
             setShowPasskeyIncentive(true);
           } else {
-            onClose();
-            await finalizeAuth({ redirect: true, fallback: "/masterpass" });
+            onSuccess();
           }
         } else {
           toast.error("Incorrect master password. Please try again.");
@@ -193,7 +281,9 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
     router.replace("/");
   };
 
-  if (showPasskeyIncentive && user) {
+  if (!user || !isOpen) return null;
+
+  if (showPasskeyIncentive) {
     return (
       <PasskeySetup
         isOpen={true}
@@ -262,10 +352,62 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       </DialogTitle>
 
       <DialogContent sx={{ mt: 2 }}>
-        {isFirstTime === null || (loading && !masterPassword) ? (
+        {isFirstTime === null || (loading && !masterPassword && mode !== "pin") ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress />
           </Box>
+        ) : mode === "pin" ? (
+          <Stack spacing={3} sx={{ mt: 2 }}>
+            <Box>
+              <Typography variant="caption" sx={{ fontWeight: 700, mb: 1, display: 'block', textAlign: 'center' }}>
+                ENTER 4-DIGIT PIN
+              </Typography>
+              <TextField
+                fullWidth
+                type="password"
+                placeholder="••••"
+                value={pin}
+                onChange={handlePinChange}
+                autoFocus
+                inputProps={{
+                  maxLength: 4,
+                  inputMode: 'numeric',
+                  style: { textAlign: 'center', fontSize: '2rem', letterSpacing: '0.5em' }
+                }}
+                variant="filled"
+                InputProps={{
+                  disableUnderline: true,
+                  sx: { borderRadius: '16px', bgcolor: 'rgba(255, 255, 255, 0.05)' }
+                }}
+              />
+            </Box>
+
+            <Box sx={{ width: '100%', position: 'relative', py: 1 }}>
+              <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+              <Typography variant="caption" sx={{
+                position: 'relative',
+                bgcolor: 'rgb(24, 24, 24)',
+                px: 2,
+                mx: 'auto',
+                display: 'table',
+                color: 'text.secondary',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em'
+              }}>
+                Or
+              </Typography>
+            </Box>
+
+            <Button
+              fullWidth
+              variant="text"
+              size="small"
+              onClick={() => setMode("password")}
+              sx={{ color: 'text.secondary', '&:hover': { color: 'white' } }}
+            >
+              Use Master Password
+            </Button>
+          </Stack>
         ) : (
           <Stack spacing={3} component="form" onSubmit={handleSubmit}>
             <Box>
@@ -378,7 +520,44 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       </DialogContent>
 
       <DialogActions sx={{ flexDirection: 'column', p: 4, pt: 0, gap: 2 }}>
-        {!isFirstTime && hasPasskey && (
+        {mode !== "password" && mode !== "initialize" && (
+          <Button
+            variant="text"
+            fullWidth
+            onClick={() => setMode("password")}
+            sx={{
+              borderRadius: '16px',
+              py: 1,
+              fontWeight: 700,
+              color: 'text.secondary'
+            }}
+          >
+            Use Master Password
+          </Button>
+        )}
+
+        {!isFirstTime && hasPin && mode !== "pin" && (
+          <Button
+            variant="outlined"
+            fullWidth
+            onClick={() => setMode("pin")}
+            sx={{
+              borderRadius: '16px',
+              py: 1.5,
+              fontWeight: 700,
+              bgcolor: 'rgba(255, 255, 255, 0.02)',
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+              '&:hover': {
+                bgcolor: 'rgba(255, 255, 255, 0.05)',
+                borderColor: 'primary.main'
+              }
+            }}
+          >
+            Unlock with PIN
+          </Button>
+        )}
+
+        {!isFirstTime && hasPasskey && mode !== "passkey" && (
           <Button
             variant="outlined"
             fullWidth

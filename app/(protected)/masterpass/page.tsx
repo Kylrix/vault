@@ -24,8 +24,12 @@ export default function MasterPassPage() {
   useEffect(() => {
     if (!isAuthReady) return;
 
+    // Only show modal if we have a user and they're authenticated
+    // If user is null, the "Authentication Required" screen below will show
     if (user) {
       setShowModal(true);
+    } else {
+      setShowModal(false);
     }
   }, [user, isAuthReady]);
 

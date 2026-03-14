@@ -160,8 +160,8 @@ export class EcosystemSecurity {
    */
   async fetchKeychain(userId: string) {
     try {
-      const PW_DB = APPWRITE_CONFIG.DATABASES.VAULT || 'passwordManagerDb';
-      const KEYCHAIN_TABLE = APPWRITE_CONFIG.TABLES.VAULT?.KEYCHAIN || 'keychain';
+      const PW_DB = APPWRITE_CONFIG.DATABASES.PASSWORD_MANAGER || 'passwordManagerDb';
+      const KEYCHAIN_TABLE = APPWRITE_CONFIG.TABLES.PASSWORD_MANAGER?.KEYCHAIN || 'keychain';
       
       const res = await tablesDB.listDocuments(PW_DB, KEYCHAIN_TABLE, [
         Query.equal('userId', userId),

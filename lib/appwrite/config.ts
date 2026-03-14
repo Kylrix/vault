@@ -7,7 +7,8 @@ export const APPWRITE_CONFIG = {
         NOTE: '67ff05a9000296822396',
         VAULT: 'passwordManagerDb',
         FLOW: 'whisperrflow',
-        CHAT: 'chat'
+        CHAT: 'chat',
+        PASSWORD_MANAGER: 'passwordManagerDb'
     },
     TABLES: {
         NOTE: {
@@ -33,6 +34,10 @@ export const APPWRITE_CONFIG = {
             SECURITY_LOGS: 'securityLogs',
             USER: 'user',
             KEYCHAIN: 'keychain'
+        },
+        PASSWORD_MANAGER: {
+            KEYCHAIN: 'keychain',
+            IDENTITIES: 'identities'
         },
         FLOW: {
             TASKS: 'tasks',

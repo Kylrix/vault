@@ -94,7 +94,10 @@ export class MasterPassCrypto {
   ): Promise<boolean> {
     try {
       // 1. Try to unlock via Keychain (New Architecture)
-      const keychainSuccess = await this.unlockWithKeychain(masterPassword, userId);
+      const keychainSuccess = await this.unlockWithKeychain(
+        masterPassword,
+        userId
+      );
       if (keychainSuccess) {
         // Ensure user document is marked as having masterpass if keychain exists
         const { AppwriteService } = await import("../../../lib/appwrite");
@@ -103,9 +106,15 @@ export class MasterPassCrypto {
           await AppwriteService.setMasterpassFlag(userId, userDoc.email);
         }
 
+        // Sync with EcosystemSecurity for identity logic
+        const rawMek = await crypto.subtle.exportKey("raw", this.masterKey!);
+        await ecosystemSecurity.importMasterKey(rawMek);
+
         this.isUnlocked = true;
         if (typeof sessionStorage !== "undefined") {
           sessionStorage.setItem("vault_unlocked", Date.now().toString());
+          // Ensure we don't have stale login data
+          sessionStorage.removeItem("vault_login_check");
         }
         markSudoActive();
         return true;
@@ -118,6 +127,10 @@ export class MasterPassCrypto {
 
         // Create keychain entry immediately
         await this.createKeychainEntry(this.masterKey, masterPassword, userId);
+
+        // Sync with EcosystemSecurity for identity logic
+        const rawMek = await crypto.subtle.exportKey("raw", this.masterKey!);
+        await ecosystemSecurity.importMasterKey(rawMek);
 
         this.isUnlocked = true;
         if (typeof sessionStorage !== "undefined") {
@@ -318,19 +331,31 @@ export class MasterPassCrypto {
 
   // Check if vault is unlocked with dynamic timeout
   isVaultUnlocked(): boolean {
-    if (!this.isUnlocked || !this.masterKey) return false;
-
-    if (typeof sessionStorage !== "undefined") {
-      const unlockTime = sessionStorage.getItem("vault_unlocked");
-      if (unlockTime) {
-        const elapsed = Date.now() - parseInt(unlockTime);
-        const timeout = this.getTimeoutSetting();
-        if (elapsed > timeout) {
-          this.lockApplication();
-          return false;
-        }
+    if (typeof sessionStorage === "undefined") return this.isUnlocked && !!this.masterKey;
+    
+    const unlockTime = sessionStorage.getItem("vault_unlocked");
+    if (!unlockTime) {
+      if (this.isUnlocked) {
+        logWarn("Vault internal state is unlocked but session storage is missing. Locking.");
+        this.lockApplication();
       }
+      return false;
     }
+
+    const elapsed = Date.now() - parseInt(unlockTime);
+    const timeout = this.getTimeoutSetting();
+    if (elapsed > timeout) {
+      logDebug("Vault timeout reached", { elapsed, timeout });
+      this.lockApplication();
+      return false;
+    }
+
+    // If session says we're unlocked but memory doesn't, we need to recover
+    // (This usually happens on page refresh)
+    if (!this.isUnlocked || !this.masterKey) {
+       return false;
+    }
+
     return true;
   }
 

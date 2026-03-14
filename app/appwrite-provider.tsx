@@ -48,12 +48,14 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     if (!isRetry) setLoading(true);
     try {
       const account = await appwriteAccount.get();
-      setUser(account);
-
+      
       if (verbose)
         logDebug("[auth] account.get success", { hasAccount: !!account });
 
       if (account) {
+        // Update user state first
+        setUser(account);
+
         // Clear the auth=success param from URL if it exists
         if (window.location.search.includes('auth=success')) {
           const url = new URL(window.location.href);
@@ -68,13 +70,24 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
             hasMasterpass: hasMp,
             unlocked,
           });
-        setNeedsMasterPassword(!hasMp || !unlocked);
+        
+        // Use pathname to skip forcing masterpass on specific pages
+        const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
+        
+        // Only set needsMasterPassword if we have a valid account AND they have a masterpass set (or need one)
+        setNeedsMasterPassword(!hasMp || (!unlocked && !isAuthPage));
       } else {
+        // Explicitly clear everything on failure
+        setUser(null);
         setNeedsMasterPassword(false);
       }
       return account;
     } catch (err: unknown) {
       const e = err as AppwriteError;
+      
+      // Explicitly clear user on 401
+      setUser(null);
+      setNeedsMasterPassword(false);
       
       // Check for auth=success signal in URL
       const hasAuthSignal = window.location.search.includes('auth=success');
@@ -86,26 +99,12 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
       }
 
       if (verbose) logWarn("[auth] account.get error", { error: e });
-
-      const isNetworkError = !e.response && (e.message?.includes('Network Error') || e.message?.includes('Failed to fetch'));
-
-      if (e.code === 401) {
-        // If it's a 401 and not a retry, let attemptSilentAuth handle it
-        if (!isRetry) throw e;
-        setUser(null);
-        setNeedsMasterPassword(false);
-      } else if (!isNetworkError) {
-        setUser(null);
-        setNeedsMasterPassword(false);
-      } else {
-        logWarn("[auth] Network error, retaining last session state");
-      }
       return null;
     } finally {
       if (!isRetry) setLoading(false);
       setIsAuthReady(true);
     }
-  }, [verbose]);
+  }, [verbose, pathname]);
 
   const attemptSilentAuth = useCallback(async () => {
     if (typeof window === "undefined") return;
@@ -299,13 +298,23 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
 
   const refresh = async () => {
     await fetchUser();
+    // After refresh, re-calculate needsMasterPassword specifically
+    const unlocked = masterPassCrypto.isVaultUnlocked();
+    const hasMp = user ? await hasMasterpass(user.$id) : false;
+    const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
+    setNeedsMasterPassword(!hasMp || (!unlocked && !isAuthPage));
   };
 
   const logout = async () => {
-    await logoutAppwrite();
-    masterPassCrypto.lock();
-    setUser(null);
+    // 1. Immediately clear local security state to stop modal triggers
     setNeedsMasterPassword(false);
+    masterPassCrypto.lock();
+    
+    // 2. Perform the actual Appwrite logout
+    await logoutAppwrite();
+    
+    // 3. Clear the user state and trigger a final refresh
+    setUser(null);
   };
 
   const resetMasterpass = async () => {
