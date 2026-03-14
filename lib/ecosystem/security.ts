@@ -155,6 +155,26 @@ export class EcosystemSecurity {
   }
 
   /**
+   * Fetches the user's keychain directly from the password manager database.
+   * This allows the app to be self-sufficient without a hard ID app redirect.
+   */
+  async fetchKeychain(userId: string) {
+    try {
+      const PW_DB = APPWRITE_CONFIG.DATABASES.VAULT || 'passwordManagerDb';
+      const KEYCHAIN_TABLE = APPWRITE_CONFIG.TABLES.VAULT?.KEYCHAIN || 'keychain';
+      
+      const res = await tablesDB.listDocuments(PW_DB, KEYCHAIN_TABLE, [
+        Query.equal('userId', userId),
+        Query.limit(1)
+      ]);
+      return res.documents[0] || null;
+    } catch (_e: unknown) {
+      console.error('[Security] Failed to fetch keychain:', _e);
+      return null;
+    }
+  }
+
+  /**
    * Derive key from password
    */
   public async deriveKey(password: string, salt: Uint8Array): Promise<CryptoKey> {

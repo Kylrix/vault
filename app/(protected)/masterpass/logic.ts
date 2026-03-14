@@ -159,26 +159,22 @@ export class MasterPassCrypto {
   // Unlock using the Keychain architecture
   private async unlockWithKeychain(password: string, userId: string): Promise<boolean> {
     try {
-      const { AppwriteService } = await import("../../../lib/appwrite");
-      const keychainEntries = await AppwriteService.listKeychainEntries(userId);
+      const keychainEntry = await ecosystemSecurity.fetchKeychain(userId);
 
-      // Find password type entry
-      const passwordEntry = keychainEntries.find(k => k.type === 'password');
-
-      if (!passwordEntry) {
+      if (!keychainEntry) {
         return false; // No keychain entry found
       }
 
       // Derive AuthKey using the stored salt
       const salt = new Uint8Array(
-        atob(passwordEntry.salt).split("").map(c => c.charCodeAt(0))
+        atob(keychainEntry.salt).split("").map(c => c.charCodeAt(0))
       );
 
       const authKey = await this.deriveKey(password, salt);
 
       // Unwrap the MEK
       const wrappedKeyBytes = new Uint8Array(
-        atob(passwordEntry.wrappedKey).split("").map(c => c.charCodeAt(0))
+        atob(keychainEntry.wrappedKey).split("").map(c => c.charCodeAt(0))
       );
 
       // Extract IV (first 16 bytes)
