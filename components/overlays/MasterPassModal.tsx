@@ -313,19 +313,39 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       }}
     >
       <Box sx={{ position: 'absolute', top: -32, left: '50%', transform: 'translateX(-50%)' }}>
-        <Paper sx={{
-          width: 64,
-          height: 64,
-          borderRadius: '18px',
-          bgcolor: '#A855F7',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 8px 32px rgba(168, 85, 247, 0.3)',
-          color: 'white'
-        }}>
-          <LockIcon sx={{ fontSize: 32 }} />
-        </Paper>
+        <Box sx={{ position: 'relative' }}>
+          <Box 
+            component="img" 
+            src="/logo.jpg" 
+            alt="App Logo" 
+            sx={{ 
+              width: 64, 
+              height: 64, 
+              borderRadius: '18px',
+              objectFit: 'cover',
+              border: '2px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+            }} 
+          />
+          <Box sx={{
+            position: 'absolute',
+            bottom: -8,
+            right: -8,
+            width: 32,
+            height: 32,
+            borderRadius: '10px',
+            bgcolor: '#A855F7',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(168, 85, 247, 0.4)',
+            border: '3px solid rgba(10, 10, 10, 1)',
+            zIndex: 1
+          }}>
+            <LockIcon sx={{ fontSize: 16 }} />
+          </Box>
+        </Box>
       </Box>
 
       <DialogTitle sx={{ textAlign: 'center', pt: 5, pb: 1 }}>
@@ -381,6 +401,65 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 }}
               />
             </Box>
+
+            <Box sx={{ width: '100%', position: 'relative', py: 1 }}>
+              <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
+              <Typography variant="caption" sx={{
+                position: 'relative',
+                bgcolor: 'rgb(24, 24, 24)',
+                px: 2,
+                mx: 'auto',
+                display: 'table',
+                color: 'text.secondary',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em'
+              }}>
+                Or
+              </Typography>
+            </Box>
+
+            <Button
+              fullWidth
+              variant="text"
+              size="small"
+              onClick={() => setMode("password")}
+              sx={{ color: 'text.secondary', '&:hover': { color: 'white' } }}
+            >
+              Use Master Password
+            </Button>
+          </Stack>
+        ) : mode === "passkey" ? (
+          <Stack spacing={3} sx={{ mt: 2, alignItems: 'center' }}>
+            <Box
+              onClick={handlePasskeyUnlock}
+              sx={{
+                width: 100,
+                height: 100,
+                borderRadius: '50%',
+                border: '2px dashed',
+                borderColor: passkeyLoading ? 'primary.main' : 'rgba(255, 255, 255, 0.2)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  borderColor: 'primary.main',
+                  bgcolor: alpha(muiTheme.palette.primary.main, 0.05),
+                  transform: 'scale(1.05)'
+                }
+              }}
+            >
+              {passkeyLoading ? (
+                <CircularProgress size={40} />
+              ) : (
+                <FingerprintIcon sx={{ fontSize: 48, color: "rgba(255, 255, 255, 0.4)" }} />
+              )}
+            </Box>
+
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              {passkeyLoading ? "CONFIRM ON DEVICE" : "TAP TO VERIFY"}
+            </Typography>
 
             <Box sx={{ width: '100%', position: 'relative', py: 1 }}>
               <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
@@ -520,22 +599,6 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       </DialogContent>
 
       <DialogActions sx={{ flexDirection: 'column', p: 4, pt: 0, gap: 2 }}>
-        {mode !== "password" && mode !== "initialize" && (
-          <Button
-            variant="text"
-            fullWidth
-            onClick={() => setMode("password")}
-            sx={{
-              borderRadius: '16px',
-              py: 1,
-              fontWeight: 700,
-              color: 'text.secondary'
-            }}
-          >
-            Use Master Password
-          </Button>
-        )}
-
         {!isFirstTime && (
           <Button
             variant="text"
@@ -553,7 +616,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           </Button>
         )}
 
-        {!isFirstTime && hasPin && mode !== "pin" && (
+        {!isFirstTime && hasPin && mode !== "pin" && mode !== "passkey" && (
           <Button
             variant="outlined"
             fullWidth
@@ -574,7 +637,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           </Button>
         )}
 
-        {!isFirstTime && hasPasskey && mode !== "passkey" && (
+        {!isFirstTime && hasPasskey && mode !== "passkey" && mode !== "pin" && (
           <Button
             variant="outlined"
             fullWidth
