@@ -453,6 +453,17 @@ export default function SudoModal({
                                 </Typography>
                             )}
                         </Box>
+                        {passkeyLoading && (
+                            <Button
+                                fullWidth
+                                variant="text"
+                                size="small"
+                                onClick={() => setMode("password")}
+                                sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                            >
+                                Use Master Password
+                            </Button>
+                        )}
                     </Stack>
                 ) : mode === "initialize" ? (
                     <Stack spacing={3} sx={{ mt: 2 }}>
@@ -757,12 +768,15 @@ export default function SudoModal({
                             </Box>
                         )}
 
-                        {hasPasskey && (
+                        {hasPasskey && mode !== "passkey" && (
                             <Button
                                 fullWidth
                                 variant="text"
                                 startIcon={<FingerprintIcon sx={{ fontSize: 18 }} />}
-                                onClick={() => setMode("passkey")}
+                                onClick={() => {
+                                    setMode("passkey");
+                                    handlePasskeyVerify();
+                                }}
                                 sx={{
                                     color: 'rgba(255, 255, 255, 0.6)',
                                     py: 1.5,
@@ -778,7 +792,7 @@ export default function SudoModal({
                             </Button>
                         )}
 
-                        {hasPin && (
+                        {hasPin && mode !== "pin" && (
                             <Button
                                 fullWidth
                                 variant="text"
@@ -789,6 +803,16 @@ export default function SudoModal({
                                 Use PIN
                             </Button>
                         )}
+
+                        <Button
+                            fullWidth
+                            variant="text"
+                            size="small"
+                            onClick={() => window.open("https://vault.kylrix.space/masterpass/reset", "_blank")}
+                            sx={{ color: 'error.main', '&:hover': { bgcolor: alpha('#ef4444', 0.1) }, mt: 2 }}
+                        >
+                            Reset Master Password
+                        </Button>
                     </Stack>
                 )}
             </DialogContent>
