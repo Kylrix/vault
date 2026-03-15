@@ -37,7 +37,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
         } catch (e: unknown) {
             if (e.code === 404) {
                 const username = user.prefs?.username || `user${user.$id.slice(0, 6)}`;
-                const profilePicId = user.prefs?.profilePicId || null;
+                const avatar = user.prefs?.profilePicId || user.avatar || null;
 
                 const baseData = {
                     username,
@@ -46,6 +46,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                     bio: user.prefs?.bio || '',
+                    avatar,
                     privacySettings: JSON.stringify({ public: true, searchable: true })
                 };
 
@@ -55,29 +56,17 @@ export async function ensureGlobalIdentity(user: any, force = false) {
                     `delete("user:${user.$id}")`
                 ];
 
-                // Order of preference for avatar field names in the ecosystem
-                const avatarFieldCandidates = ['profilePicId', 'avatarFileId', 'avatarUrl'];
-
-                for (const field of avatarFieldCandidates) {
-                    try {
-                        const payload = { ...baseData };
-                        if (profilePicId) payload[field] = profilePicId;
-
-                        profile = await appwriteDatabases.createDocument(
-                            CONNECT_DATABASE_ID,
-                            CONNECT_COLLECTION_ID_USERS,
-                            user.$id,
-                            payload,
-                            permissions
-                        );
-                        break;
-                    } catch (e: unknown) {
-                        const msg = (e.message || JSON.stringify(e)).toLowerCase();
-                        if (msg.includes('unknown attribute') || msg.includes('invalid document structure')) {
-                            continue;
-                        }
-                        throw e;
-                    }
+                try {
+                    profile = await appwriteDatabases.createDocument(
+                        CONNECT_DATABASE_ID,
+                        CONNECT_COLLECTION_ID_USERS,
+                        user.$id,
+                        baseData,
+                        permissions
+                    );
+                } catch (e: any) {
+                    console.error('[Identity] Global profile creation failed:', e);
+                    throw e;
                 }
             } else {
                 throw e;
@@ -131,8 +120,7 @@ export async function searchGlobalUsers(query: string, limit = 10) {
             id: doc.$id,
             title: doc.displayName || doc.username,
             subtitle: `@${doc.username}`,
-            avatar: null,
-            avatarFileId: doc.avatarFileId || doc.profilePicId,
+            avatar: doc.avatar,
             apps: doc.appsActive || []
         }));
     } catch (error: unknown) {
