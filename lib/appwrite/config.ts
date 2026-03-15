@@ -67,7 +67,8 @@ export const APPWRITE_CONFIG = {
         LOG_SECURITY_EVENT: '69a6c45a002085baa8dd',
         SYNC_SUBSCRIPTION_STATUS: '69a6c56d00203438232c',
         ACCOUNT_CLEANUP: '69a6c6fc001dc877979d',
-        CONNECT_CALL_CLEANUP: '69a6c841000b2c5aaae3'
+        CONNECT_CALL_CLEANUP: '69a6c841000b2c5aaae3',
+        DATA_PORTER: 'data-porter'
     },
     SYSTEM: {
         DOMAIN: 'kylrix.space',

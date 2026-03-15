@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Box, 
-  Typography, 
-  Button, 
-  Grid, 
-  Paper, 
-  Stack, 
-  alpha, 
+import {
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Paper,
+  Stack,
+  alpha,
   ToggleButton,
   ToggleButtonGroup,
   Alert,
@@ -18,6 +18,7 @@ import {
   ListItemText
 } from "@mui/material";
 import UploadIcon from "@mui/icons-material/Upload";
+import DownloadIcon from "@mui/icons-material/Download";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ShieldIcon from "@mui/icons-material/Shield";
 import InfoIcon from "@mui/icons-material/Info";
@@ -32,6 +33,8 @@ import { ImportPreviewModal } from "@/components/import/ImportPreviewModal";
 import { ImportItem } from "@/lib/import/deduplication";
 import { analyzeBitwardenExport } from "@/utils/import/bitwarden-mapper";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { porterExport, downloadExportAsFile } from "@/lib/data-porter";
+import toast from "react-hot-toast";
 
 export default function ImportPage() {
   const { user } = useAppwriteVault();
@@ -39,9 +42,25 @@ export default function ImportPage() {
   const [importType, setImportType] = useState<string>("bitwarden");
   const [file, setFile] = useState<File | null>(null);
   const [errorState, setErrorState] = useState<string | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
 
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewItems, setPreviewItems] = useState<ImportItem[]>([]);
+
+  const handleExport = async () => {
+    if (!user) return;
+    setIsExporting(true);
+    try {
+      const result = await porterExport(user.$id);
+      downloadExportAsFile(result.data);
+      toast.success(`Exported ${result.data.credentials.length} credentials, ${result.data.totpSecrets.length} TOTP secrets`);
+    } catch (err: unknown) {
+      console.error('Export failed:', err);
+      toast.error('Export failed: ' + ((err as Error).message || 'Unknown error'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFile(e.target.files?.[0] || null);
@@ -132,8 +151,8 @@ export default function ImportPage() {
   return (
     <Box sx={{ maxWidth: '1100px', mx: 'auto', p: { xs: 2, md: 4 } }}>
       <Box sx={{ mb: 5 }}>
-        <Typography variant="h4" sx={{ 
-          fontWeight: 900, 
+        <Typography variant="h4" sx={{
+          fontWeight: 900,
           fontFamily: 'var(--font-space-grotesk)',
           letterSpacing: '-0.03em',
           mb: 1
@@ -148,9 +167,9 @@ export default function ImportPage() {
       <Grid container spacing={4}>
         <Grid size={{ xs: 12, md: 7 }}>
           <Stack spacing={3}>
-            <Paper sx={{ 
-              p: 4, 
-              borderRadius: '28px', 
+            <Paper sx={{
+              p: 4,
+              borderRadius: '28px',
               bgcolor: 'rgba(10, 10, 10, 0.9)',
               backdropFilter: 'blur(25px) saturate(180%)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -165,7 +184,7 @@ export default function ImportPage() {
                     value={importType}
                     exclusive
                     onChange={(_, val) => val && setImportType(val)}
-                    sx={{ 
+                    sx={{
                       width: '100%',
                       display: 'grid',
                       gridTemplateColumns: '1fr 1fr',
@@ -185,15 +204,15 @@ export default function ImportPage() {
                     }}
                   >
                     <ToggleButton value="bitwarden">Bitwarden</ToggleButton>
-                    <ToggleButton value="kylrixvault">Kylrix Note</ToggleButton>
+                    <ToggleButton value="kylrixvault">Kylrix Vault</ToggleButton>
                     <ToggleButton value="zoho" disabled>Zoho Vault</ToggleButton>
                     <ToggleButton value="proton" disabled>Proton Pass</ToggleButton>
                   </ToggleButtonGroup>
                 </Box>
 
-                <Box sx={{ 
-                  p: 3, 
-                  borderRadius: '20px', 
+                <Box sx={{
+                  p: 3,
+                  borderRadius: '20px',
                   bgcolor: 'rgba(255, 255, 255, 0.03)',
                   border: '1px solid rgba(255, 255, 255, 0.05)'
                 }}>
@@ -216,9 +235,9 @@ export default function ImportPage() {
                   <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, mb: 2, display: 'block', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                     Select File
                   </Typography>
-                  <Box 
+                  <Box
                     component="label"
-                    sx={{ 
+                    sx={{
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
@@ -251,9 +270,9 @@ export default function ImportPage() {
                   variant="contained"
                   onClick={handleImportClick}
                   disabled={globalImporting || !isFileValid}
-                  sx={{ 
-                    borderRadius: '16px', 
-                    py: 2, 
+                  sx={{
+                    borderRadius: '16px',
+                    py: 2,
                     fontWeight: 800,
                     bgcolor: '#6366F1',
                     color: '#000',
@@ -273,9 +292,9 @@ export default function ImportPage() {
             </Paper>
 
             {!globalImporting && (
-              <Paper sx={{ 
-                p: 3, 
-                borderRadius: '24px', 
+              <Paper sx={{
+                p: 3,
+                borderRadius: '24px',
                 bgcolor: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)'
               }}>
@@ -299,12 +318,51 @@ export default function ImportPage() {
               </Paper>
             )}
           </Stack>
+
+          {/* Export Section */}
+          <Paper sx={{
+            p: 4,
+            borderRadius: '28px',
+            bgcolor: 'rgba(10, 10, 10, 0.9)',
+            backdropFilter: 'blur(25px) saturate(180%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backgroundImage: 'none'
+          }}>
+            <Stack spacing={3}>
+              <Box>
+                <Typography variant="h6" sx={{ fontWeight: 900, fontFamily: 'var(--font-space-grotesk)', mb: 1 }}>
+                  Export Vault
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
+                  Download all your vault data as a Kylrix Vault JSON file. This export can be re-imported into any Kylrix instance.
+                </Typography>
+              </Box>
+              <Button
+                fullWidth
+                variant="outlined"
+                onClick={handleExport}
+                disabled={isExporting || !user}
+                startIcon={<DownloadIcon />}
+                sx={{
+                  borderRadius: '16px',
+                  py: 2,
+                  fontWeight: 800,
+                  borderColor: 'rgba(255, 255, 255, 0.15)',
+                  color: '#fff',
+                  '&:hover': { borderColor: '#6366F1', bgcolor: 'rgba(99, 102, 241, 0.05)' },
+                  '&.Mui-disabled': { borderColor: 'rgba(255, 255, 255, 0.05)' }
+                }}
+              >
+                {isExporting ? 'Exporting...' : 'Export as Kylrix Vault JSON'}
+              </Button>
+            </Stack>
+          </Paper>
         </Grid>
 
         <Grid size={{ xs: 12, md: 5 }}>
-          <Paper sx={{ 
-            p: 4, 
-            borderRadius: '28px', 
+          <Paper sx={{
+            p: 4,
+            borderRadius: '28px',
             bgcolor: 'rgba(10, 10, 10, 0.9)',
             backdropFilter: 'blur(25px) saturate(180%)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -322,19 +380,19 @@ export default function ImportPage() {
               ].map((item, i) => (
                 <ListItem key={i} sx={{ px: 0, py: 2.5 }}>
                   <ListItemIcon sx={{ minWidth: 48 }}>
-                    <Box sx={{ 
-                      width: 36, 
-                      height: 36, 
-                      borderRadius: '10px', 
-                      bgcolor: 'rgba(99, 102, 241, 0.05)', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center' 
+                    <Box sx={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '10px',
+                      bgcolor: 'rgba(99, 102, 241, 0.05)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
                     }}>
                       <item.icon sx={{ fontSize: 18, color: "#6366F1" }} />
                     </Box>
                   </ListItemIcon>
-                  <ListItemText 
+                  <ListItemText
                     primary={<Typography variant="body2" sx={{ fontWeight: 800 }}>{item.title}</Typography>}
                     secondary={<Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>{item.desc}</Typography>}
                   />
