@@ -38,6 +38,9 @@ import { useNotifications } from "@/app/context/NotificationContext";
 import { useState, useEffect } from "react";
 import EcosystemPortal from "../common/EcosystemPortal";
 import { getEcosystemUrl } from "@/lib/constants/ecosystem";
+import Logo from "../common/Logo";
+import { getUserProfilePicId } from "@/lib/user-utils";
+import { fetchProfilePreview, getCachedProfilePreview } from "@/lib/profile-preview";
 
 // Pages that should use the simplified layout (no sidebar/header)
 const SIMPLIFIED_LAYOUT_PATHS = ["/"];
@@ -56,6 +59,32 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [anchorElAccount, setAnchorElAccount] = useState<null | HTMLElement>(null);
   const [anchorElNotifications, setAnchorElNotifications] = useState<null | HTMLElement>(null);
   const [isEcosystemPortalOpen, setIsEcosystemPortalOpen] = useState(false);
+  const [profileUrl, setProfileUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const profilePicId = getUserProfilePicId(user);
+    const cached = getCachedProfilePreview(profilePicId || undefined);
+    if (cached !== undefined && mounted) {
+      setTimeout(() => {
+        if (mounted) setProfileUrl(cached ?? null);
+      }, 0);
+    }
+
+    const fetchPreview = async () => {
+      try {
+        if (profilePicId) {
+          const url = await fetchProfilePreview(profilePicId, 64, 64);
+          if (mounted) setProfileUrl(url as unknown as string);
+        } else if (mounted) setProfileUrl(null);
+      } catch (_err: unknown) {
+        if (mounted) setProfileUrl(null);
+      }
+    };
+
+    fetchPreview();
+    return () => { mounted = false; };
+  }, [user]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -83,17 +112,17 @@ export function Header({ onMenuClick }: HeaderProps) {
       elevation={0}
       sx={{ 
         zIndex: 1201,
-        bgcolor: 'rgba(10, 10, 10, 0.95)',
+        bgcolor: 'rgba(5, 5, 5, 0.01)',
         backdropFilter: 'blur(25px) saturate(180%)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         backgroundImage: 'none'
       }}
     >
       <Toolbar sx={{ 
         gap: 2, 
         '@media (min-width: 900px)': { gap: 4 },
-        px: { xs: 2, md: 3 }, 
-        minHeight: '72px' 
+        px: { xs: 2, md: 4 }, 
+        minHeight: '88px' 
       }}>
         {/* Left: Logo */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
@@ -107,31 +136,13 @@ export function Header({ onMenuClick }: HeaderProps) {
           >
             <MenuIcon size={20} strokeWidth={1.5} />
           </IconButton>
-          <Box sx={{ 
-            width: 42, 
-            height: 42, 
-            bgcolor: 'rgba(255, 255, 255, 0.03)', 
-            border: '1px solid rgba(255, 255, 255, 0.1)', 
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden'
-          }}>
-            <Box sx={{ color: '#6366F1', fontWeight: 900, fontSize: '1.2rem' }}>K</Box>
-          </Box>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              display: { xs: 'none', sm: 'block' },
-              fontWeight: 900, 
-              letterSpacing: '-0.05em',
-              fontFamily: 'var(--font-space-grotesk)',
-              color: 'white'
-            }}
-          >
-            KYLRIX<Box component="span" sx={{ color: '#6366F1' }}>KEEP</Box>
-          </Typography>
+          <Logo 
+            app="vault" 
+            size={32} 
+            sx={{ cursor: 'pointer', '&:hover': { opacity: 0.8 } }}
+            component="a"
+            href="/"
+          />
         </Box>
 
         {/* Center: Search */}
@@ -275,6 +286,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               }}
             >
               <Avatar 
+                src={profileUrl || undefined}
                 sx={{ 
                   width: { xs: 32, sm: 38 }, 
                   height: { xs: 32, sm: 38 }, 

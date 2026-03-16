@@ -17,7 +17,10 @@ export const metadata: Metadata = {
   title: "Kylrix Vault - Premium Password Vault",
   description: "Secure, simple password management for individuals and teams. Your digital life, protected.",
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico' },
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+    ],
     apple: '/apple-touch-icon.png',
   },
   openGraph: {

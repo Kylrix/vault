@@ -30,6 +30,9 @@ import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import EcosystemPortal from "../common/EcosystemPortal";
 import Logo from "../common/Logo";
+import Avatar from "@mui/material/Avatar";
+import { getUserProfilePicId } from "@/lib/user-utils";
+import { fetchProfilePreview, getCachedProfilePreview } from "@/lib/profile-preview";
 
 const PasswordGenerator = dynamic(() => import("@/components/ui/PasswordGenerator"), { 
   loading: () => <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}><CircularProgress size={24} /></Box>,
@@ -41,7 +44,33 @@ export function Navbar() {
   const { openAIModal } = useAI();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isEcosystemPortalOpen, setIsEcosystemPortalOpen] = useState(false);
+  const [profileUrl, setProfileUrl] = useState<string | null>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    let mounted = true;
+    const profilePicId = getUserProfilePicId(user);
+    const cached = getCachedProfilePreview(profilePicId || undefined);
+    if (cached !== undefined && mounted) {
+      setTimeout(() => {
+        if (mounted) setProfileUrl(cached ?? null);
+      }, 0);
+    }
+
+    const fetchPreview = async () => {
+      try {
+        if (profilePicId) {
+          const url = await fetchProfilePreview(profilePicId, 64, 64);
+          if (mounted) setProfileUrl(url as unknown as string);
+        } else if (mounted) setProfileUrl(null);
+      } catch (_err: unknown) {
+        if (mounted) setProfileUrl(null);
+      }
+    };
+
+    fetchPreview();
+    return () => { mounted = false; };
+  }, [user]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -76,14 +105,14 @@ export function Navbar() {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'rgba(5, 5, 5, 0.03)',
+        bgcolor: 'rgba(5, 5, 5, 0.01)',
         backdropFilter: 'blur(25px) saturate(180%)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         boxShadow: 'none',
         backgroundImage: 'none'
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 88 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 88, px: { xs: 2, md: 4 } }}>
         <Logo 
           size={32} 
           app="vault" 
@@ -91,23 +120,32 @@ export function Navbar() {
           href="/" 
           sx={{ 
             color: 'inherit',
-            '&:hover': { opacity: 0.8 },
-            fontFamily: 'var(--font-clash)',
-            fontWeight: 900,
-            letterSpacing: '-0.04em'
+            '&:hover': { opacity: 0.8 }
           }} 
         />
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Tooltip title="Kylrix Portal (Ctrl+Space)">
             <IconButton
               onClick={() => setIsEcosystemPortalOpen(true)}
               sx={{ 
-                color: 'rgba(255, 255, 255, 0.6)', 
-                bgcolor: 'rgba(255, 255, 255, 0.03)',
+                color: '#6366F1', 
+                bgcolor: alpha('#6366F1', 0.05),
                 borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                '&:hover': { color: '#6366F1', bgcolor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(99, 102, 241, 0.2)' } 
+                border: '1px solid rgba(99, 102, 241, 0.1)',
+                width: 42,
+                height: 42,
+                animation: 'pulse-slow 4s infinite ease-in-out',
+                '@keyframes pulse-slow': {
+                  '0%': { boxShadow: '0 0 0 0 rgba(99, 102, 241, 0.2)' },
+                  '70%': { boxShadow: '0 0 0 10px rgba(99, 102, 241, 0)' },
+                  '100%': { boxShadow: '0 0 0 0 rgba(99, 102, 241, 0)' },
+                },
+                '&:hover': { 
+                  bgcolor: alpha('#6366F1', 0.1), 
+                  borderColor: '#6366F1',
+                  boxShadow: '0 0 15px rgba(99, 102, 241, 0.3)' 
+                }
               }}
             >
               <GripIcon sx={{ fontSize: 20 }} />
@@ -115,15 +153,17 @@ export function Navbar() {
           </Tooltip>
 
           {user && isCorePage && (
-            <Tooltip title="AI Assistant">
+            <Tooltip title="Cognitive Link (AI)">
               <IconButton
                 onClick={openAIModal}
                 sx={{ 
                   color: '#6366F1', 
-                  bgcolor: 'rgba(99, 102, 241, 0.05)',
+                  bgcolor: alpha('#6366F1', 0.03),
                   borderRadius: '12px',
                   border: '1px solid rgba(99, 102, 241, 0.1)',
-                  '&:hover': { bgcolor: alpha('#6366F1', 0.1), border: '1px solid rgba(99, 102, 241, 0.3)' } 
+                  width: 42,
+                  height: 42,
+                  '&:hover': { bgcolor: alpha('#6366F1', 0.08), boxShadow: '0 0 15px rgba(99, 102, 241, 0.2)' } 
                 }}
               >
                 <SparklesIcon sx={{ fontSize: 20 }} />
@@ -133,20 +173,24 @@ export function Navbar() {
 
           <DropdownMenu
             trigger={
-              <IconButton title="Password Generator" sx={{ 
-                color: 'rgba(255, 255, 255, 0.6)', 
-                bgcolor: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.2)' } 
-              }}>
-                <KeyIcon sx={{ fontSize: 20 }} />
-              </IconButton>
+              <Tooltip title="Password Generator">
+                <IconButton sx={{ 
+                  color: 'rgba(255, 255, 255, 0.4)', 
+                  bgcolor: 'rgba(255, 255, 255, 0.03)',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  width: 42,
+                  height: 42,
+                  '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.05)', borderColor: 'rgba(255, 255, 255, 0.2)' } 
+                }}>
+                  <KeyIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+              </Tooltip>
             }
             width="400px"
             align="right"
           >
-            <Box sx={{ p: 3, bgcolor: 'rgba(5, 5, 5, 0.03)', backdropFilter: 'blur(25px)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '24px' }}>
+            <Box sx={{ p: 3, bgcolor: 'rgba(10, 10, 10, 0.95)', backdropFilter: 'blur(25px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px' }}>
               <PasswordGenerator />
             </Box>
           </DropdownMenu>
@@ -154,48 +198,47 @@ export function Navbar() {
           {!user ? (
             <Button
               variant="contained"
-              size="large"
+              size="small"
               onClick={() => {
                 window.location.href = `https://accounts.kylrix.space/login?source=${encodeURIComponent(window.location.origin)}`;
               }}
               sx={{ 
-                background: 'linear-gradient(135deg, #6366F1 0%, #00D1DA 100%)',
+                bgcolor: '#6366F1',
                 color: '#000',
                 fontWeight: 800,
-                fontFamily: 'var(--font-satoshi)',
-                borderRadius: '14px',
-                textTransform: 'none',
-                px: 4,
-                py: 1,
-                boxShadow: '0 8px 20px rgba(99, 102, 241, 0.15)',
-                '&:hover': { background: 'linear-gradient(135deg, #00E5FF 0%, #00C1CA 100%)', transform: 'translateY(-1px)' }
+                borderRadius: '10px',
+                px: 3,
+                '&:hover': { bgcolor: alpha('#6366F1', 0.8) }
               }}
             >
               Connect
             </Button>
           ) : (
             <Box>
-              <Button
-                variant="text"
+              <IconButton 
                 onClick={handleOpenMenu}
-                startIcon={<UserIcon size={18} strokeWidth={1.5} />}
                 sx={{ 
-                  color: 'white',
-                  fontWeight: 700,
-                  fontFamily: 'var(--font-satoshi)',
-                  textTransform: 'none',
-                  px: 2.5,
-                  py: 1,
-                  borderRadius: '14px',
-                  bgcolor: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.15)' }
+                  p: 0.5,
+                  '&:hover': { transform: 'scale(1.05)' },
+                  transition: 'transform 0.2s'
                 }}
               >
-                <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'inline' }, fontWeight: 700 }}>
-                  {user.name || user.email}
-                </Typography>
-              </Button>
+                <Avatar 
+                  src={profileUrl || undefined}
+                  sx={{ 
+                    width: 38, 
+                    height: 38, 
+                    bgcolor: '#6366F1',
+                    fontSize: '0.75rem',
+                    fontWeight: 800,
+                    color: '#000',
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '10px'
+                  }}
+                >
+                  {user?.name ? user.name[0].toUpperCase() : 'U'}
+                </Avatar>
+              </IconButton>
               <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
