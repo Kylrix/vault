@@ -8,12 +8,8 @@ import {
   Typography, 
   alpha 
 } from '@mui/material';
-import { 
-  Lock as LockIcon,
-  LockOpen as UnlockIcon,
-  Shield as ShieldIcon
-} from '@mui/icons-material';
 
+import Logo from '@/components/common/Logo';
 import { ecosystemSecurity } from '@/lib/ecosystem/security';
 import { AppwriteService } from '@/lib/appwrite';
 import { useAppwriteVault } from '@/context/appwrite-context';
@@ -67,12 +63,11 @@ export const VaultStatus = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                         <Box sx={{ 
-                            p: 1, 
-                            borderRadius: '10px', 
-                            bgcolor: alpha('#F59E0B', 0.1),
-                            color: '#F59E0B'
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                         }}>
-                            <ShieldIcon sx={{ fontSize: 20 }} />
+                            <Logo app="vault" variant="icon" size={24} />
                         </Box>
                         <Typography sx={{ fontWeight: 800, fontSize: '0.875rem', color: 'white' }}>
                             {isInitialized === false ? 'Setup Vault' : (isLocked ? 'Vault Locked' : 'Vault Active')}

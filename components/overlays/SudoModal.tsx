@@ -22,6 +22,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ShieldIcon from "@mui/icons-material/Shield";
 import AppsIcon from "@mui/icons-material/Apps";
 import KeyRoundIcon from "@mui/icons-material/Key";
+import Logo from "../common/Logo";
 import { AppwriteService } from "@/lib/appwrite";
 import { ecosystemSecurity } from "@/lib/ecosystem/security";
 import { PasskeySetup } from "./passkeySetup";
@@ -381,17 +382,15 @@ export default function SudoModal({
                 </IconButton>
 
                 <Box sx={{ position: 'relative', mb: 3, display: 'inline-flex' }}>
-                    <Box 
-                        component="img" 
-                        src="/logo.jpg" 
-                        alt="App Logo" 
+                    <Logo 
+                        variant="icon" 
+                        size={64} 
+                        app="vault"
                         sx={{ 
-                            width: 64, 
-                            height: 64, 
                             borderRadius: '16px',
-                            objectFit: 'cover',
                             border: '2px solid rgba(255, 255, 255, 0.1)',
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)'
+                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                            bgcolor: '#0A0908'
                         }} 
                     />
                     <Box sx={{

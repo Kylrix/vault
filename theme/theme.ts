@@ -10,11 +10,11 @@ const getDesignTokens = (): ThemeOptions => ({
       contrastText: '#000000',
     },
     secondary: {
-      main: '#A855F7', // Royal Amethyst
+      main: '#10B981', // Atomic Emerald
     },
     background: {
-      default: '#000000', // The Void
-      paper: '#0A0A0A',   // The Surface
+      default: '#0A0908', // Deep Earth
+      paper: '#161412',   // Surface
     },
     text: {
       primary: '#F2F2F2',   // Titanium
@@ -86,7 +86,7 @@ const getDesignTokens = (): ThemeOptions => ({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#000000',
+          backgroundColor: '#0A0908',
           color: '#F2F2F2',
           scrollbarColor: '#222222 transparent',
           '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
@@ -150,7 +150,7 @@ const getDesignTokens = (): ThemeOptions => ({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: '#0A0A0A',
+          backgroundColor: '#161412',
           backgroundImage: 'none',
           border: '1px solid rgba(255, 255, 255, 0.1)',
         },
