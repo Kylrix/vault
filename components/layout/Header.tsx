@@ -355,13 +355,9 @@ export function Header({ onMenuClick }: HeaderProps) {
             <MenuItem 
               onClick={() => {
                 setAnchorElAccount(null);
-                if (pathname === "/settings") {
-                  const domain = process.env.NEXT_PUBLIC_DOMAIN || 'kylrix.space';
-                  const idSubdomain = process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN || 'accounts';
-                  window.location.href = `https://${idSubdomain}.${domain}/settings?source=${encodeURIComponent(window.location.origin)}&tab=profile`;
-                } else {
-                  router.push("/settings");
-                }
+                const domain = process.env.NEXT_PUBLIC_DOMAIN || 'kylrix.space';
+                const idSubdomain = process.env.NEXT_PUBLIC_AUTH_SUBDOMAIN || 'accounts';
+                window.location.href = `https://${idSubdomain}.${domain}/settings?source=${encodeURIComponent(window.location.origin)}&tab=profile`;
               }}
               sx={{ py: 1.5, px: 3, '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.05)' } }}
             >
