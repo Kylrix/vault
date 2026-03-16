@@ -112,8 +112,7 @@ export function Header({ onMenuClick }: HeaderProps) {
       elevation={0}
       sx={{ 
         zIndex: 1201,
-        bgcolor: 'rgba(5, 5, 5, 0.01)',
-        backdropFilter: 'blur(25px) saturate(180%)',
+        bgcolor: 'rgba(11, 9, 8, 0.95)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         backgroundImage: 'none'
       }}
@@ -329,8 +328,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             sx: {
               mt: 1.5,
               width: 280,
-              bgcolor: 'rgba(10, 10, 10, 0.95)',
-              backdropFilter: 'blur(25px) saturate(180%)',
+              bgcolor: 'rgba(11, 9, 8, 0.98)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '24px',
               backgroundImage: 'none',
@@ -390,8 +388,7 @@ export function Header({ onMenuClick }: HeaderProps) {
             sx: {
               mt: 1.5,
               width: 360,
-              bgcolor: 'rgba(10, 10, 10, 0.95)',
-              backdropFilter: 'blur(25px) saturate(180%)',
+              bgcolor: 'rgba(11, 9, 8, 0.98)',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '24px',
               backgroundImage: 'none',

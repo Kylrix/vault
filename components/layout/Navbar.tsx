@@ -105,8 +105,7 @@ export function Navbar() {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'rgba(5, 5, 5, 0.01)',
-        backdropFilter: 'blur(25px) saturate(180%)',
+        bgcolor: 'rgba(11, 9, 8, 0.95)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         boxShadow: 'none',
         backgroundImage: 'none'
@@ -190,7 +189,7 @@ export function Navbar() {
             width="400px"
             align="right"
           >
-            <Box sx={{ p: 3, bgcolor: 'rgba(10, 10, 10, 0.95)', backdropFilter: 'blur(25px)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px' }}>
+            <Box sx={{ p: 3, bgcolor: 'rgba(11, 9, 8, 0.98)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '24px' }}>
               <PasswordGenerator />
             </Box>
           </DropdownMenu>
@@ -247,8 +246,7 @@ export function Navbar() {
                   sx: {
                     mt: 2,
                     minWidth: 260,
-                    bgcolor: 'rgba(5, 5, 5, 0.05)',
-                    backdropFilter: 'blur(30px) saturate(180%)',
+                    bgcolor: 'rgba(11, 9, 8, 0.98)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     borderRadius: '24px',
                     boxShadow: '0 25px 50px rgba(0,0,0,0.7)',
