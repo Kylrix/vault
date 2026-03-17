@@ -158,8 +158,14 @@ export function Header({ onMenuClick }: HeaderProps) {
               py: 0.5,
               transition: 'all 0.2s ease',
               '&:hover': {
-                borderColor: 'rgba(255, 255, 255, 0.2)',
+                borderColor: alpha('#6366F1', 0.4),
                 bgcolor: 'rgba(255, 255, 255, 0.05)',
+                boxShadow: '0 0 15px rgba(99, 102, 241, 0.1)'
+              },
+              '&:focus-within': {
+                borderColor: '#6366F1',
+                bgcolor: 'rgba(255, 255, 255, 0.08)',
+                boxShadow: '0 0 20px rgba(99, 102, 241, 0.15)'
               }
             }}
           >
