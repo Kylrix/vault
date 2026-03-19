@@ -37,10 +37,10 @@ function normalizeEndpoint(ep?: string): string {
 // Client is initialized lazily or with a safe check
 const getAppwriteClient = () => {
   const client = new Client();
-  const endpoint = APPWRITE_CONFIG.ENDPOINT;
+  const endpoint = 'https://api.kylrix.space/v1';
   const project = APPWRITE_CONFIG.PROJECT_ID;
 
-  if (endpoint) client.setEndpoint(endpoint);
+  client.setEndpoint(endpoint);
   if (project) client.setProject(project);
 
   return client;
