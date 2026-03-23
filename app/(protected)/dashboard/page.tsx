@@ -37,7 +37,8 @@ import {
   Menu,
   MenuItem,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  alpha
 } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";

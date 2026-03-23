@@ -45,6 +45,10 @@ interface MasterPassModalProps {
   onClose: () => void;
 }
 
+const VAULT_PRIMARY = "#10B981"; // Emerald
+const BG_COLOR = "#0A0908";
+const SURFACE_COLOR = "#161412";
+
 export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const muiTheme = useTheme();
   const [masterPassword, setMasterPassword] = useState("");
@@ -303,24 +307,15 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       PaperProps={{
         sx: {
           borderRadius: '32px',
-          bgcolor: '#161412',
+          bgcolor: BG_COLOR,
+          backdropFilter: 'blur(32px) saturate(200%)',
           border: '1px solid rgba(255, 255, 255, 0.05)',
           backgroundImage: 'none',
-          boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
+          boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8)',
           width: '100%',
           maxWidth: '400px',
           overflow: 'hidden',
           position: 'relative',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '1px',
-            background: 'rgba(255, 255, 255, 0.03)',
-            borderRadius: '32px',
-          },
         }
       }}
     >
@@ -358,13 +353,13 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 width: 28,
                 height: 28,
                 borderRadius: '8px',
-                bgcolor: '#6366F1',
-                color: 'white',
+                bgcolor: VAULT_PRIMARY,
+                color: '#000',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 12px rgba(99, 102, 241, 0.4)',
-                border: '3px solid #161412',
+                boxShadow: `0 4px 12px ${alpha(VAULT_PRIMARY, 0.4)}`,
+                border: `3px solid ${BG_COLOR}`,
                 zIndex: 1
               }}>
                 <LockIcon sx={{ fontSize: 14 }} />
@@ -389,7 +384,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
       <DialogContent sx={{ pb: 4 }}>
         {isFirstTime === null || (loading && !masterPassword && mode !== "pin") ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress sx={{ color: '#A855F7' }} />
+            <CircularProgress sx={{ color: VAULT_PRIMARY }} />
           </Box>
         ) : mode === "pin" ? (
           <Stack spacing={3} sx={{ mt: 2 }}>
@@ -412,10 +407,10 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '14px',
-                    bgcolor: 'rgba(255, 255, 255, 0.03)',
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                    '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                    bgcolor: SURFACE_COLOR,
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                    '&.Mui-focused fieldset': { borderColor: VAULT_PRIMARY },
                   },
                   '& .MuiInputBase-input': { color: 'white' }
                 }}
@@ -427,7 +422,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               variant="text"
               size="small"
               onClick={() => setMode("password")}
-              sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600, '&:hover': { color: 'white', bgcolor: 'transparent' } }}
+              sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700, '&:hover': { color: 'white', bgcolor: 'transparent' } }}
             >
               Use Master Password
             </Button>
@@ -472,8 +467,8 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 )}
                 <defs>
                   <linearGradient id="racingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#6366F1" />
-                    <stop offset="100%" stopColor="#4F46E5" />
+                    <stop offset="0%" stopColor={VAULT_PRIMARY} />
+                    <stop offset="100%" stopColor={alpha(VAULT_PRIMARY, 0.6)} />
                   </linearGradient>
                 </defs>
               </svg>
@@ -484,11 +479,11 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 justifyContent: 'center',
                 animation: passkeyLoading ? 'pulse-hex 2s infinite ease-in-out' : 'none'
               }}>
-                <FingerprintIcon sx={{ fontSize: 32, color: passkeyLoading ? '#6366F1' : 'rgba(255, 255, 255, 0.4)' }} />
+                <FingerprintIcon sx={{ fontSize: 32, color: passkeyLoading ? VAULT_PRIMARY : 'rgba(255, 255, 255, 0.4)' }} />
               </Box>
             </Box>
 
-            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
               {passkeyLoading ? "CONFIRM ON DEVICE" : "TAP TO VERIFY"}
             </Typography>
 
@@ -523,18 +518,20 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                     </Box>
                   ),
                   endAdornment: (
+                    <InputAdornment position="end">
                     <IconButton onClick={() => setShowPassword(!showPassword)} edge="end" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
                       {showPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                     </IconButton>
+                    </InputAdornment>
                   ),
                 }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '14px',
-                    bgcolor: 'rgba(255, 255, 255, 0.03)',
-                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                    '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                    bgcolor: SURFACE_COLOR,
+                    '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
+                    '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                    '&.Mui-focused fieldset': { borderColor: VAULT_PRIMARY },
                   },
                   '& .MuiInputBase-input': { color: 'white' }
                 }}
@@ -560,18 +557,20 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                   required
                   InputProps={{
                     endAdornment: (
+                      <InputAdornment position="end">
                       <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
                         {showConfirmPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                       </IconButton>
+                      </InputAdornment>
                     )
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: '14px',
-                      bgcolor: 'rgba(255, 255, 255, 0.03)',
-                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                      '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                      '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                      bgcolor: SURFACE_COLOR,
+                      '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
+                      '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                      '&.Mui-focused fieldset': { borderColor: VAULT_PRIMARY },
                     },
                     '& .MuiInputBase-input': { color: 'white' }
                   }}
@@ -593,12 +592,12 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               <Box sx={{
                 p: 2,
                 borderRadius: '16px',
-                bgcolor: alpha('#3b82f6', 0.05),
-                border: `1px solid ${alpha('#3b82f6', 0.2)}`,
+                bgcolor: alpha(VAULT_PRIMARY, 0.05),
+                border: `1px solid ${alpha(VAULT_PRIMARY, 0.15)}`,
                 display: 'flex',
                 gap: 1.5
               }}>
-                <ShieldIcon sx={{ fontSize: 20, color: '#3b82f6', flexShrink: 0 }} />
+                <ShieldIcon sx={{ fontSize: 20, color: VAULT_PRIMARY, flexShrink: 0 }} />
                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 500 }}>
                   <strong>Important:</strong> Your master password encrypts all your data locally. We cannot recover it if you forget it.
                 </Typography>
@@ -613,16 +612,21 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               sx={{
                 py: 2,
                 borderRadius: '16px',
-                background: '#6366F1',
+                bgcolor: VAULT_PRIMARY,
                 color: '#000',
-                fontWeight: 800,
-                fontFamily: 'var(--font-clash)',
+                fontWeight: 900,
+                fontFamily: 'var(--font-space-grotesk)',
                 textTransform: 'none',
-                boxShadow: '0 1px 0 rgba(0, 0, 0, 0.4)',
+                boxShadow: `0 8px 25px ${alpha(VAULT_PRIMARY, 0.3)}`,
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  background: alpha('#6366F1', 0.8),
-                  transform: 'translateY(-1px)',
-                  boxShadow: '0 10px 25px rgba(99, 102, 241, 0.2), 0 1px 0 rgba(0, 0, 0, 0.4)'
+                  bgcolor: alpha(VAULT_PRIMARY, 0.9),
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 12px 30px ${alpha(VAULT_PRIMARY, 0.4)}`
+                },
+                '&:disabled': {
+                  bgcolor: 'rgba(255,255,255,0.05)',
+                  color: 'rgba(255,255,255,0.2)'
                 }
               }}
             >
@@ -645,7 +649,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                   border: '1px solid rgba(255, 255, 255, 0.05)',
                   textTransform: 'none',
                   fontFamily: 'var(--font-satoshi)',
-                  fontWeight: 600,
+                  fontWeight: 700,
                   '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.15)' },
                   mt: 1
                 }}
@@ -666,7 +670,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                   borderRadius: '12px',
                   textTransform: 'none',
                   fontFamily: 'var(--font-satoshi)',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.03)' },
                   mt: 0.5
                 }}
@@ -682,12 +686,12 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 size="small"
                 onClick={() => router.push("/masterpass/reset")}
                 sx={{
-                  color: 'error.main',
+                  color: '#ef4444',
                   fontSize: '0.75rem',
                   mt: 1,
                   '&:hover': { bgcolor: alpha('#ef4444', 0.1) },
                   textTransform: 'none',
-                  fontWeight: 600
+                  fontWeight: 700
                 }}
               >
                 Reset Master Password
@@ -703,7 +707,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
           size="small"
           onClick={handleLogout}
           startIcon={<LogoutIcon sx={{ fontSize: 14 }} />}
-          sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 600, '&:hover': { color: 'white' } }}
+          sx={{ color: 'rgba(255, 255, 255, 0.4)', fontWeight: 700, '&:hover': { color: 'white', bgcolor: 'transparent' } }}
         >
           Logout from Account
         </Button>

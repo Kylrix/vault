@@ -21,12 +21,18 @@ import {
   InputAdornment, 
   Box, 
   Typography, 
-  Grid
+  Grid,
+  alpha
 } from "@mui/material";
 import { createCredential, updateCredential } from "@/lib/appwrite";
 import type { Credentials } from "@/types/appwrite";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { generateRandomPassword } from "@/utils/password";
+
+const VAULT_PRIMARY = "#10B981"; // Emerald
+const ECOSYSTEM_PRIMARY = "#6366F1"; // Indigo
+const SURFACE_COLOR = "#161412";
+const BG_COLOR = "#0A0908";
 
 export default function CredentialDialog({
   open,
@@ -187,33 +193,39 @@ export default function CredentialDialog({
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: '28px',
-          bgcolor: 'rgba(10, 10, 10, 0.8)',
-          backdropFilter: 'blur(25px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '24px',
+          bgcolor: BG_COLOR,
+          backdropFilter: 'blur(32px) saturate(200%)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
           backgroundImage: 'none',
-          boxShadow: '0 24px 48px rgba(0, 0, 0, 0.5)'
+          boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8)',
+          overflow: 'hidden'
         }
       }}
     >
       <form onSubmit={handleSubmit}>
         <DialogTitle sx={{ 
-          p: 3, 
-          pb: 1, 
+          p: 4, 
+          pb: 2, 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between',
           fontFamily: 'var(--font-space-grotesk)',
           fontWeight: 900,
-          fontSize: '1.5rem'
+          fontSize: '1.4rem',
+          color: 'white',
+          letterSpacing: '-0.02em'
         }}>
-          {initial ? "Edit Credential" : "Add Credential"}
-          <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{ width: 12, height: 12, borderRadius: '3px', bgcolor: VAULT_PRIMARY, boxShadow: `0 0 15px ${VAULT_PRIMARY}` }} />
+            {initial ? "Edit Credential" : "New Credential"}
+          </Box>
+          <IconButton onClick={onClose} size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white', bgcolor: 'rgba(255,255,255,0.05)' } }}>
             <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
         </DialogTitle>
 
-        <DialogContent sx={{ p: 3, pt: 1 }}>
+        <DialogContent sx={{ p: 4, pt: 0 }}>
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12 }}>
               <TextField
@@ -226,8 +238,18 @@ export default function CredentialDialog({
                 variant="filled"
                 InputProps={{
                   disableUnderline: true,
-                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                  sx: { 
+                    borderRadius: '12px', 
+                    bgcolor: SURFACE_COLOR,
+                    border: '1px solid rgba(255,255,255,0.03)',
+                    transition: 'all 0.2s ease',
+                    '&.Mui-focused': {
+                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                      bgcolor: 'rgba(255,255,255,0.01)'
+                    }
+                  }
                 }}
+                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
               />
             </Grid>
 
@@ -244,21 +266,29 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <PersonIcon sx={{ fontSize: 18 }} />
+                      <PersonIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                  sx: { 
+                    borderRadius: '12px', 
+                    bgcolor: SURFACE_COLOR,
+                    border: '1px solid rgba(255,255,255,0.03)',
+                    '&.Mui-focused': {
+                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                    }
+                  }
                 }}
+                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
               />
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              <Box sx={{ display: 'flex', gap: 1.5 }}>
                 <TextField
                   fullWidth
                   label="Password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter or generate password"
+                  placeholder="Password"
                   value={form.password}
                   onChange={(e) => setForm({ ...form, password: e.target.value })}
                   required
@@ -267,31 +297,41 @@ export default function CredentialDialog({
                     disableUnderline: true,
                     startAdornment: (
                       <InputAdornment position="start">
-                        <LockIcon sx={{ fontSize: 18 }} />
+                        <LockIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} size="small">
+                        <IconButton onClick={() => setShowPassword(!showPassword)} size="small" sx={{ color: 'rgba(255,255,255,0.2)' }}>
                           {showPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
                         </IconButton>
                       </InputAdornment>
                     ),
-                    sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                    sx: { 
+                      borderRadius: '12px', 
+                      bgcolor: SURFACE_COLOR,
+                      border: '1px solid rgba(255,255,255,0.03)',
+                      '&.Mui-focused': {
+                        border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                      }
+                    }
                   }}
+                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
                 />
                 <IconButton 
                   onClick={handleGeneratePassword}
                   sx={{ 
-                    bgcolor: 'rgba(0, 240, 255, 0.1)', 
-                    color: 'primary.main',
+                    bgcolor: alpha(VAULT_PRIMARY, 0.1), 
+                    color: VAULT_PRIMARY,
                     borderRadius: '12px',
                     width: 56,
                     height: 56,
-                    '&:hover': { bgcolor: 'rgba(0, 240, 255, 0.2)' }
+                    border: `1px solid ${alpha(VAULT_PRIMARY, 0.2)}`,
+                    '&:hover': { bgcolor: alpha(VAULT_PRIMARY, 0.2) },
+                    transition: 'all 0.2s ease'
                   }}
                 >
-                  <AutorenewIcon sx={{ fontSize: 20 }} />
+                  <AutorenewIcon sx={{ fontSize: 22 }} />
                 </IconButton>
               </Box>
             </Grid>
@@ -309,11 +349,19 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LanguageIcon sx={{ fontSize: 18 }} />
+                      <LanguageIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                  sx: { 
+                    borderRadius: '12px', 
+                    bgcolor: SURFACE_COLOR,
+                    border: '1px solid rgba(255,255,255,0.03)',
+                    '&.Mui-focused': {
+                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                    }
+                  }
                 }}
+                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
               />
             </Grid>
 
@@ -321,7 +369,7 @@ export default function CredentialDialog({
               <TextField
                 fullWidth
                 label="Tags"
-                placeholder="Comma separated: work, email, important"
+                placeholder="work, email, private"
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
                 variant="filled"
@@ -329,11 +377,19 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <LocalOfferIcon sx={{ fontSize: 18 }} />
+                      <LocalOfferIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                  sx: { 
+                    borderRadius: '12px', 
+                    bgcolor: SURFACE_COLOR,
+                    border: '1px solid rgba(255,255,255,0.03)',
+                    '&.Mui-focused': {
+                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                    }
+                  }
                 }}
+                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
               />
             </Grid>
 
@@ -343,7 +399,7 @@ export default function CredentialDialog({
                 label="Notes"
                 multiline
                 rows={3}
-                placeholder="Additional notes"
+                placeholder="Secure notes..."
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 variant="filled"
@@ -351,39 +407,52 @@ export default function CredentialDialog({
                   disableUnderline: true,
                   startAdornment: (
                     <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1.5 }}>
-                      <DescriptionIcon sx={{ fontSize: 18 }} />
+                      <DescriptionIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
                     </InputAdornment>
                   ),
-                  sx: { borderRadius: '12px', bgcolor: 'rgba(255, 255, 255, 0.03)' }
+                  sx: { 
+                    borderRadius: '12px', 
+                    bgcolor: SURFACE_COLOR,
+                    border: '1px solid rgba(255,255,255,0.03)',
+                    '&.Mui-focused': {
+                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                    }
+                  }
                 }}
+                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
               />
             </Grid>
 
             {/* Custom Fields */}
             <Grid size={{ xs: 12 }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-space-grotesk)', textTransform: 'uppercase', letterSpacing: '0.05em', fontSize: '0.75rem' }}>
                   Custom Fields
                 </Typography>
                 <Button
                   size="small"
                   startIcon={<AddIcon sx={{ fontSize: 16 }} />}
                   onClick={addCustomField}
-                  sx={{ borderRadius: '8px' }}
+                  sx={{ 
+                    borderRadius: '8px', 
+                    color: VAULT_PRIMARY,
+                    fontWeight: 700,
+                    '&:hover': { bgcolor: alpha(VAULT_PRIMARY, 0.05) }
+                  }}
                 >
                   Add Field
                 </Button>
               </Box>
               
               {customFields.map((field) => (
-                <Box key={field.id} sx={{ display: 'flex', gap: 1, mb: 1 }}>
+                <Box key={field.id} sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
                   <TextField
                     size="small"
                     placeholder="Label"
                     value={field.label}
                     onChange={(e) => updateCustomField(field.id, "label", e.target.value)}
                     variant="filled"
-                    InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+                    InputProps={{ disableUnderline: true, sx: { borderRadius: '10px', bgcolor: SURFACE_COLOR, border: '1px solid rgba(255,255,255,0.03)' } }}
                   />
                   <TextField
                     size="small"
@@ -391,9 +460,9 @@ export default function CredentialDialog({
                     value={field.value}
                     onChange={(e) => updateCustomField(field.id, "value", e.target.value)}
                     variant="filled"
-                    InputProps={{ disableUnderline: true, sx: { borderRadius: '8px', bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+                    InputProps={{ disableUnderline: true, sx: { borderRadius: '10px', bgcolor: SURFACE_COLOR, border: '1px solid rgba(255,255,255,0.03)' } }}
                   />
-                  <IconButton onClick={() => removeCustomField(field.id)} size="small" color="error">
+                  <IconButton onClick={() => removeCustomField(field.id)} size="small" sx={{ color: 'rgba(239, 68, 68, 0.4)', '&:hover': { color: '#ef4444', bgcolor: alpha('#ef4444', 0.1) } }}>
                     <CloseIcon sx={{ fontSize: 18 }} />
                   </IconButton>
                 </Box>
@@ -402,18 +471,24 @@ export default function CredentialDialog({
           </Grid>
 
           {error && (
-            <Typography color="error" variant="caption" sx={{ mt: 2, display: 'block' }}>
+            <Typography color="error" variant="caption" sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1, bgcolor: alpha('#ef4444', 0.05), p: 1.5, borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
               {error}
             </Typography>
           )}
         </DialogContent>
 
-        <DialogActions sx={{ p: 3, pt: 1, gap: 1.5 }}>
+        <DialogActions sx={{ p: 4, pt: 1, gap: 2 }}>
           <Button 
             onClick={onClose} 
             fullWidth 
-            variant="outlined"
-            sx={{ borderRadius: '12px', py: 1.2, fontWeight: 700 }}
+            variant="text"
+            sx={{ 
+              borderRadius: '14px', 
+              py: 1.5, 
+              fontWeight: 700, 
+              color: 'rgba(255,255,255,0.4)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.05)', color: 'white' }
+            }}
           >
             Cancel
           </Button>
@@ -424,13 +499,26 @@ export default function CredentialDialog({
             disabled={loading}
             startIcon={!loading && <SaveIcon sx={{ fontSize: 18 }} />}
             sx={{ 
-              borderRadius: '12px', 
-              py: 1.2, 
-              fontWeight: 700,
-              boxShadow: '0 8px 20px rgba(0, 240, 255, 0.2)'
+              borderRadius: '14px', 
+              py: 1.5, 
+              fontWeight: 900,
+              bgcolor: VAULT_PRIMARY,
+              color: '#000',
+              fontFamily: 'var(--font-space-grotesk)',
+              boxShadow: `0 8px 25px ${alpha(VAULT_PRIMARY, 0.3)}`,
+              '&:hover': { 
+                bgcolor: '#0fa976',
+                boxShadow: `0 12px 30px ${alpha(VAULT_PRIMARY, 0.4)}`,
+                transform: 'translateY(-2px)'
+              },
+              '&:disabled': {
+                bgcolor: 'rgba(255,255,255,0.05)',
+                color: 'rgba(255,255,255,0.2)'
+              },
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
           >
-            {loading ? "Saving..." : initial ? "Update" : "Add"}
+            {loading ? "Saving..." : initial ? "Update" : "Add Credential"}
           </Button>
         </DialogActions>
       </form>

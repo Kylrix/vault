@@ -40,6 +40,10 @@ interface SudoModalProps {
     intent?: "unlock" | "initialize" | "reset";
 }
 
+const VAULT_PRIMARY = "#10B981"; // Emerald
+const BG_COLOR = "#0A0908";
+const SURFACE_COLOR = "#161412";
+
 export default function SudoModal({
     isOpen,
     onSuccess,
@@ -347,11 +351,11 @@ export default function SudoModal({
             PaperProps={{
                 sx: {
                     borderRadius: '32px',
-                    bgcolor: 'rgba(5, 5, 5, 0.03)',
-                    backdropFilter: 'blur(25px) saturate(180%)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    bgcolor: BG_COLOR,
+                    backdropFilter: 'blur(32px) saturate(200%)',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
                     backgroundImage: 'none',
-                    boxShadow: '0 25px 50px rgba(0, 0, 0, 0.6)',
+                    boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8)',
                     overflow: 'hidden'
                 }
             }}
@@ -388,9 +392,9 @@ export default function SudoModal({
                         app="vault"
                         sx={{ 
                             borderRadius: '16px',
-                            border: '2px solid rgba(255, 255, 255, 0.1)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-                            bgcolor: '#0A0908'
+                            bgcolor: BG_COLOR
                         }} 
                     />
                     <Box sx={{
@@ -400,13 +404,13 @@ export default function SudoModal({
                         width: 32,
                         height: 32,
                         borderRadius: '10px',
-                        bgcolor: '#A855F7',
-                        color: 'white',
+                        bgcolor: VAULT_PRIMARY,
+                        color: '#000',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: '0 4px 12px rgba(168, 85, 247, 0.4)',
-                        border: '3px solid rgba(5, 5, 5, 1)',
+                        boxShadow: `0 4px 12px ${alpha(VAULT_PRIMARY, 0.4)}`,
+                        border: `3px solid ${BG_COLOR}`,
                         zIndex: 1
                     }}>
                         <ShieldIcon sx={{ fontSize: 16 }} />
@@ -420,7 +424,7 @@ export default function SudoModal({
                 }}>
                     {user?.name || "User"}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', mt: 1, fontFamily: 'var(--font-satoshi)' }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.4)', mt: 1, fontFamily: 'var(--font-satoshi)', fontWeight: 600 }}>
                     Security verification required
                 </Typography>
             </DialogTitle>
@@ -434,10 +438,10 @@ export default function SudoModal({
                             bgcolor: alpha('#ef4444', 0.1),
                             border: '1px solid rgba(239, 68, 68, 0.2)',
                         }}>
-                            <Typography variant="body2" sx={{ color: '#ef4444', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="body2" sx={{ color: '#ef4444', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <ShieldIcon sx={{ fontSize: 16 }} /> RESET CONFIRMATION
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5, display: 'block' }}>
+                            <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5, display: 'block', fontWeight: 600 }}>
                                 {confirmPhase === 0 
                                     ? "Resetting your master password will permanently wipe all your encrypted data (Tier 2)." 
                                     : confirmPhase === 1 
@@ -456,7 +460,7 @@ export default function SudoModal({
                                 borderRadius: '14px',
                                 bgcolor: '#ef4444',
                                 color: '#fff',
-                                fontWeight: 700,
+                                fontWeight: 800,
                                 '&:hover': { bgcolor: alpha('#ef4444', 0.8) }
                             }}
                         >
@@ -471,16 +475,16 @@ export default function SudoModal({
                             variant="text" 
                             size="small" 
                             onClick={onCancel} 
-                            sx={{ color: 'rgba(255, 255, 255, 0.5)' }}
+                            sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700 }}
                         >
                             Wait, cancel this
                         </Button>
                     </Stack>
                 ) : isDetecting || passkeyLoading ? (
                     <Stack spacing={3} sx={{ mt: 4, mb: 2, alignItems: 'center' }}>
-                        <CircularProgress size={48} sx={{ color: '#A855F7' }} />
+                        <CircularProgress size={48} sx={{ color: VAULT_PRIMARY }} />
                         <Box sx={{ textAlign: 'center' }}>
-                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 600, letterSpacing: '0.1em' }}>
+                            <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 800, letterSpacing: '0.1em' }}>
                                 {passkeyLoading ? "AUTHENTICATING..." : "PREPARING SECURITY CHECK..."}
                             </Typography>
                         </Box>
@@ -490,7 +494,7 @@ export default function SudoModal({
                                 variant="text"
                                 size="small"
                                 onClick={() => setMode("password")}
-                                sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                                sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700, '&:hover': { color: 'white' } }}
                             >
                                 Use Master Password
                             </Button>
@@ -521,10 +525,10 @@ export default function SudoModal({
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
                                                 borderRadius: '14px',
-                                                bgcolor: 'rgba(255, 255, 255, 0.03)',
-                                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                                '&.Mui-focused fieldset': { borderColor: '#A855F7' },
+                                                bgcolor: SURFACE_COLOR,
+                                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
+                                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                                                '&.Mui-focused fieldset': { borderColor: VAULT_PRIMARY },
                                             },
                                             '& .MuiInputBase-input': { color: 'white' }
                                         }}
@@ -537,24 +541,25 @@ export default function SudoModal({
                                     variant="contained"
                                     disabled={loading || !password || password.length < 8}
                                     sx={{
-                                        py: 1.8,
+                                        py: 2,
                                         borderRadius: '16px',
-                                        background: 'linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)',
-                                        color: '#FFFFFF',
-                                        fontWeight: 800,
-                                        fontFamily: 'var(--font-satoshi)',
+                                        bgcolor: VAULT_PRIMARY,
+                                        color: '#000',
+                                        fontWeight: 900,
+                                        fontFamily: 'var(--font-space-grotesk)',
                                         textTransform: 'none',
+                                        boxShadow: `0 8px 25px ${alpha(VAULT_PRIMARY, 0.3)}`,
                                         '&:hover': {
-                                            background: 'linear-gradient(135deg, #9333EA 0%, #6B21A8 100%)',
+                                            bgcolor: alpha(VAULT_PRIMARY, 0.9),
                                             transform: 'translateY(-1px)',
-                                            boxShadow: '0 8px 25px rgba(168, 85, 247, 0.25)'
+                                            boxShadow: `0 12px 30px ${alpha(VAULT_PRIMARY, 0.4)}`
                                         }
                                     }}
                                 >
                                     {loading ? <CircularProgress size={24} color="inherit" /> : "Initialize Ecosystem Vault"}
                                 </Button>
                                 
-                                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', textAlign: 'center', mt: 1 }}>
+                                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', textAlign: 'center', mt: 1, fontWeight: 500 }}>
                                     Your MasterPass is the key to all your secure data. <br/> It cannot be recovered if lost.
                                 </Typography>
                             </Stack>
@@ -588,10 +593,10 @@ export default function SudoModal({
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: '14px',
-                                        bgcolor: 'rgba(255, 255, 255, 0.03)',
-                                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                        '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                        '&.Mui-focused fieldset': { borderColor: '#A855F7' },
+                                        bgcolor: SURFACE_COLOR,
+                                        '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
+                                        '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                                        '&.Mui-focused fieldset': { borderColor: VAULT_PRIMARY },
                                     },
                                     '& .MuiInputBase-input': { color: 'white' }
                                 }}
@@ -602,13 +607,14 @@ export default function SudoModal({
                             <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
                             <Typography variant="caption" sx={{
                                 position: 'relative',
-                                bgcolor: 'rgba(10, 10, 10, 1)',
+                                bgcolor: BG_COLOR,
                                 px: 2,
                                 mx: 'auto',
                                 display: 'table',
                                 color: 'rgba(255, 255, 255, 0.3)',
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.1em'
+                                letterSpacing: '0.1em',
+                                fontWeight: 800
                             }}>
                                 Or
                             </Typography>
@@ -619,7 +625,7 @@ export default function SudoModal({
                             variant="text"
                             size="small"
                             onClick={() => setMode("password")}
-                            sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                            sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700, '&:hover': { color: 'white' } }}
                         >
                             Use Master Password
                         </Button>
@@ -664,8 +670,8 @@ export default function SudoModal({
                                 )}
                                 <defs>
                                     <linearGradient id="racingGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stopColor="#A855F7" />
-                                        <stop offset="100%" stopColor="#7E22CE" />
+                                        <stop offset="0%" stopColor={VAULT_PRIMARY} />
+                                        <stop offset="100%" stopColor={alpha(VAULT_PRIMARY, 0.6)} />
                                     </linearGradient>
                                 </defs>
                             </svg>
@@ -676,11 +682,11 @@ export default function SudoModal({
                                 justifyContent: 'center',
                                 animation: passkeyLoading ? 'pulse-hex 2s infinite ease-in-out' : 'none'
                             }}>
-                                <FingerprintIcon sx={{ fontSize: 32, color: passkeyLoading ? '#A855F7' : 'rgba(255, 255, 255, 0.4)' }} />
+                                <FingerprintIcon sx={{ fontSize: 32, color: passkeyLoading ? VAULT_PRIMARY : 'rgba(255, 255, 255, 0.4)' }} />
                             </Box>
                         </Box>
 
-                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                        <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.3)', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                             {passkeyLoading ? "CONFIRM ON DEVICE" : "TAP TO VERIFY"}
                         </Typography>
 
@@ -688,13 +694,14 @@ export default function SudoModal({
                             <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.1)' }} />
                             <Typography variant="caption" sx={{
                                 position: 'relative',
-                                bgcolor: 'rgba(5, 5, 5, 1)',
+                                bgcolor: BG_COLOR,
                                 px: 2,
                                 mx: 'auto',
                                 display: 'table',
                                 color: 'rgba(255, 255, 255, 0.3)',
                                 textTransform: 'uppercase',
-                                letterSpacing: '0.1em'
+                                letterSpacing: '0.1em',
+                                fontWeight: 800
                             }}>
                                 Or
                             </Typography>
@@ -705,7 +712,7 @@ export default function SudoModal({
                             variant="text"
                             size="small"
                             onClick={() => setMode("password")}
-                            sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                            sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700, '&:hover': { color: 'white' } }}
                         >
                             Use Master Password
                         </Button>
@@ -735,10 +742,10 @@ export default function SudoModal({
                                         sx={{
                                             '& .MuiOutlinedInput-root': {
                                                 borderRadius: '14px',
-                                                bgcolor: 'rgba(255, 255, 255, 0.03)',
-                                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                                                '&.Mui-focused fieldset': { borderColor: '#A855F7' },
+                                                bgcolor: SURFACE_COLOR,
+                                                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.05)' },
+                                                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                                                '&.Mui-focused fieldset': { borderColor: VAULT_PRIMARY },
                                             },
                                             '& .MuiInputBase-input': { color: 'white' }
                                         }}
@@ -751,17 +758,18 @@ export default function SudoModal({
                                     variant="contained"
                                     disabled={loading || !password}
                                     sx={{
-                                        py: 1.8,
+                                        py: 2,
                                         borderRadius: '16px',
-                                        background: 'linear-gradient(135deg, #A855F7 0%, #7E22CE 100%)',
-                                        color: '#FFFFFF',
-                                        fontWeight: 800,
-                                        fontFamily: 'var(--font-satoshi)',
+                                        bgcolor: VAULT_PRIMARY,
+                                        color: '#000',
+                                        fontWeight: 900,
+                                        fontFamily: 'var(--font-space-grotesk)',
                                         textTransform: 'none',
+                                        boxShadow: `0 8px 25px ${alpha(VAULT_PRIMARY, 0.3)}`,
                                         '&:hover': {
-                                            background: 'linear-gradient(135deg, #9333EA 0%, #6B21A8 100%)',
-                                            transform: 'translateY(-1px)',
-                                            boxShadow: '0 8px 25px rgba(168, 85, 247, 0.25)'
+                                            bgcolor: alpha(VAULT_PRIMARY, 0.9),
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: `0 12px 30px ${alpha(VAULT_PRIMARY, 0.4)}`
                                         }
                                     }}
                                 >
@@ -775,15 +783,16 @@ export default function SudoModal({
                             <Box sx={{ position: 'absolute', top: '50%', left: 0, right: 0, height: '1px', bgcolor: 'rgba(255, 255, 255, 0.05)' }} />
                             <Typography variant="caption" sx={{
                                 position: 'relative',
-                                bgcolor: 'rgba(5, 5, 5, 1)',
+                                bgcolor: BG_COLOR,
                                 px: 2.5,
                                 mx: 'auto',
                                 display: 'table',
                                 color: 'rgba(255, 255, 255, 0.25)',
                                 textTransform: 'uppercase',
                                 letterSpacing: '0.15em',
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: '0.65rem'
+                                fontFamily: 'var(--font-space-grotesk)',
+                                fontSize: '0.65rem',
+                                fontWeight: 800
                             }}>
                                 Or
                             </Typography>
@@ -805,7 +814,7 @@ export default function SudoModal({
                                     border: '1px solid rgba(255, 255, 255, 0.05)',
                                     textTransform: 'none',
                                     fontFamily: 'var(--font-satoshi)',
-                                    fontWeight: 600,
+                                    fontWeight: 700,
                                     '&:hover': { color: 'white', bgcolor: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.15)' }
                                 }}
                             >
@@ -819,7 +828,7 @@ export default function SudoModal({
                                 variant="text"
                                 startIcon={<AppsIcon sx={{ fontSize: 18 }} />}
                                 onClick={() => setMode("pin")}
-                                sx={{ color: 'rgba(255, 255, 255, 0.5)', '&:hover': { color: 'white' } }}
+                                sx={{ color: 'rgba(255, 255, 255, 0.5)', fontWeight: 700, '&:hover': { color: 'white' } }}
                             >
                                 Use PIN
                             </Button>
@@ -831,7 +840,7 @@ export default function SudoModal({
                                 variant="text"
                                 size="small"
                                 onClick={() => router.push('/masterpass/reset')}
-                                sx={{ color: 'error.main', '&:hover': { bgcolor: alpha('#ef4444', 0.1) }, mt: 2 }}
+                                sx={{ color: '#ef4444', '&:hover': { bgcolor: alpha('#ef4444', 0.1) }, mt: 2, fontWeight: 700 }}
                             >
                                 Reset Master Password
                             </Button>
