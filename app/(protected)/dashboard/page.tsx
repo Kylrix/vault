@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import type { Credentials, Folders as FolderDoc } from "@/types/appwrite.d";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import {
@@ -66,6 +67,8 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 export default function DashboardPage() {
   const { user } = useAppwriteVault();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { analyze, registerCreateModal } = useAI();
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('md'));
@@ -75,11 +78,38 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showDialog, setShowDialog] = useState(false);
+  const [dialogType, setDialogType] = useState<string>("login");
   const [editCredential, setEditCredential] = useState<Credentials | null>(
     null,
   );
   // Add state for prefilling dialog
   const [dialogPrefill, setDialogPrefill] = useState<{ name?: string; url?: string } | undefined>(undefined);
+
+  // Handle action query param
+  useEffect(() => {
+    const action = searchParams?.get('action');
+    if (action === 'add-login') {
+      setEditCredential(null);
+      setDialogType("login");
+      setShowDialog(true);
+      // Clean up URL
+      const current = new URLSearchParams(Array.from(searchParams?.entries() || []));
+      current.delete('action');
+      const search = current.toString();
+      const query = search ? `?${search}` : "";
+      router.replace(`${window.location.pathname}${query}`);
+    } else if (action === 'add-card') {
+      setEditCredential(null);
+      setDialogType("card");
+      setShowDialog(true);
+      // Clean up URL
+      const current = new URLSearchParams(Array.from(searchParams?.entries() || []));
+      current.delete('action');
+      const search = current.toString();
+      const query = search ? `?${search}` : "";
+      router.replace(`${window.location.pathname}${query}`);
+    }
+  }, [searchParams, router]);
 
   const [selectedCredential, setSelectedCredential] =
     useState<Credentials | null>(null);
@@ -88,6 +118,7 @@ export default function DashboardPage() {
   useEffect(() => {
     registerCreateModal((prefill) => {
       setEditCredential(null);
+      setDialogType("login");
       setDialogPrefill(prefill);
       setShowDialog(true);
     });
@@ -267,6 +298,7 @@ export default function DashboardPage() {
 
   const handleAdd = () => {
     setEditCredential(null);
+    setDialogType("login");
     setShowDialog(true);
   };
 
@@ -401,33 +433,6 @@ export default function DashboardPage() {
             Add Password
           </Button>
         </Box>
-
-        <Fab
-          color="secondary"
-          aria-label="add"
-          onClick={handleAdd}
-          sx={{
-            position: 'fixed',
-            bottom: { xs: 112, lg: 32 },
-            right: { xs: 24, lg: 32 },
-            borderRadius: '20px',
-            width: 64,
-            height: 64,
-            bgcolor: '#10B981',
-            color: '#000',
-            boxShadow: '0 8px 32px rgba(16, 185, 129, 0.4)',
-            '&:hover': {
-              bgcolor: alpha('#10B981', 0.9),
-              transform: 'scale(1.05) translateY(-2px)',
-              boxShadow: '0 12px 40px rgba(16, 185, 129, 0.5)',
-            },
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            zIndex: 1000,
-            display: { xs: 'flex', lg: 'none' } // Show FAB only on mobile as it's replacing bottom bar icon
-          }}
-        >
-          <AddIcon sx={{ fontSize: 32 }} />
-        </Fab>
 
         {/* Main Content Area */}
         <Container maxWidth="lg" sx={{ px: { xs: 2, md: 4 } }}>
@@ -600,6 +605,7 @@ export default function DashboardPage() {
           }}
           initial={editCredential}
           prefill={dialogPrefill}
+          defaultType={dialogType}
           onSaved={refreshCredentials}
         />
 

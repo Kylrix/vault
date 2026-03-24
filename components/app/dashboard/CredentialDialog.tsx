@@ -40,12 +40,14 @@ export default function CredentialDialog({
   initial,
   onSaved,
   prefill,
+  defaultType = "login",
 }: {
   open: boolean;
   onClose: () => void;
   initial?: Credentials | null;
   onSaved: () => void;
   prefill?: { name?: string; url?: string; username?: string };
+  defaultType?: string;
 }) {
   const { user } = useAppwriteVault();
   const [showPassword, setShowPassword] = useState(false);
@@ -126,7 +128,7 @@ export default function CredentialDialog({
         "$id" | "$createdAt" | "$updatedAt"
       > = {
         userId: user.$id,
-        itemType: initial?.itemType || "login",
+        itemType: initial?.itemType || defaultType,
         name: form.name.trim(),
         url: null,
         username: form.username.trim(),

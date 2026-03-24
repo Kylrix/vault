@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { 
   Box, 
   Typography, 
@@ -33,6 +34,8 @@ import { useSudo } from "@/app/context/SudoContext";
 
 export default function TOTPPage() {
   const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const { user, isVaultUnlocked } = useAppwriteVault();
   type TotpItem = {
     $id: string;
@@ -56,6 +59,20 @@ export default function TOTPPage() {
   const [editingTotp, setEditingTotp] = useState<TotpItem | null>(null);
 
   const { requestSudo } = useSudo();
+
+  // Handle action query param
+  useEffect(() => {
+    const action = searchParams?.get('action');
+    if (action === 'add-totp') {
+      setEditingTotp(null);
+      setShowNew(true);
+      
+      const params = new URLSearchParams(window.location.search);
+      params.delete('action');
+      const newRelativePathQuery = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      router.replace(newRelativePathQuery);
+    }
+  }, [searchParams, router]);
 
   useEffect(() => {
     if (!user?.$id) return;
@@ -294,33 +311,6 @@ export default function TOTPPage() {
             Add TOTP
           </Button>
         </Box>
-
-        <Fab
-          color="secondary"
-          aria-label="add"
-          onClick={() => setShowNew(true)}
-          sx={{
-            position: 'fixed',
-            bottom: { xs: 112, lg: 32 },
-            right: { xs: 24, lg: 32 },
-            borderRadius: '20px',
-            width: 64,
-            height: 64,
-            bgcolor: '#10B981',
-            color: '#000',
-            boxShadow: '0 8px 32px rgba(16, 185, 129, 0.4)',
-            '&:hover': {
-              bgcolor: alpha('#10B981', 0.9),
-              transform: 'scale(1.05) translateY(-2px)',
-              boxShadow: '0 12px 40px rgba(16, 185, 129, 0.5)',
-            },
-            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-            zIndex: 1000,
-            display: { xs: 'flex', lg: 'none' }
-          }}
-        >
-          <AddIcon sx={{ fontSize: 32 }} />
-        </Fab>
 
         <TextField
           fullWidth

@@ -29,6 +29,7 @@ import {
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
 import { Navbar } from "./Navbar";
+import { VaultFAB } from "./VaultFAB";
 import dynamic from "next/dynamic";
 import type { Models } from "appwrite";
 
@@ -424,17 +425,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </Paper>
 
       {user && (
-        <PasskeySetup
-          isOpen={showPasskeySetup}
-          onClose={() => setShowPasskeySetup(false)}
-          userId={user.$id}
-          isEnabled={false}
-          onSuccess={() => {
-            setShowPasskeySetup(false);
-            refresh();
-          }}
-          trustUnlocked={true}
-        />
+        <>
+          <VaultFAB />
+          <PasskeySetup
+            isOpen={showPasskeySetup}
+            onClose={() => setShowPasskeySetup(false)}
+            userId={user.$id}
+            isEnabled={false}
+            onSuccess={() => {
+              setShowPasskeySetup(false);
+              refresh();
+            }}
+            trustUnlocked={true}
+          />
+        </>
       )}
     </Box>
   );
