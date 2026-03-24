@@ -358,9 +358,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      bgcolor: '#6366F1',
+                      bgcolor: '#10B981',
                       color: '#000',
-                      boxShadow: '0 8px 24px rgba(99, 102, 241, 0.4)',
+                      boxShadow: '0 8px 24px rgba(16, 185, 129, 0.4)',
                       border: '4px solid #000',
                       transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                       '&:active': { transform: 'scale(0.9) translateY(4px)' }
@@ -374,7 +374,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       fontSize: 10, 
                       fontWeight: 800, 
                       mt: 0.5,
-                      color: isActive ? '#6366F1' : 'rgba(255, 255, 255, 0.6)',
+                      color: isActive ? '#10B981' : 'rgba(255, 255, 255, 0.6)',
                       fontFamily: 'var(--font-space-grotesk)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.05em'

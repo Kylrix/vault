@@ -13,7 +13,8 @@ import {
   Plus, 
   KeyRound, 
   CreditCard, 
-  ShieldCheck 
+  ShieldCheck,
+  StickyNote
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -22,14 +23,21 @@ export const VaultFAB: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  // Only show on Dashboard and TOTP pages
+  // Only show on Dashboard, TOTP and Sharing pages
   const showFab = pathname === '/dashboard' || pathname === '/totp' || pathname === '/sharing';
   
   if (!showFab) return null;
 
-  const handleAction = (action: () => void) => {
+  const handleAction = (url: string) => {
     setIsExpanded(false);
-    action();
+    router.push(url);
+    
+    // Force searchParams update detection on same page
+    if (url.startsWith(pathname)) {
+        setTimeout(() => {
+            window.dispatchEvent(new Event('popstate'));
+        }, 100);
+    }
   };
 
   const actions = [
@@ -37,25 +45,25 @@ export const VaultFAB: React.FC = () => {
       label: 'Login', 
       icon: KeyRound, 
       color: '#10B981', 
-      onClick: () => {
-        router.push('/dashboard?action=add-login');
-      }
+      url: '/dashboard?action=add-login'
     },
     { 
       label: 'Card', 
       icon: CreditCard, 
       color: '#6366F1', 
-      onClick: () => {
-        router.push('/dashboard?action=add-card');
-      }
+      url: '/dashboard?action=add-card'
+    },
+    { 
+      label: 'Note', 
+      icon: StickyNote, 
+      color: '#A855F7', 
+      url: '/dashboard?action=add-note'
     },
     { 
       label: 'TOTP', 
       icon: ShieldCheck, 
       color: '#F59E0B', 
-      onClick: () => {
-        router.push('/totp?action=add-totp');
-      }
+      url: '/totp?action=add-totp'
     },
   ];
 
@@ -111,7 +119,7 @@ export const VaultFAB: React.FC = () => {
               </Typography>
               <Fab
                 size="medium"
-                onClick={() => handleAction(action.onClick)}
+                onClick={() => handleAction(action.url)}
                 sx={{
                   bgcolor: action.color,
                   color: '#000',

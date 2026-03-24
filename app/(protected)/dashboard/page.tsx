@@ -88,26 +88,16 @@ export default function DashboardPage() {
   // Handle action query param
   useEffect(() => {
     const action = searchParams?.get('action');
-    if (action === 'add-login') {
+    if (action && ['add-login', 'add-card', 'add-note'].includes(action)) {
       setEditCredential(null);
-      setDialogType("login");
+      setDialogType(action.split('-')[1]);
       setShowDialog(true);
+      
       // Clean up URL
-      const current = new URLSearchParams(Array.from(searchParams?.entries() || []));
-      current.delete('action');
-      const search = current.toString();
-      const query = search ? `?${search}` : "";
-      router.replace(`${window.location.pathname}${query}`);
-    } else if (action === 'add-card') {
-      setEditCredential(null);
-      setDialogType("card");
-      setShowDialog(true);
-      // Clean up URL
-      const current = new URLSearchParams(Array.from(searchParams?.entries() || []));
-      current.delete('action');
-      const search = current.toString();
-      const query = search ? `?${search}` : "";
-      router.replace(`${window.location.pathname}${query}`);
+      const params = new URLSearchParams(window.location.search);
+      params.delete('action');
+      const newPath = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+      router.replace(newPath);
     }
   }, [searchParams, router]);
 

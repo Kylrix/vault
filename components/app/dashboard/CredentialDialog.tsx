@@ -10,9 +10,10 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import DescriptionIcon from "@mui/icons-material/Description";
 import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 import { 
   Dialog, 
-  DialogTitle, 
+...
   DialogContent, 
   DialogActions, 
   Button, 
@@ -61,6 +62,12 @@ export default function CredentialDialog({
     url: "",
     notes: "",
     tags: "",
+    cardNumber: "",
+    cardholderName: "",
+    cardExpiry: "",
+    cardCVV: "",
+    cardPIN: "",
+    cardType: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +81,12 @@ export default function CredentialDialog({
         url: initial.url || "",
         notes: initial.notes || "",
         tags: initial.tags ? initial.tags.join(", ") : "",
+        cardNumber: initial.cardNumber || "",
+        cardholderName: initial.cardholderName || "",
+        cardExpiry: initial.cardExpiry || "" ,
+        cardCVV: initial.cardCVV || "",
+        cardPIN: initial.cardPIN || "",
+        cardType: initial.cardType || "",
       });
       setCustomFields(
         initial.customFields ? JSON.parse(initial.customFields) : [],
@@ -86,6 +99,12 @@ export default function CredentialDialog({
         url: prefill?.url || "",
         notes: "",
         tags: "",
+        cardNumber: "",
+        cardholderName: "",
+        cardExpiry: "",
+        cardCVV: "",
+        cardPIN: "",
+        cardType: "",
       });
       setCustomFields([]);
     }
@@ -123,23 +142,25 @@ export default function CredentialDialog({
     try {
       if (!user) throw new Error("Not authenticated");
 
+      const type = initial?.itemType || defaultType;
+
       const credentialData: Omit<
         Credentials,
         "$id" | "$createdAt" | "$updatedAt"
       > = {
         userId: user.$id,
-        itemType: initial?.itemType || defaultType,
+        itemType: type,
         name: form.name.trim(),
         url: null,
-        username: form.username.trim(),
+        username: null,
         notes: null,
         totpId: initial?.totpId || null,
-        cardNumber: initial?.cardNumber || null,
-        cardholderName: initial?.cardholderName || null,
-        cardExpiry: initial?.cardExpiry || null,
-        cardCVV: initial?.cardCVV || null,
-        cardPIN: initial?.cardPIN || null,
-        cardType: initial?.cardType || null,
+        cardNumber: null,
+        cardholderName: null,
+        cardExpiry: null,
+        cardCVV: null,
+        cardPIN: null,
+        cardType: null,
         folderId: initial?.folderId || null,
         tags: null,
         customFields: null,
@@ -149,7 +170,7 @@ export default function CredentialDialog({
         deletedAt: initial?.deletedAt || null,
         lastAccessedAt: initial?.lastAccessedAt || null,
         passwordChangedAt: initial?.passwordChangedAt || null,
-        password: form.password.trim(),
+        password: null,
         createdAt:
           initial && initial.createdAt
             ? initial.createdAt
@@ -160,7 +181,22 @@ export default function CredentialDialog({
         $databaseId: "",
         $permissions: [],
       };
-      if (form.url && form.url.trim()) credentialData.url = form.url.trim();
+
+      if (type === 'login') {
+        credentialData.username = form.username.trim();
+        credentialData.password = form.password.trim();
+        if (form.url && form.url.trim()) credentialData.url = form.url.trim();
+      } else if (type === 'card') {
+        credentialData.cardNumber = form.cardNumber.trim();
+        credentialData.cardholderName = form.cardholderName.trim();
+        credentialData.cardExpiry = form.cardExpiry.trim();
+        credentialData.cardCVV = form.cardCVV.trim();
+        credentialData.cardPIN = form.cardPIN.trim();
+        credentialData.cardType = form.cardType.trim();
+      } else if (type === 'note') {
+          // Name is the title, notes is the content
+      }
+
       if (form.notes && form.notes.trim())
         credentialData.notes = form.notes.trim();
       if (form.tags && form.tags.trim()) {
@@ -186,6 +222,8 @@ export default function CredentialDialog({
     }
     setLoading(false);
   };
+
+  const currentType = initial?.itemType || defaultType;
 
   return (
     <Dialog 
@@ -220,7 +258,7 @@ export default function CredentialDialog({
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box sx={{ width: 12, height: 12, borderRadius: '3px', bgcolor: VAULT_PRIMARY, boxShadow: `0 0 15px ${VAULT_PRIMARY}` }} />
-            {initial ? "Edit Credential" : "New Credential"}
+            {initial ? "Edit" : "New"} {currentType.charAt(0).toUpperCase() + currentType.slice(1)}
           </Box>
           <IconButton onClick={onClose} size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white', bgcolor: 'rgba(255,255,255,0.05)' } }}>
             <CloseIcon sx={{ fontSize: 20 }} />
@@ -233,7 +271,7 @@ export default function CredentialDialog({
               <TextField
                 fullWidth
                 label="Name"
-                placeholder="e.g., GitHub, Gmail"
+                placeholder={currentType === 'note' ? "Note Title" : "e.g., GitHub, Gmail"}
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required
@@ -255,117 +293,195 @@ export default function CredentialDialog({
               />
             </Grid>
 
-            <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
-                label="Username/Email"
-                placeholder="john@example.com"
-                value={form.username}
-                onChange={(e) => setForm({ ...form, username: e.target.value })}
-                required
-                variant="filled"
-                InputProps={{
-                  disableUnderline: true,
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
-                    </InputAdornment>
-                  ),
-                  sx: { 
-                    borderRadius: '12px', 
-                    bgcolor: SURFACE_COLOR,
-                    border: '1px solid rgba(255,255,255,0.03)',
-                    '&.Mui-focused': {
-                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
-                    }
-                  }
-                }}
-                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-              <Box sx={{ display: 'flex', gap: 1.5 }}>
-                <TextField
-                  fullWidth
-                  label="Password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  required
-                  variant="filled"
-                  InputProps={{
-                    disableUnderline: true,
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton onClick={() => setShowPassword(!showPassword)} size="small" sx={{ color: 'rgba(255,255,255,0.2)' }}>
-                          {showPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                    sx: { 
-                      borderRadius: '12px', 
-                      bgcolor: SURFACE_COLOR,
-                      border: '1px solid rgba(255,255,255,0.03)',
-                      '&.Mui-focused': {
-                        border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+            {currentType === 'login' && (
+              <>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Username/Email"
+                    placeholder="john@example.com"
+                    value={form.username}
+                    onChange={(e) => setForm({ ...form, username: e.target.value })}
+                    required
+                    variant="filled"
+                    InputProps={{
+                      disableUnderline: true,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <PersonIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
+                        </InputAdornment>
+                      ),
+                      sx: { 
+                        borderRadius: '12px', 
+                        bgcolor: SURFACE_COLOR,
+                        border: '1px solid rgba(255,255,255,0.03)',
+                        '&.Mui-focused': {
+                          border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                        }
                       }
-                    }
-                  }}
-                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
-                />
-                <IconButton 
-                  onClick={handleGeneratePassword}
-                  sx={{ 
-                    bgcolor: alpha(VAULT_PRIMARY, 0.1), 
-                    color: VAULT_PRIMARY,
-                    borderRadius: '12px',
-                    width: 56,
-                    height: 56,
-                    border: `1px solid ${alpha(VAULT_PRIMARY, 0.2)}`,
-                    '&:hover': { bgcolor: alpha(VAULT_PRIMARY, 0.2) },
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <AutorenewIcon sx={{ fontSize: 22 }} />
-                </IconButton>
-              </Box>
-            </Grid>
+                    }}
+                    InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                  />
+                </Grid>
 
-            <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
-                label="Website URL"
-                type="url"
-                placeholder="https://example.com"
-                value={form.url}
-                onChange={(e) => setForm({ ...form, url: e.target.value })}
-                variant="filled"
-                InputProps={{
-                  disableUnderline: true,
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LanguageIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
-                    </InputAdornment>
-                  ),
-                  sx: { 
-                    borderRadius: '12px', 
-                    bgcolor: SURFACE_COLOR,
-                    border: '1px solid rgba(255,255,255,0.03)',
-                    '&.Mui-focused': {
-                      border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
-                    }
-                  }
-                }}
-                InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
-              />
-            </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ display: 'flex', gap: 1.5 }}>
+                    <TextField
+                      fullWidth
+                      label="Password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={form.password}
+                      onChange={(e) => setForm({ ...form, password: e.target.value })}
+                      required
+                      variant="filled"
+                      InputProps={{
+                        disableUnderline: true,
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={() => setShowPassword(!showPassword)} size="small" sx={{ color: 'rgba(255,255,255,0.2)' }}>
+                              {showPassword ? <VisibilityOffIcon sx={{ fontSize: 18 }} /> : <VisibilityIcon sx={{ fontSize: 18 }} />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                        sx: { 
+                          borderRadius: '12px', 
+                          bgcolor: SURFACE_COLOR,
+                          border: '1px solid rgba(255,255,255,0.03)',
+                          '&.Mui-focused': {
+                            border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                          }
+                        }
+                      }}
+                      InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                    />
+                    <IconButton 
+                      onClick={handleGeneratePassword}
+                      sx={{ 
+                        bgcolor: alpha(VAULT_PRIMARY, 0.1), 
+                        color: VAULT_PRIMARY,
+                        borderRadius: '12px',
+                        width: 56,
+                        height: 56,
+                        border: `1px solid ${alpha(VAULT_PRIMARY, 0.2)}`,
+                        '&:hover': { bgcolor: alpha(VAULT_PRIMARY, 0.2) },
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <AutorenewIcon sx={{ fontSize: 22 }} />
+                    </IconButton>
+                  </Box>
+                </Grid>
+
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Website URL"
+                    type="url"
+                    placeholder="https://example.com"
+                    value={form.url}
+                    onChange={(e) => setForm({ ...form, url: e.target.value })}
+                    variant="filled"
+                    InputProps={{
+                      disableUnderline: true,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <LanguageIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
+                        </InputAdornment>
+                      ),
+                      sx: { 
+                        borderRadius: '12px', 
+                        bgcolor: SURFACE_COLOR,
+                        border: '1px solid rgba(255,255,255,0.03)',
+                        '&.Mui-focused': {
+                          border: `1px solid ${alpha(VAULT_PRIMARY, 0.3)}`,
+                        }
+                      }
+                    }}
+                    InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                  />
+                </Grid>
+              </>
+            )}
+
+            {currentType === 'card' && (
+              <>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Card Number"
+                    placeholder="•••• •••• •••• ••••"
+                    value={form.cardNumber}
+                    onChange={(e) => setForm({ ...form, cardNumber: e.target.value })}
+                    required
+                    variant="filled"
+                    InputProps={{
+                      disableUnderline: true,
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CreditCardIcon sx={{ fontSize: 18, color: 'rgba(255,255,255,0.3)' }} />
+                        </InputAdornment>
+                      ),
+                      sx: { borderRadius: '12px', bgcolor: SURFACE_COLOR, border: '1px solid rgba(255,255,255,0.03)' }
+                    }}
+                    InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <TextField
+                    fullWidth
+                    label="Cardholder Name"
+                    placeholder="JOHN DOE"
+                    value={form.cardholderName}
+                    onChange={(e) => setForm({ ...form, cardholderName: e.target.value })}
+                    required
+                    variant="filled"
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: { borderRadius: '12px', bgcolor: SURFACE_COLOR, border: '1px solid rgba(255,255,255,0.03)' }
+                    }}
+                    InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="Expiry"
+                    placeholder="MM/YY"
+                    value={form.cardExpiry}
+                    onChange={(e) => setForm({ ...form, cardExpiry: e.target.value })}
+                    required
+                    variant="filled"
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: { borderRadius: '12px', bgcolor: SURFACE_COLOR, border: '1px solid rgba(255,255,255,0.03)' }
+                    }}
+                    InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                  />
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <TextField
+                    fullWidth
+                    label="CVV"
+                    placeholder="•••"
+                    value={form.cardCVV}
+                    onChange={(e) => setForm({ ...form, cardCVV: e.target.value })}
+                    required
+                    variant="filled"
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: { borderRadius: '12px', bgcolor: SURFACE_COLOR, border: '1px solid rgba(255,255,255,0.03)' }
+                    }}
+                    InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.4)', '&.Mui-focused': { color: VAULT_PRIMARY } } }}
+                  />
+                </Grid>
+              </>
+            )}
 
             <Grid size={{ xs: 12 }}>
               <TextField
@@ -398,10 +514,10 @@ export default function CredentialDialog({
             <Grid size={{ xs: 12 }}>
               <TextField
                 fullWidth
-                label="Notes"
+                label={currentType === 'note' ? "Note Content" : "Notes"}
                 multiline
-                rows={3}
-                placeholder="Secure notes..."
+                rows={currentType === 'note' ? 10 : 3}
+                placeholder={currentType === 'note' ? "Write your secure note here..." : "Secure notes..."}
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
                 variant="filled"
