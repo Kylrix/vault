@@ -54,12 +54,6 @@ export const VaultFAB: React.FC = () => {
       url: '/dashboard?action=add-card'
     },
     { 
-      label: 'Note', 
-      icon: StickyNote, 
-      color: '#A855F7', 
-      url: '/dashboard?action=add-note'
-    },
-    { 
       label: 'TOTP', 
       icon: ShieldCheck, 
       color: '#F59E0B', 

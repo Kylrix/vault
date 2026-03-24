@@ -193,8 +193,6 @@ export default function CredentialDialog({
         credentialData.cardCVV = form.cardCVV.trim();
         credentialData.cardPIN = form.cardPIN.trim();
         credentialData.cardType = form.cardType.trim();
-      } else if (type === 'note') {
-          // Name is the title, notes is the content
       }
 
       if (form.notes && form.notes.trim())
@@ -271,7 +269,7 @@ export default function CredentialDialog({
               <TextField
                 fullWidth
                 label="Name"
-                placeholder={currentType === 'note' ? "Note Title" : "e.g., GitHub, Gmail"}
+                placeholder="e.g., GitHub, Gmail"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 required

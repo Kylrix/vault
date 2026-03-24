@@ -88,7 +88,7 @@ export default function DashboardPage() {
   // Handle action query param
   useEffect(() => {
     const action = searchParams?.get('action');
-    if (action && ['add-login', 'add-card', 'add-note'].includes(action)) {
+    if (action && ['add-login', 'add-card'].includes(action)) {
       setEditCredential(null);
       setDialogType(action.split('-')[1]);
       setShowDialog(true);
