@@ -19,7 +19,7 @@ export function PaywallWrapper({
 
   if (isLoading) return null;
 
-  const tiers: (SubscriptionTier | 'FREE')[] = ['FREE', 'PRO', 'ULTRA', 'ENTERPRISE'];
+  const tiers: (SubscriptionTier | 'FREE')[] = ['FREE', 'PRO'];
   const userTierIndex = tiers.indexOf(currentTier);
   const requiredTierIndex = tiers.indexOf(requiredTier);
 
