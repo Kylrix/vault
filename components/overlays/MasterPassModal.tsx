@@ -155,7 +155,6 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
         const effectivePasskeyPresent = passkeyPresent && isKylrixDomain;
 
         setHasPasskey(effectivePasskeyPresent);
-        setHasMasterpassLocal(passwordPresent);
         setIsFirstTime(!passwordPresent);
 
         if (!passwordPresent) {
