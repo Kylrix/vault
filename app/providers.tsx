@@ -7,6 +7,7 @@ import { AIProvider } from "./context/AIContext";
 import { SudoProvider } from "./context/SudoContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { SubscriptionProvider } from "@/context/subscription";
+import { DataNexusProvider } from "@/context/DataNexusContext";
 import { Toaster } from "react-hot-toast";
 import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material";
 import { darkTheme } from "@/theme/theme";
@@ -36,8 +37,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SubscriptionProvider>
       <MuiThemeProvider theme={darkTheme}>
         <CssBaseline />
-        <AppwriteProvider>
-          <NotificationProvider>
+        <DataNexusProvider>
+          <AppwriteProvider>
+            <NotificationProvider>
             <SudoProvider>
               <BackgroundTaskProvider>
                 <AIProvider>
@@ -58,6 +60,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             </SudoProvider>
           </NotificationProvider>
         </AppwriteProvider>
+        </DataNexusProvider>
       </MuiThemeProvider>
     </SubscriptionProvider>
   );

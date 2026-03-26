@@ -29,9 +29,11 @@ import {
   AppwriteService,
 } from "@/lib/appwrite";
 import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { useDataNexus } from "@/context/DataNexusContext";
 
 export default function OverviewPage() {
   const { user } = useAppwriteVault();
+  const { fetchOptimized } = useDataNexus();
   const [stats, setStats] = useState({ totalCreds: 0, totpCount: 0 });
   const [recent, setRecent] = useState<
     Array<{ $id: string; name: string; username?: string }>
@@ -48,20 +50,24 @@ export default function OverviewPage() {
     const run = async () => {
       if (!user) return;
       try {
-        const credsResp = (await AppwriteService.listCredentials(
-          user.$id,
-          1,
-          0,
-          [Query.orderDesc("$updatedAt")],
-        )) as { total: number; documents: Array<Record<string, unknown>> };
+        const credsResp = await fetchOptimized(`v_creds_total_${user.$id}`, () =>
+          AppwriteService.listCredentials(
+            user.$id,
+            1,
+            0,
+            [Query.orderDesc("$updatedAt")],
+          )
+        );
 
         let totpCount = 0;
         try {
-          const totpResp = (await appwriteDatabases.listDocuments(
-            APPWRITE_DATABASE_ID,
-            APPWRITE_COLLECTION_TOTPSECRETS_ID,
-            [Query.equal("userId", user.$id), Query.limit(1)],
-          )) as { documents: Array<Record<string, unknown>>; total?: number };
+          const totpResp = await fetchOptimized(`v_totp_total_${user.$id}`, () =>
+            appwriteDatabases.listDocuments(
+              APPWRITE_DATABASE_ID,
+              APPWRITE_COLLECTION_TOTPSECRETS_ID,
+              [Query.equal("userId", user.$id), Query.limit(1)],
+            )
+          );
           totpCount =
             (
               totpResp as {
@@ -90,12 +96,14 @@ export default function OverviewPage() {
         }> = [];
         try {
           const windowSize = Math.min(50, totalCreds);
-          const recentWindow = (await AppwriteService.listCredentials(
-            user.$id,
-            windowSize,
-            0,
-            [Query.orderDesc("$updatedAt")],
-          )) as { documents?: Array<Record<string, unknown>> };
+          const recentWindow = await fetchOptimized(`v_recent_creds_window_${user.$id}`, () =>
+            AppwriteService.listCredentials(
+              user.$id,
+              windowSize,
+              0,
+              [Query.orderDesc("$updatedAt")],
+            )
+          );
           const items = recentWindow.documents || [];
           const fieldCandidates = [
             "username",
