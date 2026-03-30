@@ -655,7 +655,7 @@ export function SudoModal({
                             </Typography>
                         </Box>
 
-                        {hasPasskey && mode !== "passkey" && (
+                        {hasPasskey && (
                             <Button
                                 fullWidth
                                 variant="text"

@@ -30,7 +30,7 @@ export default function CredentialItem({
 }: {
   credential: Credentials;
   onCopy: (value: string) => void;
-  _isDesktop: boolean;
+  _isDesktop?: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onClick?: () => void;
@@ -117,12 +117,12 @@ export default function CredentialItem({
         {!isMobile ? (
           <>
             <Tooltip title="Copy Username">
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.username); }} sx={{ color: 'text.secondary' }}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.username || ''); }} sx={{ color: 'text.secondary' }}>
                 <PersonIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Copy Password">
-              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.password); }} sx={{ color: '#10B981' }}>
+              <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleCopy(credential.password || ''); }} sx={{ color: '#10B981' }}>
                 <LockIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
@@ -165,11 +165,11 @@ export default function CredentialItem({
           }
         }}
       >
-        <MenuItem onClick={() => handleCopy(credential.username)}>
+        <MenuItem onClick={() => handleCopy(credential.username || '')}>
           <ListItemIcon><PersonIcon sx={{ fontSize: 18 }} /></ListItemIcon>
           <ListItemText primary="Copy Username" primaryTypographyProps={{ fontWeight: 600 }} />
         </MenuItem>
-        <MenuItem onClick={() => handleCopy(credential.password)}>
+        <MenuItem onClick={() => handleCopy(credential.password || '')}>
           <ListItemIcon><LockIcon sx={{ fontSize: 18 }} /></ListItemIcon>
           <ListItemText primary="Copy Password" primaryTypographyProps={{ fontWeight: 600 }} />
         </MenuItem>

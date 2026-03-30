@@ -8,7 +8,7 @@ import * as ecc from 'tiny-secp256k1';
 import { derivePath } from 'ed25519-hd-key';
 import { Keypair } from '@solana/web3.js';
 import { Ed25519Keypair as SuiEd25519Keypair } from '@mysten/sui/keypairs/ed25519';
-import { tablesDB } from '../appwrite/client';
+import { tablesDB } from '../appwrite';
 import { APPWRITE_CONFIG } from '../appwrite/config';
 import { ecosystemSecurity } from '../ecosystem/security';
 import { UsersService } from './users';

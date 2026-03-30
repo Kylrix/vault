@@ -39,11 +39,11 @@ interface ExtendedUser extends Models.User<Models.Preferences> {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Sharing", href: "/sharing", icon: Share2 },
-  { name: "TOTP", href: "/totp", icon: Shield },
-  { name: "Import", href: "/import", icon: Upload },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Dashboard", href: "/dashboard", icon: Home, big: false },
+  { name: "Sharing", href: "/sharing", icon: Share2, big: false },
+  { name: "TOTP", href: "/totp", icon: Shield, big: false },
+  { name: "Import", href: "/import", icon: Upload, big: false },
+  { name: "Settings", href: "/settings", icon: Settings, big: false },
 ];
 
 const SIMPLIFIED_LAYOUT_PATHS = [

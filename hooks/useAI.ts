@@ -1,6 +1,6 @@
 'use client';
 
-import { useAppwriteVault } from '@/hooks/use-appwrite-vault';
+import { useAppwriteVault } from '@/context/appwrite-context';
 
 export interface AIChatMessage {
   role: 'user' | 'assistant';

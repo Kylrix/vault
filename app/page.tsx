@@ -214,7 +214,7 @@ export default function LandingPage() {
                 { label: 'Recent Activity', val: '3', icon: AccessTimeIcon, color: '#FF9800' },
                 { label: 'Security Alerts', val: '1', icon: WarningIcon, color: '#FF4D4D' },
               ].map((stat, i) => (
-                <Grid item xs={6} md={3} key={i}>
+                <Grid size={{ xs: 6, md: 3 }} key={i}>
                   <Paper sx={{ 
                     p: 2.5, 
                     borderRadius: '20px', 
@@ -235,7 +235,7 @@ export default function LandingPage() {
             </Grid>
 
             <Grid container spacing={3}>
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Paper sx={{ 
                   p: 3, 
                   borderRadius: '24px', 
@@ -252,7 +252,7 @@ export default function LandingPage() {
                   </Stack>
                 </Paper>
               </Grid>
-              <Grid item xs={12} md={8}>
+              <Grid size={{ xs: 12, md: 8 }}>
                 <Paper sx={{ 
                   p: 3, 
                   borderRadius: '24px', 

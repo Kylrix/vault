@@ -27,11 +27,11 @@ import {
     History,
     Settings,
 } from 'lucide-react';
-import { useAuth } from '@/lib/auth';
-import { useSudo } from '@/context/SudoContext';
+import { useAppwriteVault as useAuth } from '@/context/appwrite-context';
+import { useSudo } from '@/app/context/SudoContext';
 import { ecosystemSecurity } from '@/lib/ecosystem/security';
 import { toast } from 'react-hot-toast';
-import { KeychainService } from '@/lib/appwrite/keychain';
+import { AppwriteService } from '@/lib/appwrite';
 import { WalletService, type SupportedWalletChain, type WalletSummary } from '@/lib/services/wallets';
 
 interface WalletSidebarProps {
@@ -83,7 +83,7 @@ export const WalletSidebar = ({ isOpen, onClose }: WalletSidebarProps) => {
 
         setError(null);
 
-        const masterpassPresent = await KeychainService.hasMasterpass(user.$id);
+        const masterpassPresent = await AppwriteService.hasMasterpass(user.$id);
         setHasMasterpass(masterpassPresent);
 
         if (!masterpassPresent) {

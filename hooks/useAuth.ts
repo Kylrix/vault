@@ -1,4 +1,4 @@
-import { useAppwriteVault } from '@/hooks/use-appwrite-vault';
+import { useAppwriteVault } from '@/context/appwrite-context';
 
 export const useAuth = () => {
     const { user, loading, isAuthenticated, openIDMWindow, logout } = useAppwriteVault();

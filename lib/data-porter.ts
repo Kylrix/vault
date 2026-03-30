@@ -5,7 +5,7 @@
  * Handles import/export operations with progress tracking and fallback.
  */
 
-import { Functions } from 'appwrite';
+import { Functions, ExecutionMethod } from 'appwrite';
 import { appwriteClient } from '@/lib/appwrite';
 import { APPWRITE_CONFIG } from '@/lib/appwrite/config';
 
@@ -58,7 +58,7 @@ export async function porterImport(
             }),
             false, // async = false (synchronous execution, we wait for result)
             '/', // path
-            'POST' // method
+            ExecutionMethod.POST // method
         );
 
         if (execution.status === 'failed') {
@@ -87,7 +87,7 @@ export async function porterExport(userId: string): Promise<PorterExportResult> 
             }),
             false,
             '/',
-            'POST'
+            ExecutionMethod.POST
         );
 
         if (execution.status === 'failed') {

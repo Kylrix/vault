@@ -26,7 +26,7 @@ import {
   alpha
 } from "@mui/material";
 import { createCredential, updateCredential } from "@/lib/appwrite";
-import type { Credentials } from "@/types/appwrite";
+import type { Credentials, CredentialsCreate } from "@/types/appwrite";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { generateRandomPassword } from "@/utils/password";
 
@@ -143,10 +143,7 @@ export default function CredentialDialog({
 
       const type = initial?.itemType || defaultType;
 
-      const credentialData: Omit<
-        Credentials,
-        "$id" | "$createdAt" | "$updatedAt"
-      > = {
+      const credentialData: CredentialsCreate = {
         userId: user.$id,
         itemType: type,
         name: form.name.trim(),
@@ -175,10 +172,6 @@ export default function CredentialDialog({
             ? initial.createdAt
             : new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        $sequence: 0,
-        $collectionId: "",
-        $databaseId: "",
-        $permissions: [],
       };
 
       if (type === 'login') {

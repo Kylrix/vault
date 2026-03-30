@@ -46,7 +46,7 @@ export function DataNexusProvider({ children }: { children: ReactNode }) {
         return () => window.removeEventListener("vault-locked", handleVaultLocked);
     }, [purge]);
 
-    const getCachedData = useCallback(async <T>(key: string, ttl: number = DEFAULT_TTL): T | null => {
+    const getCachedData = useCallback(async <T,>(key: string, ttl: number = DEFAULT_TTL): Promise<T | null> => {
         // 1. Check memory cache first (Decrypted, Volatile)
         const memoryEntry = memoryCache.current.get(key);
         const now = Date.now();
@@ -80,7 +80,7 @@ export function DataNexusProvider({ children }: { children: ReactNode }) {
         return null;
     }, []);
 
-    const setCachedData = useCallback(async <T>(key: string, data: T, _ttl?: number) => {
+    const setCachedData = useCallback(async <T,>(key: string, data: T, _ttl?: number): Promise<void> => {
         const entry: CacheEntry<T> = {
             data,
             timestamp: Date.now()
@@ -108,7 +108,7 @@ export function DataNexusProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    const fetchOptimized = useCallback(async <T>(
+    const fetchOptimized = useCallback(async <T,>(
         key: string, 
         fetcher: () => Promise<T>, 
         ttl: number = DEFAULT_TTL

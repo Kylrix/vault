@@ -35,7 +35,6 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { useAppwriteVault } from "@/context/appwrite-context";
-import { ecosystemSecurity } from "@/lib/ecosystem/security";
 import { MasterPassModal } from "@/components/overlays/MasterPassModal";
 import { PasskeySetup } from "@/components/overlays/passkeySetup";
 import { DiscoverabilitySettings } from "@/components/settings/DiscoverabilitySettings";
@@ -52,6 +51,7 @@ export default function SettingsPage() {
   
   // Master Password Change state
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [unlockModalOpen, setUnlockModalOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -324,6 +324,9 @@ export default function SettingsPage() {
               </Box>
 
               <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)' }} />
+            </Stack>
+          </Paper>
+        </Box>
 
         {/* Preferences Section */}
         <Box>

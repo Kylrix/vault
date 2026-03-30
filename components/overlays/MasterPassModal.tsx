@@ -64,7 +64,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
   const [pin, setPin] = useState("");
   const [hasPin, setHasPin] = useState(false);
 
-  const { user, refresh } = useAppwriteVault();
+  const { user, refresh, logout } = useAppwriteVault();
   const { finalizeAuth } = useFinalizeAuth();
   const router = useRouter();
 
@@ -638,7 +638,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               {loading ? <CircularProgress size={24} color="inherit" /> : (isFirstTime ? "Set Master Password" : "Verify Identity")}
             </Button>
 
-            {hasPasskey && mode !== "passkey" && !isFirstTime && (
+            {hasPasskey && !isFirstTime && (
               <Button
                 fullWidth
                 variant="text"
@@ -663,7 +663,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
               </Button>
             )}
 
-            {hasPin && mode !== "pin" && !isFirstTime && (
+            {hasPin && !isFirstTime && (
               <Button
                 fullWidth
                 variant="text"

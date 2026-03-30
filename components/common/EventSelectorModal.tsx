@@ -93,7 +93,7 @@ export function EventSelectorModal({ isOpen, onClose, onSelect }: EventSelectorM
           <Typography variant="body2" sx={{ textAlign: 'center', opacity: 0.5, py: 4 }}>No events found</Typography>
         ) : (
           <List sx={{ maxHeight: '400px', overflowY: 'auto' }}>
-            {filtered.map((_event) => (
+            {filtered.map((event) => (
               <ListItemButton
                 key={event.$id}
                 onClick={() => onSelect(event.$id)}
@@ -114,7 +114,7 @@ export function EventSelectorModal({ isOpen, onClose, onSelect }: EventSelectorM
                   primary={event.title} 
                   secondary={new Date(event.startTime).toLocaleDateString()}
                   primaryTypographyProps={{ fontSize: '0.9rem', fontWeight: 600 }}
-                  secondaryTypographyProps={{ fontSize: '0.75rem', opacity: 0.5 }}
+                  secondaryTypographyProps={{ fontSize: '0.75rem', sx: { opacity: 0.5 } }}
                 />
               </ListItemButton>
             ))}

@@ -13,7 +13,7 @@ import Logo from '@/components/common/Logo';
 import { ecosystemSecurity } from '@/lib/ecosystem/security';
 import { AppwriteService } from '@/lib/appwrite';
 import { useAppwriteVault } from '@/context/appwrite-context';
-import SudoModal from '@/components/overlays/SudoModal';
+import { SudoModal } from '@/components/overlays/SudoModal';
 import { useEffect } from 'react';
 
 /**

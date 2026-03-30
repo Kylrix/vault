@@ -1,10 +1,10 @@
 
 export interface ImportItem {
-  name?: string;
-  url?: string;
-  username?: string;
-  password?: string;
-  notes?: string;
+  name?: string | null;
+  url?: string | null;
+  username?: string | null;
+  password?: string | null;
+  notes?: string | null;
   // Add other credential fields as needed, or extend Partial<Credentials> correctly if type allows
   // For now defining explicitly to fix build error
   _status: 'new' | 'duplicate' | 'merged';

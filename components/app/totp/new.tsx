@@ -94,10 +94,6 @@ export default function NewTotpDialog({
           isDeleted: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          $sequence: 0,
-          $collectionId: "",
-          $databaseId: "",
-          $permissions: [],
         });
         toast.success("TOTP code added!");
       }

@@ -34,7 +34,7 @@ export async function ensureGlobalIdentity(user: any, force = false) {
                 CONNECT_COLLECTION_ID_USERS,
                 user.$id
             );
-        } catch (e: unknown) {
+        } catch (e: any) {
             if (e.code === 404) {
                 const username = user.prefs?.username || `user${user.$id.slice(0, 6)}`;
                 const avatar = user.prefs?.profilePicId || user.avatar || null;

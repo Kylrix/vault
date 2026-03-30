@@ -217,10 +217,6 @@ export default function DashboardPage() {
             parentFolderId: null, // flattened structure for now
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
-            $sequence: 0,
-            $collectionId: "",
-            $databaseId: "",
-            $permissions: [],
           });
           folderId = newFolder.$id;
           folderMap.set(folderName.toLowerCase(), folderId);
@@ -500,7 +496,6 @@ export default function DashboardPage() {
                     <CredentialItem
                       credential={cred}
                       onCopy={handleCopy}
-                      isDesktop={!isMobileView}
                       onEdit={() => handleEdit(cred)}
                       onDelete={() => openDeleteModal(cred)}
                       onClick={() => {
@@ -556,11 +551,10 @@ export default function DashboardPage() {
             ) : (
               paginatedCredentials.map((cred: Credentials) => (
                 <CredentialItem
-                  key={cred.$id}
-                  credential={cred}
-                  onCopy={handleCopy}
-                  isDesktop={!isMobileView}
-                  onEdit={() => handleEdit(cred)}
+                    key={cred.$id}
+                    credential={cred}
+                    onCopy={handleCopy}
+                    onEdit={() => handleEdit(cred)}
                   onDelete={() => openDeleteModal(cred)}
                   onClick={() => {
                     setSelectedCredential(cred);

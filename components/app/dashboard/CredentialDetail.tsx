@@ -251,9 +251,8 @@ export default function CredentialDetail({
         </Box>
 
         <Stack spacing={3.5}>
-          {/* Username */}
           <Box>
-            <FieldLabel label="Username / Email" onCopy={() => handleCopy(credential.username, "username")} fieldId="username" />
+            <FieldLabel label="Username / Email" onCopy={() => handleCopy(credential.username || '', "username")} fieldId="username" />
             <FieldValue>{credential.username || "N/A"}</FieldValue>
           </Box>
 
@@ -280,7 +279,7 @@ export default function CredentialDetail({
                 </Button>
                 <Button 
                   size="small" 
-                  onClick={() => requestSudo({ onSuccess: () => handleCopy(credential.password, "password") })}
+                  onClick={() => requestSudo({ onSuccess: () => handleCopy(credential.password || '', "password") })}
                   startIcon={<ContentCopyIcon sx={{ fontSize: 12 }} />}
                   sx={{ 
                     height: 24, 

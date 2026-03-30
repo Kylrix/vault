@@ -39,7 +39,7 @@ export class MasterPassCrypto {
     return crypto.subtle.deriveKey(
       {
         name: "PBKDF2",
-        salt: salt,
+        salt: salt as any,
         iterations: MasterPassCrypto.PBKDF2_ITERATIONS,
         hash: "SHA-256",
       },
@@ -105,7 +105,7 @@ export class MasterPassCrypto {
         // Ensure user document is marked as having masterpass if keychain exists
         const { AppwriteService } = await import("../../../lib/appwrite");
         const userDoc = await AppwriteService.getUserDoc(userId);
-        if (userDoc && !userDoc.masterpass) {
+        if (userDoc && !userDoc.masterpass && userDoc.email) {
           await AppwriteService.setMasterpassFlag(userId, userDoc.email);
         }
 

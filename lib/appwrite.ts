@@ -14,11 +14,16 @@ import {
 } from "appwrite";
 import type {
   Credentials,
+  CredentialsCreate,
   TotpSecrets,
+  TotpSecretsCreate,
   Folders,
+  FoldersCreate,
   SecurityLogs,
+  SecurityLogsCreate,
   User,
   Keychain,
+  KeychainCreate,
 } from "@/types/appwrite.d";
 import { AuthenticatorType } from "appwrite";
 import { sanitizeString } from "@/lib/validation";
@@ -454,7 +459,7 @@ export class AppwriteService {
   }
   // Create with automatic encryption
   static async createCredential(
-    data: Omit<Credentials, "$id" | "$createdAt" | "$updatedAt">,
+    data: CredentialsCreate,
   ): Promise<Credentials> {
     const sanitizedData = this.sanitizeCredentialData(data);
     const encryptedData = await this.encryptDocumentFields(sanitizedData, "credentials");
@@ -505,7 +510,7 @@ export class AppwriteService {
   }
 
   static async createTOTPSecret(
-    data: Omit<TotpSecrets, "$id" | "$createdAt" | "$updatedAt">,
+    data: TotpSecretsCreate,
   ): Promise<TotpSecrets> {
     const sanitizedData = this.sanitizeTotpData(data);
     const encryptedData = await this.encryptDocumentFields(sanitizedData, "totpSecrets");
@@ -527,7 +532,7 @@ export class AppwriteService {
   }
 
   static async createFolder(
-    data: Omit<Folders, "$id" | "$createdAt" | "$updatedAt">,
+    data: FoldersCreate,
   ): Promise<Folders> {
     const sanitizedData = {
       ...data,
@@ -548,7 +553,7 @@ export class AppwriteService {
   }
 
   static async createSecurityLog(
-    data: Omit<SecurityLogs, "$id">,
+    data: SecurityLogsCreate,
   ): Promise<SecurityLogs> {
     const doc = await appwriteDatabases.createDocument(
       APPWRITE_DATABASE_ID,
@@ -566,7 +571,7 @@ export class AppwriteService {
   }
 
   static async createKeychainEntry(
-    data: Omit<Keychain, "$id" | "$createdAt" | "$updatedAt">,
+    data: KeychainCreate,
   ): Promise<Keychain> {
     const doc = await appwriteDatabases.createDocument(
       APPWRITE_DATABASE_ID,
@@ -1727,7 +1732,7 @@ export async function deleteFolder(id: string) {
  * Create a new folder.
  */
 export async function createFolder(
-  data: Omit<Folders, "$id" | "$createdAt" | "$updatedAt">,
+  data: FoldersCreate,
 ) {
   return await AppwriteService.createFolder(data);
 }
@@ -1736,7 +1741,7 @@ export async function createFolder(
  * Create a new TOTP secret (encrypted).
  */
 export async function createTotpSecret(
-  data: Omit<TotpSecrets, "$id" | "$createdAt" | "$updatedAt">,
+  data: TotpSecretsCreate,
 ) {
   return await AppwriteService.createTOTPSecret(data);
 }
@@ -1995,7 +2000,7 @@ export async function listAllCredentials(
  * Create a new credential (encrypted).
  */
 export async function createCredential(
-  data: Omit<Credentials, "$id" | "$createdAt" | "$updatedAt">,
+  data: CredentialsCreate,
 ) {
   return await AppwriteService.createCredential(data);
 }
