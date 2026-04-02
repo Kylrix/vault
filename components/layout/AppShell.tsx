@@ -212,42 +212,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Box sx={{ mt: 'auto', pt: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
               <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.03)', mb: 3 }} />
               
-              {/* Ecosystem Pulse Bridge */}
-              <Box 
-                sx={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: 2, 
-                  px: 2, 
-                  py: 1.5,
-                  mb: 1,
-                  borderRadius: '12px',
-                  bgcolor: 'rgba(255, 255, 255, 0.02)',
-                  border: '1px solid rgba(255, 255, 255, 0.05)'
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: '#10b981',
-                    boxShadow: '0 0 12px #10b981',
-                    animation: 'pulse 2s infinite'
-                  }}
-                />
-                <Typography 
-                  sx={{ 
-                    fontSize: '0.75rem', 
-                    fontWeight: 900, 
-                    color: 'white', 
-                    letterSpacing: '0.1em',
-                    fontFamily: 'var(--font-space-grotesk)'
-                  }}
-                >
-                  VAULT ACTIVE
-                </Typography>
-              </Box>
 
               <Button
                 variant="text"
