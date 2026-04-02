@@ -1,6 +1,6 @@
 "use client";
 
-import { getMfaAuthenticationStatus, hasMasterpass } from "@/lib/appwrite";
+import { getMfaAuthenticationStatus } from "@/lib/appwrite";
 import { useRouter } from "next/navigation";
 import { useAppwriteVault } from "@/context/appwrite-context";
 
@@ -43,9 +43,8 @@ export function useFinalizeAuth() {
         router.replace(options.fallback || "/masterpass");
         return;
       }
-      // Check masterpass and vault
-      const hasMp = await hasMasterpass(u.$id);
-      if (!hasMp || !isVaultUnlocked()) {
+      // The vault crypto lock is the source of truth for local access.
+      if (!isVaultUnlocked()) {
         router.replace("/masterpass");
       } else {
         router.replace("/dashboard");

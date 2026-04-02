@@ -11,7 +11,6 @@ import { useRouter, usePathname } from "next/navigation";
 import {
   appwriteAccount,
   resetMasterpassAndWipe,
-  hasMasterpass,
   logoutAppwrite,
 } from "@/lib/appwrite";
 import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
@@ -63,23 +62,21 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
           window.history.replaceState({}, '', url.toString());
         }
 
-        const hasMp = await hasMasterpass(account.$id);
         const unlocked = masterPassCrypto.isVaultUnlocked();
         if (verbose)
           logDebug("[auth] master password status", {
-            hasMasterpass: hasMp,
             unlocked,
           });
         
         // Use pathname to skip forcing masterpass on specific pages
         const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
         
-        // Only set needsMasterPassword if we have a valid account AND they have a masterpass set (or need one)
-        // If it's an auth page, we don't need to force the modal
+        // The crypto lock state is the source of truth for whether the vault is usable.
+        // If it's an auth page, we don't need to force the modal.
         if (isAuthPage) {
           setNeedsMasterPassword(false);
         } else {
-          setNeedsMasterPassword(!hasMp || !unlocked);
+          setNeedsMasterPassword(!unlocked);
         }
       } else {
         // Explicitly clear everything on failure
@@ -305,13 +302,12 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     await fetchUser();
     // After refresh, re-calculate needsMasterPassword specifically
     const unlocked = masterPassCrypto.isVaultUnlocked();
-    const hasMp = user ? await hasMasterpass(user.$id) : false;
     const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
     
     if (isAuthPage) {
       setNeedsMasterPassword(false);
     } else {
-      setNeedsMasterPassword(!hasMp || !unlocked);
+      setNeedsMasterPassword(!unlocked);
     }
   };
 
