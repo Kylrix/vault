@@ -29,9 +29,10 @@ import { usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import EcosystemPortal from "../common/EcosystemPortal";
 import Logo from "../common/Logo";
-import Avatar from "@mui/material/Avatar";
 import { getUserProfilePicId } from "@/lib/user-utils";
 import { fetchProfilePreview, getCachedProfilePreview } from "@/lib/profile-preview";
+import { IdentityAvatar, computeIdentityFlags } from "../common/IdentityBadge";
+import { searchGlobalUsers } from "@/lib/ecosystem/identity";
 
 const PasswordGenerator = dynamic(() => import("@/components/ui/PasswordGenerator"), { 
   loading: () => <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}><CircularProgress size={24} /></Box>,
@@ -44,6 +45,8 @@ export function Navbar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isEcosystemPortalOpen, setIsEcosystemPortalOpen] = useState(false);
   const [profileUrl, setProfileUrl] = useState<string | null>(null);
+  const [profileRecord, setProfileRecord] = useState<any>(null);
+  const profileUsername = String((user?.prefs as any)?.username || user?.name || '').trim();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -81,6 +84,35 @@ export function Navbar() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadProfileRecord = async () => {
+      if (!profileUsername) return;
+      try {
+        const results = await searchGlobalUsers(profileUsername, 1);
+        if (!mounted) return;
+        setProfileRecord(results[0] || null);
+      } catch (error) {
+        console.warn('[Vault Navbar] Failed to load profile record:', error);
+      }
+    };
+    loadProfileRecord();
+    return () => {
+      mounted = false;
+    };
+  }, [profileUsername]);
+
+  const identitySignals = computeIdentityFlags({
+    createdAt: profileRecord?.createdAt || (user as any)?.$createdAt || (user as any)?.createdAt || null,
+    lastUsernameEdit: profileRecord?.lastUsernameEdit || (user?.prefs as any)?.last_username_edit || null,
+    profilePicId: profileRecord?.profilePicId || getUserProfilePicId(user) || null,
+    username: profileRecord?.username || (user?.prefs as any)?.username || user?.name || null,
+    bio: profileRecord?.bio || (user?.prefs as any)?.bio || null,
+    tier: profileRecord?.tier || (user?.prefs as any)?.tier || null,
+    publicKey: profileRecord?.publicKey || (user?.prefs as any)?.publicKey || null,
+    emailVerified: Boolean((user as any)?.emailVerification),
+  });
 
   const isCorePage = [
     "/dashboard",
@@ -221,21 +253,15 @@ export function Navbar() {
                   transition: 'transform 0.2s'
                 }}
               >
-                <Avatar 
+                <IdentityAvatar
                   src={profileUrl || undefined}
-                  sx={{ 
-                    width: 38, 
-                    height: 38, 
-                    bgcolor: '#6366F1',
-                    fontSize: '0.75rem',
-                    fontWeight: 800,
-                    color: '#000',
-                    border: '2px solid rgba(255, 255, 255, 0.1)',
-                    borderRadius: '10px'
-                  }}
-                >
-                  {user?.name ? user.name[0].toUpperCase() : 'U'}
-                </Avatar>
+                  alt={user?.name || user?.email || 'profile'}
+                  fallback={user?.name ? user.name[0].toUpperCase() : 'U'}
+                  verified={identitySignals.verified}
+                  pro={identitySignals.pro}
+                  size={38}
+                  borderRadius="12px"
+                />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}

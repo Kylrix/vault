@@ -14,7 +14,6 @@ import {
   Divider,
   ListItemIcon,
   ListItemText,
-  Avatar,
   InputBase,
   Button
 } from "@mui/material";
@@ -42,7 +41,9 @@ import { getEcosystemUrl } from "@/lib/constants/ecosystem";
 import Logo from "../common/Logo";
 import { getUserProfilePicId } from "@/lib/user-utils";
 import { fetchProfilePreview, getCachedProfilePreview } from "@/lib/profile-preview";
+import { IdentityAvatar, computeIdentityFlags } from "../common/IdentityBadge";
 import { WalletSidebar } from "../overlays/WalletSidebar";
+import { searchGlobalUsers } from "@/lib/ecosystem/identity";
 
 // Pages that should use the simplified layout (no sidebar/header)
 const SIMPLIFIED_LAYOUT_PATHS = ["/"];
@@ -76,6 +77,8 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [isEcosystemPortalOpen, setIsEcosystemPortalOpen] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [profileUrl, setProfileUrl] = useState<string | null>(null);
+  const [profileRecord, setProfileRecord] = useState<any>(null);
+  const profileUsername = String((user?.prefs as any)?.username || user?.name || '').trim();
 
   useEffect(() => {
     let mounted = true;
@@ -101,6 +104,35 @@ export function Header({ onMenuClick }: HeaderProps) {
     fetchPreview();
     return () => { mounted = false; };
   }, [user]);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadProfileRecord = async () => {
+      if (!profileUsername) return;
+      try {
+        const results = await searchGlobalUsers(profileUsername, 1);
+        if (!mounted) return;
+        setProfileRecord(results[0] || null);
+      } catch (error) {
+        console.warn('[Vault Header] Failed to load profile record:', error);
+      }
+    };
+    loadProfileRecord();
+    return () => {
+      mounted = false;
+    };
+  }, [profileUsername]);
+
+  const identitySignals = computeIdentityFlags({
+    createdAt: profileRecord?.createdAt || (user as any)?.$createdAt || (user as any)?.createdAt || null,
+    lastUsernameEdit: profileRecord?.lastUsernameEdit || (user?.prefs as any)?.last_username_edit || null,
+    profilePicId: profileRecord?.profilePicId || getUserProfilePicId(user) || null,
+    username: profileRecord?.username || (user?.prefs as any)?.username || user?.name || null,
+    bio: profileRecord?.bio || (user?.prefs as any)?.bio || null,
+    tier: profileRecord?.tier || (user?.prefs as any)?.tier || null,
+    publicKey: profileRecord?.publicKey || (user?.prefs as any)?.publicKey || null,
+    emailVerified: Boolean((user as any)?.emailVerification),
+  });
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -327,21 +359,15 @@ export function Header({ onMenuClick }: HeaderProps) {
                 transition: 'transform 0.2s'
               }}
             >
-              <Avatar 
+              <IdentityAvatar
                 src={profileUrl || undefined}
-                sx={{ 
-                  width: { xs: 32, sm: 38 }, 
-                  height: { xs: 32, sm: 38 }, 
-                  bgcolor: '#6366F1',
-                  fontSize: '0.75rem',
-                  fontWeight: 800,
-                  color: '#000',
-                  border: '2px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '10px'
-                }}
-              >
-                {user?.name ? user.name[0].toUpperCase() : 'U'}
-              </Avatar>
+                alt={user?.name || user?.email || 'profile'}
+                fallback={user?.name ? user.name[0].toUpperCase() : 'U'}
+                verified={identitySignals.verified}
+                pro={identitySignals.pro}
+                size={38}
+                borderRadius="12px"
+              />
             </IconButton>
           ) : (
             <Button
