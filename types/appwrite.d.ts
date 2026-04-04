@@ -88,6 +88,27 @@ export enum CallsType {
     VIDEO = "video"
 }
 
+export enum AccountEventsType {
+    REFERRAL = "referral",
+    REPUTATION = "reputation",
+    REPORT = "report",
+    COUPON = "coupon",
+    USERNAME_CHANGE = "username_change",
+    VERIFICATION = "verification",
+    PROFILE_SYNC = "profile_sync"
+}
+
+export enum AccountEventsStatus {
+    PENDING = "pending",
+    ACTIVE = "active",
+    VERIFIED = "verified",
+    REJECTED = "rejected",
+    REDEEMED = "redeemed",
+    EXPIRED = "expired",
+    REVOKED = "revoked",
+    SYNCED = "synced"
+}
+
 export enum FormsStatus {
     DRAFT = "draft",
     PUBLISHED = "published",
@@ -256,18 +277,6 @@ export type Subscriptions = Models.Row & {
     updatedAt: string | null;
 }
 
-export type SecurityLogsCreate = {
-    userId: string;
-    eventType: string;
-    ipAddress?: string | null;
-    userAgent?: string | null;
-    deviceFingerprint?: string | null;
-    details?: string | null;
-    success?: boolean;
-    severity?: string;
-    timestamp?: string;
-}
-
 export type SecurityLogs = Models.Row & {
     userId: string;
     eventType: string;
@@ -278,34 +287,6 @@ export type SecurityLogs = Models.Row & {
     success: boolean;
     severity: string;
     timestamp: string;
-}
-
-export type CredentialsCreate = {
-    userId: string;
-    itemType: string;
-    name: string;
-    url?: string | null;
-    notes?: string | null;
-    totpId?: string | null;
-    password?: string | null;
-    cardNumber?: string | null;
-    cardholderName?: string | null;
-    cardExpiry?: string | null;
-    cardCVV?: string | null;
-    cardPIN?: string | null;
-    cardType?: string | null;
-    folderId?: string | null;
-    tags?: string[] | null;
-    customFields?: string | null;
-    faviconUrl?: string | null;
-    isFavorite?: boolean;
-    isDeleted?: boolean;
-    deletedAt?: string | null;
-    lastAccessedAt?: string | null;
-    passwordChangedAt?: string | null;
-    createdAt?: string | null;
-    updatedAt?: string | null;
-    username?: string | null;
 }
 
 export type Credentials = Models.Row & {
@@ -369,19 +350,6 @@ export type User = Models.Row & {
     updatedAt: string | null;
 }
 
-export type FoldersCreate = {
-    userId: string;
-    name: string;
-    parentFolderId?: string | null;
-    icon?: string | null;
-    color?: string | null;
-    sortOrder?: number;
-    isDeleted?: boolean;
-    deletedAt?: string | null;
-    createdAt?: string | null;
-    updatedAt?: string | null;
-}
-
 export type Folders = Models.Row & {
     userId: string;
     name: string;
@@ -393,24 +361,6 @@ export type Folders = Models.Row & {
     deletedAt: string | null;
     createdAt: string | null;
     updatedAt: string | null;
-}
-
-export type TotpSecretsCreate = {
-    userId: string;
-    issuer: string;
-    accountName: string;
-    secretKey: string;
-    algorithm?: string;
-    digits?: number;
-    period?: number;
-    url?: string | null;
-    folderId?: string | null;
-    tags?: string[] | null;
-    isFavorite?: boolean;
-    isDeleted?: boolean;
-    deletedAt?: string | null;
-    createdAt?: string | null;
-    updatedAt?: string | null;
 }
 
 export type TotpSecrets = Models.Row & {
@@ -430,18 +380,6 @@ export type TotpSecrets = Models.Row & {
     lastUsedAt: string | null;
     createdAt: string | null;
     updatedAt: string | null;
-}
-
-export type KeychainCreate = {
-    userId: string;
-    type: string;
-    credentialId?: string | null;
-    wrappedKey: string;
-    salt: string;
-    params?: string | null;
-    isBackup?: boolean;
-    createdAt?: string | null;
-    updatedAt?: string | null;
 }
 
 export type Keychain = Models.Row & {
@@ -590,6 +528,18 @@ export type Epochs = Models.Row & {
     resourceId: string;
     epochNumber: number;
     createdBy: string;
+}
+
+export type AccountEvents = Models.Row & {
+    userId: string;
+    type: AccountEventsType;
+    actorId: string;
+    relatedUserId: string | null;
+    delta: number | null;
+    discountPercent: number | null;
+    status: AccountEventsStatus | null;
+    expiresAt: string | null;
+    metadata: string | null;
 }
 
 export type FocusSessions = Models.Row & {
