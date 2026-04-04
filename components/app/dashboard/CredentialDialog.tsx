@@ -26,7 +26,7 @@ import {
   alpha
 } from "@mui/material";
 import { createCredential, updateCredential } from "@/lib/appwrite";
-import type { Credentials, CredentialsCreate } from "@/types/appwrite";
+import type { Credentials, CredentialsCreate } from "@/generated/appwrite/types";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { generateRandomPassword } from "@/utils/password";
 
