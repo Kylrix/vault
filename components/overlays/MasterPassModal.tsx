@@ -84,7 +84,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
 
     // 3. Complete the flow and navigate once the state is settled
     await finalizeAuth({ redirect: true, fallback: "/dashboard" });
-  }, [user?.$id, onClose, finalizeAuth, refresh]);
+  }, [user?.$id, finalizeAuth, refresh]);
 
   const handleSuccessWithSync = onSuccess;
 
