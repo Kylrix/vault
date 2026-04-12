@@ -5,6 +5,7 @@ import type {
   SecurityLogs,
   User,
   Keychain,
+  KeyMapping,
 } from "@/types/appwrite";
 
 export type {
@@ -14,6 +15,7 @@ export type {
   SecurityLogs,
   User,
   Keychain,
+  KeyMapping,
 };
 
 export type SecurityLogsCreate = {
@@ -54,6 +56,7 @@ export type CredentialsCreate = {
   createdAt?: string | null;
   updatedAt?: string | null;
   username?: string | null;
+  sharedFrom?: string | null;
 };
 
 export type FoldersCreate = {
@@ -86,6 +89,7 @@ export type TotpSecretsCreate = {
   lastUsedAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  sharedFrom?: string | null;
 };
 
 export type KeychainCreate = {
@@ -98,4 +102,12 @@ export type KeychainCreate = {
   isBackup?: boolean;
   createdAt?: string | null;
   updatedAt?: string | null;
+};
+
+export type KeyMappingCreate = {
+  resourceId: string;
+  resourceType: string;
+  grantee: string;
+  wrappedKey: string;
+  metadata?: string | null;
 };

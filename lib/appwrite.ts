@@ -24,6 +24,8 @@ import type {
   User,
   Keychain,
   KeychainCreate,
+  KeyMapping,
+  KeyMappingCreate,
 } from "@/lib/appwrite/types";
 import { AuthenticatorType } from "appwrite";
 import { sanitizeString } from "@/lib/validation";
@@ -208,6 +210,7 @@ export const APPWRITE_COLLECTION_FOLDERS_ID = APPWRITE_CONFIG.TABLES.VAULT.FOLDE
 export const APPWRITE_COLLECTION_SECURITYLOGS_ID = APPWRITE_CONFIG.TABLES.VAULT.SECURITY_LOGS;
 export const APPWRITE_COLLECTION_USER_ID = APPWRITE_CONFIG.TABLES.VAULT.USER;
 export const APPWRITE_COLLECTION_KEYCHAIN_ID = APPWRITE_CONFIG.TABLES.VAULT.KEYCHAIN;
+export const APPWRITE_COLLECTION_KEY_MAPPING_ID = APPWRITE_CONFIG.TABLES.VAULT.KEY_MAPPING;
 
 // Ecosystem: Kylrix Flow
 export const FLOW_DATABASE_ID = APPWRITE_CONFIG.DATABASES.FLOW;

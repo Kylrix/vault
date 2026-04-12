@@ -42,10 +42,12 @@ export const APPWRITE_CONFIG = {
             SECURITY_LOGS: 'securityLogs',
             USER: 'user',
             KEYCHAIN: 'keychain',
+            KEY_MAPPING: 'key_mapping',
             WALLETS: 'wallets'
         },
         PASSWORD_MANAGER: {
             KEYCHAIN: 'keychain',
+            KEY_MAPPING: 'key_mapping',
             IDENTITIES: 'identities',
             WALLETS: 'wallets'
         },

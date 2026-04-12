@@ -48,6 +48,14 @@ export class EcosystemSecurity {
     await this.getOrCreateNodeKeys();
   }
 
+  getIdentityPrivateKey(): CryptoKey | null {
+    return this.identityKeyPair?.privateKey ?? null;
+  }
+
+  getIdentityPublicKey(): CryptoKey | null {
+    return this.identityKeyPair?.publicKey ?? null;
+  }
+
   /**
    * Get or create this node's asymmetric identity keys
    */
@@ -75,6 +83,24 @@ export class EcosystemSecurity {
     localStorage.setItem(`kylrix_node_pubkey_${this.nodeId}`, pubKeyBase64);
 
     return this.signingKey;
+  }
+
+  async ensureIdentityKeyPair(): Promise<CryptoKeyPair> {
+    if (this.identityKeyPair) return this.identityKeyPair;
+
+    this.identityKeyPair = await crypto.subtle.generateKey(
+      {
+        name: "X25519",
+      },
+      false,
+      ["deriveKey", "deriveBits"],
+    );
+
+    return this.identityKeyPair;
+  }
+
+  async importIdentityKeyPair(keyPair: CryptoKeyPair): Promise<void> {
+    this.identityKeyPair = keyPair;
   }
 
   /**
