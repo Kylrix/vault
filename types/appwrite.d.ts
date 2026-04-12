@@ -88,6 +88,12 @@ export enum CallsType {
     VIDEO = "video"
 }
 
+export enum JoinRequestsStatus {
+    PENDING = "pending",
+    ACCEPTED = "accepted",
+    REJECTED = "rejected"
+}
+
 export enum FormsStatus {
     DRAFT = "draft",
     PUBLISHED = "published",
@@ -267,6 +273,7 @@ export type Credentials = Models.Row & {
     createdAt: string | null;
     updatedAt: string | null;
     username: string | null;
+    sharedFrom: string | null;
 }
 
 export type Identities = Models.Row & {
@@ -332,6 +339,7 @@ export type TotpSecrets = Models.Row & {
     lastUsedAt: string | null;
     createdAt: string | null;
     updatedAt: string | null;
+    sharedFrom: string | null;
 }
 
 export type Keychain = Models.Row & {
@@ -407,6 +415,7 @@ export type Conversations = Models.Row & {
     tags: string[];
     contextType: string | null;
     contextId: string | null;
+    inviteMeta: string | null;
 }
 
 export type Contacts = Models.Row & {
@@ -469,6 +478,17 @@ export type Calls = Models.Row & {
     conversationId: string | null;
 }
 
+export type Epochs = Models.Row & {
+    resourceId: string;
+    epochNumber: number;
+    createdBy: string;
+}
+
+export type ConversationMembers = Models.Row & {
+    conversationId: string;
+    userId: string;
+}
+
 export type Profiles = Models.Row & {
     username: string;
     displayName: string | null;
@@ -481,15 +501,22 @@ export type Profiles = Models.Row & {
     userId: string;
 }
 
-export type Epochs = Models.Row & {
-    resourceId: string;
-    epochNumber: number;
-    createdBy: string;
+export type MessageReactions = Models.Row & {
+    conversationId: string;
+    messageId: string;
+    userId: string;
+    emoji: string;
+    createdAt: string;
 }
 
-export type ConversationMembers = Models.Row & {
-    conversationId: string;
-    userId: string;
+export type JoinRequests = Models.Row & {
+    resourceType: string;
+    resourceId: string;
+    requesterId: string;
+    status: JoinRequestsStatus | null;
+    createdAt: string | null;
+    resolvedAt: string | null;
+    resolvedBy: string | null;
 }
 
 export type FocusSessions = Models.Row & {
