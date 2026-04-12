@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import {
-    Dialog,
+    Drawer,
     DialogTitle,
     DialogContent,
     Typography,
@@ -12,7 +12,6 @@ import {
     IconButton,
     CircularProgress,
     Stack,
-    Fade,
     alpha,
     InputAdornment,
 } from "@mui/material";
@@ -264,21 +263,30 @@ export function SudoModal({
     }
 
     return (
-        <Dialog
+        <Drawer
             open={isOpen}
             onClose={onCancel}
-            maxWidth="xs"
-            fullWidth
-            TransitionComponent={Fade}
+            anchor="bottom"
+            ModalProps={{ keepMounted: true }}
+            sx={{ zIndex: 2200 }}
             PaperProps={{
                 sx: {
-                    borderRadius: '32px',
+                    borderTopLeftRadius: '32px',
+                    borderTopRightRadius: '32px',
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
                     bgcolor: BG_COLOR,
-                    backdropFilter: 'blur(32px) saturate(200%)',
+                    backdropFilter: 'none',
                     border: '1px solid rgba(255, 255, 255, 0.05)',
                     backgroundImage: 'none',
                     boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8)',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: '100%',
+                    maxWidth: '100vw',
+                    height: 'auto',
+                    maxHeight: 'calc(100dvh - 12px)',
                 }
             }}
         >
@@ -293,7 +301,7 @@ export function SudoModal({
                     100% { transform: scale(1); opacity: 1; }
                 }
             `}</style>
-            <DialogTitle sx={{ textAlign: 'center', pt: 5, pb: 1, position: 'relative' }}>
+            <DialogTitle sx={{ textAlign: 'center', pt: 5, pb: 1, position: 'relative', bgcolor: BG_COLOR }}>
                 <IconButton
                     onClick={onCancel}
                     sx={{
@@ -351,7 +359,7 @@ export function SudoModal({
                 </Typography>
             </DialogTitle>
 
-            <DialogContent sx={{ pb: 4 }}>
+            <DialogContent sx={{ pb: 4, flex: '1 1 auto', minHeight: 0, overflowY: 'auto', scrollbarGutter: 'stable', bgcolor: BG_COLOR }}>
                 {intent === "reset" && mode === "password" ? (
                     <Stack spacing={3} sx={{ mt: 2 }}>
                         <Box sx={{
@@ -692,6 +700,6 @@ export function SudoModal({
                     </Stack>
                 )}
             </DialogContent>
-        </Dialog>
+        </Drawer>
     );
 }
