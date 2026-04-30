@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAppwriteVault } from "@/context/appwrite-context";
+import { getTopbarLogoHref } from "@/lib/sdk";
 import {
   GridViewOutlined as GripIcon,
   AutoAwesomeOutlined as SparklesIcon,
@@ -147,7 +148,7 @@ export function Navbar() {
           size={32} 
           app="vault" 
           component={Link} 
-          href="/" 
+          href={getTopbarLogoHref('vault')} 
           sx={{ 
             color: 'inherit',
             '&:hover': { opacity: 0.8 }
