@@ -48,5 +48,6 @@
     "eslint": "9.34.0",
     "eslint-config-next": "15.5.2",
     "typescript": "^5"
-  }
+  },
+  "license": "AGPL-3.0"
 }
