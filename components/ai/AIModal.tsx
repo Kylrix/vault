@@ -2,13 +2,15 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Dialog, Box, Typography, TextField, Button, CircularProgress } from "@mui/material";
+import { Drawer, Box, Typography, TextField, Button, CircularProgress, useTheme, useMediaQuery } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import SendIcon from "@mui/icons-material/Send";
 import { useAI } from "@/app/context/AIContext";
 import { toast } from "react-hot-toast";
 
 export function AIModal({ onClose }: { onClose: () => void }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { sendCommand, isLoading, openGlobalCreateModal } = useAI();
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState<string | null>(null);
@@ -68,20 +70,25 @@ export function AIModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Dialog 
+    <Drawer 
+      anchor={isMobile ? 'bottom' : 'right'}
       open={true} 
       onClose={onClose}
       PaperProps={{
         sx: {
-          width: '100%',
-          maxWidth: 500,
+          width: isMobile ? '100%' : 'min(100vw, 500px)',
+          maxWidth: '100%',
+          height: isMobile ? 'auto' : '100%',
+          maxHeight: isMobile ? '92dvh' : '100%',
+          borderRadius: isMobile ? '24px 24px 0 0' : '0',
           bgcolor: 'rgba(10, 10, 10, 0.8)',
           backdropFilter: 'blur(20px) saturate(180%)',
           border: '1px solid',
           borderColor: 'rgba(255, 255, 255, 0.08)',
-          borderRadius: '24px',
           boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-          backgroundImage: 'none'
+          backgroundImage: 'none',
+          display: 'flex',
+          flexDirection: 'column',
         }
       }}
     >
@@ -168,7 +175,6 @@ export function AIModal({ onClose }: { onClose: () => void }) {
           </Button>
         </Box>
       </Box>
-    </Dialog>
+    </Drawer>
   );
 }
-

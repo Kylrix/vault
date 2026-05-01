@@ -3,9 +3,7 @@
 import { useState, useEffect } from "react";
 import { useFinalizeAuth } from "@/lib/finalizeAuth";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
+  Drawer,
   Typography,
   Button,
   TextField, 
@@ -13,8 +11,10 @@ import {
   CircularProgress, 
   Stack, 
   Fade, 
-  alpha, 
-  } from "@mui/material";import {
+  alpha,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";import {
   Smartphone as SmartphoneIcon,
   Mail as MailIcon,
   Phone as PhoneIcon,
@@ -35,6 +35,8 @@ interface TwoFAModalProps {
 }
 
 export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [factors, setFactors] = useState<{
     totp: boolean;
     email: boolean;
@@ -106,25 +108,31 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
   };
 
   return (
-    <Dialog
+    <Drawer
+      anchor={isMobile ? 'bottom' : 'right'}
       open={isOpen}
       onClose={onClose}
-      maxWidth="xs"
-      fullWidth
       TransitionComponent={Fade}
       PaperProps={{
         sx: {
-          borderRadius: '28px',
+          width: isMobile ? '100%' : 'min(100vw, 400px)',
+          maxWidth: '100%',
+          height: isMobile ? 'auto' : '100%',
+          maxHeight: isMobile ? '92dvh' : '100%',
+          borderRadius: isMobile ? '28px 28px 0 0' : '0',
           bgcolor: 'rgba(10, 10, 10, 0.95)',
           backdropFilter: 'blur(25px) saturate(180%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           backgroundImage: 'none',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        }
         }
       }}
     >
-      <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 1 }}>
+      <Box sx={{ textAlign: 'center', pt: 4, pb: 1, borderBottom: '1px solid rgba(255, 255, 255, 0.05)', flexShrink: 0 }}>
         <Box sx={{ 
           display: 'inline-flex', 
           p: 1.5, 
@@ -146,9 +154,9 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
         <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 1 }}>
           Additional verification required to access your vault
         </Typography>
-      </DialogTitle>
+      </Box>
 
-      <DialogContent sx={{ pb: 4 }}>
+      <Box sx={{ pb: 4, px: 3, pt: 3, flex: 1, overflowY: 'auto' }}>
         {!factors ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
             <CircularProgress size={32} sx={{ color: '#6366F1' }} />
@@ -343,7 +351,7 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
             </Button>
           </Stack>
         )}
-      </DialogContent>
-    </Dialog>
+      </Box>
+    </Drawer>
   );
 }

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Dialog as MuiDialog, DialogContent, IconButton } from "@mui/material";
+import { Drawer, Box, IconButton, useTheme, useMediaQuery } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 
 export function Dialog({
@@ -13,29 +13,31 @@ export function Dialog({
   children: ReactNode;
   _className?: string;
 }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   return (
-    <MuiDialog
+    <Drawer
+      anchor={isMobile ? 'bottom' : 'right'}
       open={open}
       onClose={onClose}
-      maxWidth="md"
-      fullWidth
       PaperProps={{
         sx: {
+          width: isMobile ? '100%' : 'min(100vw, 640px)',
+          maxWidth: '100%',
+          height: isMobile ? 'auto' : '100%',
+          maxHeight: isMobile ? '92dvh' : '100%',
           bgcolor: 'rgba(10, 10, 10, 0.95)',
           backdropFilter: 'blur(25px) saturate(180%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '24px',
+          borderRadius: isMobile ? '24px 24px 0 0' : '0',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
           backgroundImage: 'none',
           color: 'white',
           position: 'relative',
-          overflow: 'visible'
-        }
-      }}
-      sx={{
-        '& .MuiBackdrop-root': {
-          bgcolor: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(4px)'
+          overflow: 'visible',
+          display: 'flex',
+          flexDirection: 'column',
         }
       }}
     >
@@ -55,9 +57,9 @@ export function Dialog({
       >
         <CloseIcon sx={{ fontSize: 20 }} />
       </IconButton>
-      <DialogContent sx={{ p: 0 }}>
+      <Box sx={{ p: 0, flex: 1, overflowY: 'auto' }}>
         {children}
-      </DialogContent>
-    </MuiDialog>
+      </Box>
+    </Drawer>
   );
 }

@@ -3,10 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  Drawer,
   Button,
   TextField,
   InputAdornment,
@@ -15,7 +12,9 @@ import {
   Box,
   Stack,
   CircularProgress,
-  alpha
+  alpha,
+  useTheme,
+  useMediaQuery
 } from "@mui/material"; import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import LockIcon from "@mui/icons-material/Lock";
@@ -48,6 +47,8 @@ const BG_COLOR = "#0A0908";
 const SURFACE_COLOR = "#161412";
 
 export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [masterPassword, setMasterPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
