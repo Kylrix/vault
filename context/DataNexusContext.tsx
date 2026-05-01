@@ -25,6 +25,7 @@ interface DataNexusContextType {
 const DataNexusContext = createContext<DataNexusContextType | undefined>(undefined);
 
 const DEFAULT_TTL = 1000 * 60 * 30; // 30 minutes default TTL for vault data
+const STALE_TTL = DEFAULT_TTL * 8;
 
 export function DataNexusProvider({ children }: { children: ReactNode }) {
     // In-memory cache for decrypted ultra-fast access (volatile)
@@ -116,6 +117,23 @@ export function DataNexusProvider({ children }: { children: ReactNode }) {
         // 1. Check if we already have valid decrypted data
         const cached = await getCachedData<T>(key, ttl);
         if (cached) return cached;
+
+        const stale = await getCachedData<T>(key, STALE_TTL);
+        if (stale) {
+            if (!activeRequests.current.has(key)) {
+                const request = (async () => {
+                    try {
+                        const data = await fetcher();
+                        await setCachedData(key, data, ttl);
+                        return data;
+                    } finally {
+                        activeRequests.current.delete(key);
+                    }
+                })();
+                activeRequests.current.set(key, request);
+            }
+            return stale;
+        }
 
         // 2. Deduplication: Check if an identical request is already in flight
         const existingRequest = activeRequests.current.get(key);
