@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { 
-  Dialog, 
+  Drawer, 
   Button, 
   TextField, 
   Box, 
@@ -11,7 +11,9 @@ import {
   IconButton, 
   CircularProgress,
   alpha,
-  Stack
+  Stack,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MailIcon from "@mui/icons-material/Mail";
@@ -25,6 +27,8 @@ interface ResetPasswordModalProps {
 }
 
 export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,19 +76,24 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
   };
 
   return (
-    <Dialog 
+    <Drawer 
+      anchor={isMobile ? 'bottom' : 'right'}
       open={isOpen} 
       onClose={onClose}
+      ModalProps={{ keepMounted: true }}
       PaperProps={{
         sx: {
-          borderRadius: '28px',
+          width: isMobile ? '100%' : 'min(100vw, 500px)',
+          maxWidth: '100%',
+          height: isMobile ? '92dvh' : '100%',
+          maxHeight: '100dvh',
+          borderRadius: isMobile ? '24px 24px 0 0' : '0',
           bgcolor: 'rgba(10, 10, 10, 0.95)',
           backdropFilter: 'blur(25px) saturate(180%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           backgroundImage: 'none',
-          maxWidth: '450px',
-          width: '100%',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+          display: 'flex',
+          flexDirection: 'column'
         }
       }}
     >
@@ -95,13 +104,14 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
           right: 16,
           top: 16,
           color: 'rgba(255, 255, 255, 0.3)',
+          zIndex: 1,
           '&:hover': { color: '#fff', bgcolor: 'rgba(255, 255, 255, 0.05)' }
         }}
       >
         <CloseIcon sx={{ fontSize: 20 }} />
       </IconButton>
 
-      <Box sx={{ p: 4, textAlign: 'center' }}>
+      <Box sx={{ p: 4, textAlign: 'center', flex: 1, overflowY: 'auto' }}>
         <Box sx={{ 
           width: 64, 
           height: 64, 
@@ -206,6 +216,6 @@ export function ResetPasswordModal({ isOpen, onClose }: ResetPasswordModalProps)
           </Stack>
         </form>
       </Box>
-    </Dialog>
+    </Drawer>
   );
 }

@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
+  Drawer,
   Typography,
   Button,
   Box,
@@ -13,6 +11,8 @@ import {
   Stack,
   Fade,
   alpha,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import {
   CheckCircle as CheckCircleIcon,
@@ -29,6 +29,8 @@ interface VerifyEmailModalProps {
 }
 
 export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const params = useSearchParams();
   const router = useRouter();
 
@@ -79,25 +81,29 @@ export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
   };
 
   return (
-    <Dialog
+    <Drawer
+      anchor={isMobile ? 'bottom' : 'right'}
       open={isOpen}
       onClose={onClose}
-      maxWidth="xs"
-      fullWidth
-      TransitionComponent={Fade}
+      ModalProps={{ keepMounted: true }}
       PaperProps={{
         sx: {
-          borderRadius: '28px',
+          width: isMobile ? '100%' : 'min(100vw, 450px)',
+          maxWidth: '100%',
+          height: isMobile ? '92dvh' : '100%',
+          maxHeight: '100dvh',
+          borderRadius: isMobile ? '24px 24px 0 0' : '0',
           bgcolor: 'rgba(10, 10, 10, 0.95)',
           backdropFilter: 'blur(25px) saturate(180%)',
           border: '1px solid rgba(255, 255, 255, 0.1)',
           backgroundImage: 'none',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-          overflow: 'hidden'
+          display: 'flex',
+          flexDirection: 'column'
         }
       }}
     >
-      <DialogTitle sx={{ textAlign: 'center', pt: 4, pb: 1 }}>
+      {/* Header */}
+      <Box sx={{ textAlign: 'center', pt: 4, pb: 1, flexShrink: 0 }}>
         <Box sx={{ 
           display: 'inline-flex', 
           p: 1.5, 
@@ -124,9 +130,10 @@ export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
         }}>
           Verify Email
         </Typography>
-      </DialogTitle>
+      </Box>
 
-      <DialogContent sx={{ pb: 4, textAlign: 'center' }}>
+      {/* Content */}
+      <Box sx={{ pb: 4, textAlign: 'center', flex: 1, overflowY: 'auto' }}>
         <Stack spacing={3} sx={{ mt: 1 }}>
           {status === "verifying" && (
             <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.6)' }}>
@@ -247,7 +254,7 @@ export function VerifyEmailModal({ isOpen, onClose }: VerifyEmailModalProps) {
             </Box>
           )}
         </Stack>
-      </DialogContent>
-    </Dialog>
+      </Box>
+    </Drawer>
   );
 }
