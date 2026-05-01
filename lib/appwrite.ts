@@ -12,6 +12,7 @@ import {
   Role,
   Realtime,
 } from "appwrite";
+import { buildVaultNoteTags } from "./sdk/crosslinks";
 import type {
   Credentials,
   CredentialsCreate,
@@ -677,8 +678,13 @@ export class AppwriteService {
   // Create with automatic encryption
   static async createCredential(
     data: CredentialsCreate,
+    options?: { linkedNoteIds?: string[] },
   ): Promise<Credentials> {
     const sanitizedData = this.sanitizeCredentialData(data);
+    const linkedTags = buildVaultNoteTags(options?.linkedNoteIds || []);
+    if (linkedTags.length) {
+      sanitizedData.tags = Array.from(new Set([...(sanitizedData.tags || []), ...linkedTags]));
+    }
     const encryptedData = await this.encryptDocumentFields(sanitizedData, "credentials");
 
     // Ensure itemType is present, default to 'login'
@@ -729,8 +735,13 @@ export class AppwriteService {
 
   static async createTOTPSecret(
     data: TotpSecretsCreate,
+    options?: { linkedNoteIds?: string[] },
   ): Promise<TotpSecrets> {
     const sanitizedData = this.sanitizeTotpData(data);
+    const linkedTags = buildVaultNoteTags(options?.linkedNoteIds || []);
+    if (linkedTags.length) {
+      sanitizedData.tags = Array.from(new Set([...(sanitizedData.tags || []), ...linkedTags]));
+    }
     const encryptedData = await this.encryptDocumentFields(sanitizedData, "totpSecrets");
     const doc = await appwriteDatabases.createDocument(
       APPWRITE_DATABASE_ID,
@@ -1470,9 +1481,14 @@ export class AppwriteService {
   static async updateCredential(
     id: string,
     data: Partial<Credentials>,
+    options?: { linkedNoteIds?: string[] },
   ): Promise<Credentials> {
     const existing = await this.getCredential(id);
     const sanitizedData = this.sanitizeCredentialData(data);
+    const linkedTags = buildVaultNoteTags(options?.linkedNoteIds || []);
+    if (linkedTags.length) {
+      sanitizedData.tags = Array.from(new Set([...(sanitizedData.tags || []), ...linkedTags]));
+    }
     const encryptedData = await this.encryptDocumentFields(sanitizedData, "credentials");
     const doc = await appwriteDatabases.updateDocument(
       APPWRITE_DATABASE_ID,
@@ -1490,9 +1506,14 @@ export class AppwriteService {
   static async updateTOTPSecret(
     id: string,
     data: Partial<TotpSecrets>,
+    options?: { linkedNoteIds?: string[] },
   ): Promise<TotpSecrets> {
     const existing = await this.getTOTPSecret(id);
     const sanitizedData = this.sanitizeTotpData(data);
+    const linkedTags = buildVaultNoteTags(options?.linkedNoteIds || []);
+    if (linkedTags.length) {
+      sanitizedData.tags = Array.from(new Set([...(sanitizedData.tags || []), ...linkedTags]));
+    }
     const encryptedData = await this.encryptDocumentFields(sanitizedData, "totpSecrets");
     const doc = await appwriteDatabases.updateDocument(
       APPWRITE_DATABASE_ID,
@@ -1894,8 +1915,12 @@ export async function generateRecoveryCodes(): Promise<{
 /**
  * Update a TOTP secret by document ID (encrypted).
  */
-export async function updateTotpSecret(id: string, data: Partial<TotpSecrets>) {
-  return await AppwriteService.updateTOTPSecret(id, data);
+export async function updateTotpSecret(
+  id: string,
+  data: Partial<TotpSecrets>,
+  options?: { linkedNoteIds?: string[] },
+) {
+  return await AppwriteService.updateTOTPSecret(id, data, options);
 }
 
 export async function shareCredential(
@@ -2253,8 +2278,9 @@ export async function createFolder(
  */
 export async function createTotpSecret(
   data: TotpSecretsCreate,
+  options?: { linkedNoteIds?: string[] },
 ) {
-  return await AppwriteService.createTOTPSecret(data);
+  return await AppwriteService.createTOTPSecret(data, options);
 }
 
 /**
@@ -2521,15 +2547,20 @@ export async function listAllCredentials(
  */
 export async function createCredential(
   data: CredentialsCreate,
+  options?: { linkedNoteIds?: string[] },
 ) {
-  return await AppwriteService.createCredential(data);
+  return await AppwriteService.createCredential(data, options);
 }
 
 /**
  * Update a credential by document ID (encrypted).
  */
-export async function updateCredential(id: string, data: Partial<Credentials>) {
-  return await AppwriteService.updateCredential(id, data);
+export async function updateCredential(
+  id: string,
+  data: Partial<Credentials>,
+  options?: { linkedNoteIds?: string[] },
+) {
+  return await AppwriteService.updateCredential(id, data, options);
 }
 
 /**
