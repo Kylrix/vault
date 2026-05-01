@@ -12,10 +12,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import { 
-  Dialog, 
-  DialogTitle, 
-  DialogContent, 
-  DialogActions, 
+  Drawer,
   Button, 
   TextField, 
   IconButton, 
@@ -23,7 +20,11 @@ import {
   Box, 
   Typography, 
   Grid,
-  alpha
+  alpha,
+  useTheme,
+  useMediaQuery,
+  Stack,
+  Divider
 } from "@mui/material";
 import { createCredential, updateCredential } from "@/lib/appwrite";
 import type { Credentials, CredentialsCreate } from "@/lib/appwrite/types";
@@ -49,6 +50,8 @@ export default function CredentialDialog({
   prefill?: { name?: string; url?: string; username?: string };
   defaultType?: string;
 }) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { user } = useAppwriteVault();
   const [showPassword, setShowPassword] = useState(false);
   const [customFields, setCustomFields] = useState<
@@ -216,26 +219,31 @@ export default function CredentialDialog({
   const currentType = initial?.itemType || defaultType;
 
   return (
-    <Dialog 
-      open={open} 
+    <Drawer
+      anchor={isMobile ? 'bottom' : 'right'}
+      open={open}
       onClose={onClose}
-      maxWidth="sm"
-      fullWidth
+      ModalProps={{ keepMounted: true }}
       PaperProps={{
         sx: {
-          borderRadius: '24px',
+          width: isMobile ? '100%' : 'min(100vw, 600px)',
+          maxWidth: '100%',
+          height: isMobile ? '92dvh' : '100%',
+          maxHeight: '100dvh',
           bgcolor: BG_COLOR,
           backdropFilter: 'blur(32px) saturate(200%)',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
+          border: isMobile ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(255, 255, 255, 0.05)',
           backgroundImage: 'none',
-          boxShadow: '0 32px 64px rgba(0, 0, 0, 0.8)',
-          overflow: 'hidden'
+          borderRadius: isMobile ? '24px 24px 0 0' : '0',
+          display: 'flex',
+          flexDirection: 'column'
         }
       }}
     >
-      <form onSubmit={handleSubmit}>
-        <DialogTitle sx={{ 
-          p: 4, 
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        {/* Header */}
+        <Box sx={{ 
+          p: 3, 
           pb: 2, 
           display: 'flex', 
           alignItems: 'center', 
@@ -244,7 +252,9 @@ export default function CredentialDialog({
           fontWeight: 900,
           fontSize: '1.4rem',
           color: 'white',
-          letterSpacing: '-0.02em'
+          letterSpacing: '-0.02em',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          flexShrink: 0
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <Box sx={{ width: 12, height: 12, borderRadius: '3px', bgcolor: VAULT_PRIMARY, boxShadow: `0 0 15px ${VAULT_PRIMARY}` }} />
@@ -253,9 +263,29 @@ export default function CredentialDialog({
           <IconButton onClick={onClose} size="small" sx={{ color: 'rgba(255,255,255,0.3)', '&:hover': { color: 'white', bgcolor: 'rgba(255,255,255,0.05)' } }}>
             <CloseIcon sx={{ fontSize: 20 }} />
           </IconButton>
-        </DialogTitle>
+        </Box>
 
-        <DialogContent sx={{ p: 4, pt: 0 }}>
+        {/* Content */}
+        <Box sx={{ 
+          p: 3, 
+          pt: 2.5,
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          '&::-webkit-scrollbar': {
+            width: '6px'
+          },
+          '&::-webkit-scrollbar-track': {
+            bgcolor: 'transparent'
+          },
+          '&::-webkit-scrollbar-thumb': {
+            bgcolor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '3px',
+            '&:hover': {
+              bgcolor: 'rgba(255, 255, 255, 0.2)'
+            }
+          }
+        }}>
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12 }}>
               <TextField
@@ -583,9 +613,20 @@ export default function CredentialDialog({
               {error}
             </Typography>
           )}
-        </DialogContent>
+          </Grid>
+        </Box>
 
-        <DialogActions sx={{ p: 4, pt: 1, gap: 2 }}>
+        {/* Footer with Actions */}
+        <Box sx={{ 
+          p: 3, 
+          pt: 2,
+          gap: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          flexShrink: 0,
+          backgroundColor: isMobile ? 'transparent' : BG_COLOR
+        }}>
           <Button 
             onClick={onClose} 
             fullWidth 
@@ -628,8 +669,8 @@ export default function CredentialDialog({
           >
             {loading ? "Saving..." : initial ? "Update" : "Add Credential"}
           </Button>
-        </DialogActions>
+        </Box>
       </form>
-    </Dialog>
+    </Drawer>
   );
 }

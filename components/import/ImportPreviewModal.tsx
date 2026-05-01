@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Dialog } from "@/components/ui/Dialog";
+import { Drawer } from "@/components/ui/Drawer";
 import { 
   Button, 
   Box, 
@@ -79,7 +79,7 @@ export function ImportPreviewModal({
   if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onClose={onClose}>
+    <Drawer open={isOpen} onClose={onClose}>
       <Box sx={{ display: 'flex', flexDirection: 'column', maxHeight: '85vh' }}>
         <Box sx={{ p: 4, borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
@@ -304,7 +304,7 @@ export function ImportPreviewModal({
           </Button>
         </Box>
       </Box>
-    </Dialog>
+    </Drawer>
   );
 }
 
