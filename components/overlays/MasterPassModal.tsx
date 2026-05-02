@@ -19,7 +19,8 @@ import {
   alpha,
   useTheme,
   useMediaQuery
-} from "@mui/material"; import VisibilityIcon from "@mui/icons-material/Visibility";
+} from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import LockIcon from "@mui/icons-material/Lock";
 import ShieldIcon from "@mui/icons-material/Shield";
