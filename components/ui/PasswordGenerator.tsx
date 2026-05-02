@@ -68,18 +68,18 @@ export default function PasswordGenerator() {
 
   return (
     <Paper sx={{ 
-      p: 3, 
+      p: 4, 
       width: '100%', 
-      maxWidth: 400, 
-      bgcolor: 'rgba(10, 10, 10, 0.95)', 
-      backdropFilter: 'blur(25px) saturate(180%)',
-      border: '1px solid rgba(255, 255, 255, 0.1)',
-      borderRadius: '24px',
-      backgroundImage: 'none'
+      maxWidth: 420, 
+      bgcolor: '#161412', 
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+      borderRadius: '32px',
+      backgroundImage: 'none',
+      boxShadow: '0 24px 48px rgba(0, 0, 0, 0.4)',
     }}>
-      <Stack spacing={3}>
+      <Stack spacing={3.5}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 800, letterSpacing: '-0.02em' }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 900, fontFamily: 'var(--font-clash)', letterSpacing: '-0.02em', textTransform: 'uppercase', fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.9)' }}>
             Password Generator
           </Typography>
           <FormControlLabel
@@ -89,12 +89,12 @@ export default function PasswordGenerator() {
                 checked={showHistory} 
                 onChange={(e) => setShowHistory(e.target.checked)}
                 sx={{
-                  '& .MuiSwitch-switchBase.Mui-checked': { color: '#6366F1' },
-                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#6366F1' }
+                  '& .MuiSwitch-switchBase.Mui-checked': { color: '#10B981' },
+                  '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { bgcolor: '#10B981' }
                 }}
               />
             }
-            label={<Typography variant="caption" sx={{ fontWeight: 600, color: 'rgba(255, 255, 255, 0.5)' }}>History</Typography>}
+            label={<Typography variant="caption" sx={{ fontWeight: 700, color: 'rgba(255, 255, 255, 0.4)', letterSpacing: '0.05em' }}>HISTORY</Typography>}
             labelPlacement="start"
           />
         </Box>
@@ -108,34 +108,36 @@ export default function PasswordGenerator() {
               readOnly: true,
               sx: {
                 fontFamily: 'var(--font-mono)',
-                fontSize: '1.1rem',
-                bgcolor: 'rgba(255, 255, 255, 0.03)',
-                borderRadius: '16px',
-                '& fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
-                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.2)' },
-                '&.Mui-focused fieldset': { borderColor: '#6366F1' },
+                fontSize: '1.15rem',
+                bgcolor: '#1C1A18',
+                borderRadius: '20px',
+                color: '#10B981',
+                fontWeight: 600,
+                '& fieldset': { border: '1px solid rgba(255, 255, 255, 0.05)' },
+                '&:hover fieldset': { borderColor: 'rgba(255, 255, 255, 0.1)' },
+                '&.Mui-focused fieldset': { borderColor: '#10B981' },
                 pr: 10
               }
             }}
           />
-          <Stack direction="row" spacing={0.5} sx={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)' }}>
+          <Stack direction="row" spacing={0.5} sx={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)' }}>
             <Tooltip title="Copy">
-              <IconButton onClick={handleCopy} size="small" sx={{ color: copied ? '#6366F1' : 'rgba(255, 255, 255, 0.4)' }}>
+              <IconButton onClick={handleCopy} size="small" sx={{ color: copied ? '#10B981' : 'rgba(255, 255, 255, 0.3)' }}>
                 <ContentCopyIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
             <Tooltip title="Regenerate">
-              <IconButton onClick={handleGenerate} size="small" sx={{ color: 'rgba(255, 255, 255, 0.4)' }}>
+              <IconButton onClick={handleGenerate} size="small" sx={{ color: 'rgba(255, 255, 255, 0.3)' }}>
                 <RefreshIcon sx={{ fontSize: 18 }} />
               </IconButton>
             </Tooltip>
           </Stack>
         </Box>
 
-        <Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="caption" sx={{ fontWeight: 700, color: 'rgba(255, 255, 255, 0.5)' }}>LENGTH</Typography>
-            <Typography variant="caption" sx={{ fontWeight: 900, color: '#6366F1' }}>{length} characters</Typography>
+        <Box sx={{ px: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+            <Typography variant="caption" sx={{ fontWeight: 800, color: 'rgba(255, 255, 255, 0.3)', letterSpacing: '0.1em' }}>LENGTH</Typography>
+            <Typography variant="caption" sx={{ fontWeight: 900, color: '#10B981', fontFamily: 'var(--font-mono)' }}>{length} CHR</Typography>
           </Box>
           <Slider
             value={length}
@@ -143,13 +145,14 @@ export default function PasswordGenerator() {
             max={64}
             onChange={handleLengthChange}
             sx={{
-              color: '#6366F1',
+              color: '#10B981',
               height: 6,
               '& .MuiSlider-thumb': {
-                width: 18,
-                height: 18,
-                bgcolor: '#6366F1',
-                '&:hover, &.Mui-focusVisible': { boxShadow: '0 0 0 8px rgba(99, 102, 241, 0.16)' }
+                width: 20,
+                height: 20,
+                bgcolor: '#10B981',
+                border: '4px solid #161412',
+                '&:hover, &.Mui-focusVisible': { boxShadow: '0 0 0 8px rgba(16, 185, 129, 0.16)' }
               },
               '& .MuiSlider-track': { border: 'none' },
               '& .MuiSlider-rail': { opacity: 0.1, bgcolor: 'white' }
@@ -163,12 +166,16 @@ export default function PasswordGenerator() {
             variant="contained"
             onClick={handleGenerate}
             sx={{
-              bgcolor: '#6366F1',
+              bgcolor: '#10B981',
               color: '#000',
-              fontWeight: 800,
-              borderRadius: '14px',
-              py: 1.5,
-              '&:hover': { bgcolor: '#00D1DA' }
+              fontWeight: 900,
+              borderRadius: '18px',
+              py: 2,
+              fontFamily: 'var(--font-clash)',
+              fontSize: '0.9rem',
+              letterSpacing: '0.02em',
+              '&:hover': { bgcolor: '#059669', transform: 'translateY(-1px)' },
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
           >
             Generate Password
