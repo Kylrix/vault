@@ -27,7 +27,7 @@ import {
 } from "@mui/material";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/lib/masterpass-crypto";
-import { Navbar } from "./Navbar";
+import VaultTopbar from "@/components/common/VaultTopbar";
 import BottomNav from "./BottomNav";
 import { VaultFAB } from "./VaultFAB";
 import dynamic from "next/dynamic";
@@ -156,9 +156,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'var(--background)', display: 'flex', flexDirection: 'column', overflowX: 'hidden' }}>
-      <Navbar />
+      <VaultTopbar />
 
-      <Box sx={{ flex: 1, display: 'flex', width: '100%', overflowX: 'hidden', pt: '72px' }}>
+      <Box sx={{ flex: 1, display: 'flex', width: '100%', overflowX: 'hidden', pt: '88px' }}>
         <Box
           component="aside"
           sx={{

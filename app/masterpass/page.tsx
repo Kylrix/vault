@@ -12,21 +12,21 @@ import { Box, CircularProgress, Typography } from "@mui/material";
  */
 export default function MasterPassPage() {
   const router = useRouter();
-  const { user, isLoading } = useAppwriteVault();
+  const { user, loading } = useAppwriteVault();
 
   useEffect(() => {
     // Security: Only authenticated users can access this route
-    if (!isLoading && !user) {
+    if (!loading && !user) {
       router.replace("/");
       return;
     }
 
     // Redirect to dashboard - masterpass management is handled via drawer
     // This route is reserved for future expansion if needed
-    if (user && !isLoading) {
+    if (user && !loading) {
       router.replace("/dashboard");
     }
-  }, [user, isLoading, router]);
+  }, [user, loading, router]);
 
   return (
     <Box
@@ -47,3 +47,4 @@ export default function MasterPassPage() {
     </Box>
   );
 }
+
