@@ -28,7 +28,7 @@ import {
 import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { Navbar } from "./Navbar";
-import { VaultFAB } from "./VaultFAB";
+import BottomNav from "./BottomNav";
 import dynamic from "next/dynamic";
 import type { Models } from "appwrite";
 
@@ -396,6 +396,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {user && (
         <>
           <VaultFAB />
+          <BottomNav />
           <PasskeySetup
             isOpen={showPasskeySetup}
             onClose={() => setShowPasskeySetup(false)}

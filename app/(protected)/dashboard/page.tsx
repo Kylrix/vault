@@ -20,7 +20,7 @@ import SearchBar from "@/components/app/dashboard/SearchBar";
 import CredentialDialog from "@/components/app/dashboard/CredentialDialog";
 import VaultGuard from "@/components/layout/VaultGuard";
 import CredentialDetail from "@/components/app/dashboard/CredentialDetail";
-import { MasterPassModal } from "@/components/overlays/MasterPassModal";
+import { MasterPassDrawer } from "@/components/overlays/MasterPassDrawer";
 import { useAI } from "@/app/context/AIContext";
 import { useSudo } from "@/app/context/SudoContext";
 import { 
@@ -387,7 +387,16 @@ export default function DashboardPage() {
 
   return (
     <VaultGuard>
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', pb: 10 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh', 
+        pb: 10,
+        transition: 'filter 0.3s ease',
+        filter: showMasterPassDrawer ? 'blur(4px)' : 'none',
+        pointerEvents: showMasterPassDrawer ? 'none' : 'auto',
+        opacity: showMasterPassDrawer ? 0.5 : 1
+      }}>
         {/* Header Section */}
         <Box sx={{ 
           px: { xs: 2, md: 4 }, 
@@ -670,8 +679,8 @@ export default function DashboardPage() {
           />
         )}
 
-        {/* Master Password Modal Drawer */}
-        <MasterPassModal 
+        {/* Master Password Unlock Drawer */}
+        <MasterPassDrawer 
           isOpen={showMasterPassDrawer}
           onClose={() => setShowMasterPassDrawer(false)}
         />

@@ -137,13 +137,14 @@ export function Navbar() {
       position="fixed"
       sx={{
         zIndex: (theme) => theme.zIndex.drawer + 1,
-        bgcolor: 'rgba(11, 9, 8, 0.95)',
+        bgcolor: 'rgba(15, 13, 12, 0.8)',
+        backdropFilter: 'blur(25px) saturate(180%)',
         borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
         boxShadow: 'none',
         backgroundImage: 'none'
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 88, px: { xs: 2, md: 4 } }}>
+      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 80, px: { xs: 2, md: 4 } }}>
         <Logo 
           size={32} 
           app="vault" 
