@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAppwriteVault } from "@/context/appwrite-context";
-import { getTopbarLogoHref } from "@/lib/sdk";
+import { getTopbarLogoHref, getEcosystemUrl } from "@/lib/sdk";
 import {
   GridViewOutlined as GripIcon,
   AutoAwesomeOutlined as SparklesIcon,
@@ -33,7 +33,7 @@ import Logo from "../common/Logo";
 import { getUserProfilePicId } from "@/lib/user-utils";
 import { fetchProfilePreview, getCachedProfilePreview } from "@/lib/profile-preview";
 import { IdentityAvatar, computeIdentityFlags } from "../common/IdentityBadge";
-import { searchGlobalUsers, getEcosystemUrl } from "@/lib/ecosystem/identity";
+import { searchGlobalUsers } from "@/lib/ecosystem/identity";
 
 const PasswordGenerator = dynamic(() => import("@/components/ui/PasswordGenerator"), { 
   loading: () => <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}><CircularProgress size={24} /></Box>,
