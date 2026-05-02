@@ -103,7 +103,7 @@ export class MasterPassCrypto {
       );
       if (keychainSuccess) {
         // Ensure user document is marked as having masterpass if keychain exists
-        const { AppwriteService } = await import("../../../lib/appwrite");
+        const { AppwriteService } = await import("./appwrite");
         const userDoc = await AppwriteService.getUserDoc(userId);
         if (userDoc && !userDoc.masterpass && userDoc.email) {
           await AppwriteService.setMasterpassFlag(userId, userDoc.email);
@@ -241,7 +241,7 @@ export class MasterPassCrypto {
   // Create a new keychain entry (wraps the MEK with the password)
   private async createKeychainEntry(mek: CryptoKey, password: string, userId: string): Promise<void> {
     try {
-      const { AppwriteService } = await import("../../../lib/appwrite");
+      const { AppwriteService } = await import("./appwrite");
 
       // Generate new random salt for the AuthKey
       const salt = crypto.getRandomValues(new Uint8Array(MasterPassCrypto.SALT_SIZE));

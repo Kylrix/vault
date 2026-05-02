@@ -613,7 +613,6 @@ export default function CredentialDialog({
               {error}
             </Typography>
           )}
-          </Grid>
         </Box>
 
         {/* Footer with Actions */}

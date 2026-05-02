@@ -26,7 +26,7 @@ import {
   alpha
 } from "@mui/material";
 import { useAppwriteVault } from "@/context/appwrite-context";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { Navbar } from "./Navbar";
 import { VaultFAB } from "./VaultFAB";
 import dynamic from "next/dynamic";
@@ -48,8 +48,6 @@ const navigation = [
 
 const SIMPLIFIED_LAYOUT_PATHS = [
   "/",
-  "/masterpass",
-  "/masterpass/reset",
   "/twofa/access",
 ];
 
@@ -76,7 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !user && !isSimplifiedLayout) {
-      router.replace("/masterpass");
+      router.replace("/dashboard");
     }
   }, [loading, user, isSimplifiedLayout, router]);
 
@@ -92,7 +90,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         intervalId = window.setInterval(() => {
           if (!masterPassCrypto.isVaultUnlocked()) {
             sessionStorage.setItem("masterpass_return_to", pathname);
-            router.replace("/masterpass");
+            router.replace("/dashboard");
             clearInterval(intervalId as number);
           }
         }, 1000);
@@ -111,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       const handleVisibility = () => {
         if (!masterPassCrypto.isVaultUnlocked()) {
           sessionStorage.setItem("masterpass_return_to", pathname);
-          router.replace("/masterpass");
+          router.replace("/dashboard");
         }
       };
       document.addEventListener("visibilitychange", handleVisibility);
@@ -120,7 +118,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       if (!masterPassCrypto.isVaultUnlocked()) {
         sessionStorage.setItem("masterpass_return_to", pathname);
-        router.replace("/masterpass");
+        router.replace("/dashboard");
       }
 
       return () => {
@@ -230,7 +228,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   masterPassCrypto.lockNow();
                   if (!masterPassCrypto.isVaultUnlocked()) {
                     sessionStorage.setItem("masterpass_return_to", pathname);
-                    router.replace("/masterpass");
+                    router.replace("/dashboard");
                   }
                 }}
                 sx={{ 

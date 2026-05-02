@@ -1,7 +1,7 @@
 "use client";
 
 import { startAuthentication } from "@simplewebauthn/browser";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { AppwriteService } from "@/lib/appwrite";
 import { logError } from "@/lib/logger";
 import toast from "react-hot-toast";

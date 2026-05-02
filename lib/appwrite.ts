@@ -1703,7 +1703,7 @@ export class AppwriteService {
 
     try {
       const { encryptField, masterPassCrypto } = await import(
-        "../app/(protected)/masterpass/logic"
+        "../lib/masterpass-crypto"
       );
 
       if (!masterPassCrypto.isVaultUnlocked()) {
@@ -1743,7 +1743,7 @@ export class AppwriteService {
 
     try {
       const { decryptField, masterPassCrypto } = await import(
-        "../app/(protected)/masterpass/logic"
+        "../lib/masterpass-crypto"
       );
 
       // Check if vault is unlocked before attempting decryption
@@ -2592,20 +2592,20 @@ export async function getAuthenticationNextRoute(
     // User is fully authenticated, check master password
     const hasMp = await hasMasterpass(userId);
     if (!hasMp) {
-      return "/masterpass";
+      return "/dashboard";
     }
 
     // Check if vault is unlocked
     try {
       const { masterPassCrypto } = await import(
-        "../app/(protected)/masterpass/logic"
+        "../lib/masterpass-crypto"
       );
       if (!masterPassCrypto.isVaultUnlocked()) {
-        return "/masterpass";
+        return "/dashboard";
       }
     } catch {
       // If can't import crypto module, assume needs master password
-      return "/masterpass";
+      return "/dashboard";
     }
 
     // Everything is ready, go to dashboard
@@ -2617,7 +2617,7 @@ export async function getAuthenticationNextRoute(
 }
 
 /**
- * Redirects authenticated users to /masterpass or /dashboard as appropriate.
+ * Redirects authenticated users to /dashboard (after master password unlock in drawer) as appropriate.
  * Updated to use the new MFA-aware authentication flow
  */
 export async function redirectIfAuthenticated(
@@ -2634,7 +2634,7 @@ export async function redirectIfAuthenticated(
       // Fallback to original logic if there's an error
       const hasMp = await hasMasterpass(user.$id);
       if (!hasMp || !isVaultUnlocked()) {
-        router.replace("/masterpass");
+        router.replace("/dashboard");
         return true;
       } else {
         router.replace("/dashboard");

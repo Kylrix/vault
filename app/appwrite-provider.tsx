@@ -17,7 +17,7 @@ import {
 } from "@/lib/appwrite";
 import { APPWRITE_CONFIG } from "@/lib/appwrite/config";
 import { getAuthOrigin, openAuthPopup } from "@/lib/authUrl";
-import { masterPassCrypto } from "./(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { logDebug, logWarn } from "@/lib/logger";
 import { AppwriteContext } from "@/context/appwrite-context";
 
@@ -71,8 +71,8 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
             unlocked,
           });
         
-        // Use pathname to skip forcing masterpass on specific pages
-        const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
+        // Use pathname to skip forcing masterpass on the landing page
+        const isAuthPage = pathname === "/" || pathname === "/landing";
         
         // The crypto lock state is the source of truth for whether the vault is usable.
         // If it's an auth page, we don't need to force the modal.
@@ -87,7 +87,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
           const retryAccount = getCurrentUserSnapshot() ?? await getCurrentUser(true);
           if (retryAccount) {
             setUser(retryAccount);
-            setNeedsMasterPassword(pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass") ? false : !masterPassCrypto.isVaultUnlocked());
+            setNeedsMasterPassword(pathname === "/" || pathname === "/landing" ? false : !masterPassCrypto.isVaultUnlocked());
             return retryAccount;
           }
         }
@@ -181,7 +181,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         setUser(account);
         setIsAuthenticating(false);
         if (pathname === "/" || pathname === "/landing") {
-          router.replace("/masterpass");
+          router.replace("/dashboard");
         }
         return;
       }
@@ -197,7 +197,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         setUser(account);
         setIsAuthenticating(false);
         if (pathname === "/" || pathname === "/landing") {
-          router.replace("/masterpass");
+          router.replace("/dashboard");
         }
         return;
       }
@@ -249,9 +249,9 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
         // Refresh user state
         const account = await fetchUser(true);
         
-        // Redirect to masterpass if authenticated
+        // Redirect to dashboard if authenticated
         if (account) {
-          router.replace("/masterpass");
+          router.replace("/dashboard");
         }
       }
     };
@@ -326,7 +326,7 @@ export function AppwriteProvider({ children }: { children: ReactNode }) {
     await fetchUser(true);
     // After refresh, re-calculate needsMasterPassword specifically
     const unlocked = masterPassCrypto.isVaultUnlocked();
-    const isAuthPage = pathname === "/" || pathname === "/landing" || pathname?.startsWith("/masterpass");
+    const isAuthPage = pathname === "/" || pathname === "/landing";
     
     if (isAuthPage) {
       setNeedsMasterPassword(false);

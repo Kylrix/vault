@@ -34,8 +34,8 @@ export default function MasterpassResetPage() {
   useEffect(() => {
     if (user === null) {
       const target = callbackUrl 
-        ? `/masterpass?callbackUrl=${encodeURIComponent(callbackUrl)}` 
-        : "/masterpass";
+        ? `/dashboard?callbackUrl=${encodeURIComponent(callbackUrl)}` 
+        : "/dashboard";
       router.replace(target);
     }
   }, [user, router, callbackUrl]);
@@ -231,8 +231,8 @@ export default function MasterpassResetPage() {
               variant="contained"
               onClick={() => {
                 const target = callbackUrl 
-                  ? `/masterpass?callbackUrl=${encodeURIComponent(callbackUrl)}` 
-                  : "/masterpass";
+                  ? `/dashboard?callbackUrl=${encodeURIComponent(callbackUrl)}` 
+                  : "/dashboard";
                 router.replace(target);
               }}
               sx={{

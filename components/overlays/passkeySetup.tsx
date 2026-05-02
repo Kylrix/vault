@@ -21,7 +21,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import FingerprintIcon from "@mui/icons-material/Fingerprint";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 
 interface PasskeySetupProps {
   isOpen: boolean;
@@ -62,7 +62,7 @@ export function PasskeySetup({
     const masterpassSet = await AppwriteService.hasMasterpass(userId);
     if (!masterpassSet) {
       toast.error("You must set a master password before adding a passkey.");
-      router.push("/masterpass");
+      router.push("/dashboard");
       onClose();
       return false;
     }

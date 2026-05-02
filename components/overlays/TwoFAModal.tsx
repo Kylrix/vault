@@ -94,7 +94,7 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
     try {
       await completeMfaChallenge(challengeId, code);
       onClose();
-      await finalizeAuth({ redirect: true, fallback: "/masterpass" });
+      await finalizeAuth({ redirect: true, fallback: "/dashboard" });
     } catch (_e: unknown) {
       const err = _e as { message?: string };
       toast.error(err.message || "Invalid code");
@@ -112,7 +112,6 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
       anchor={isMobile ? 'bottom' : 'right'}
       open={isOpen}
       onClose={onClose}
-      TransitionComponent={Fade}
       PaperProps={{
         sx: {
           width: isMobile ? '100%' : 'min(100vw, 400px)',
@@ -128,7 +127,6 @@ export function TwoFAModal({ isOpen, onClose }: TwoFAModalProps) {
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-        }
         }
       }}
     >

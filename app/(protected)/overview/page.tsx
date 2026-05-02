@@ -28,7 +28,7 @@ import {
   Query,
   AppwriteService,
 } from "@/lib/appwrite";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { useDataNexus } from "@/context/DataNexusContext";
 
 export default function OverviewPage() {

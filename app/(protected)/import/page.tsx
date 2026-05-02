@@ -32,7 +32,7 @@ import { useBackgroundTask } from "@/app/context/BackgroundTaskContext";
 import { ImportPreviewModal } from "@/components/import/ImportPreviewModal";
 import { ImportItem } from "@/lib/import/deduplication";
 import { analyzeBitwardenExport } from "@/utils/import/bitwarden-mapper";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { porterExport, downloadExportAsFile } from "@/lib/data-porter";
 import toast from "react-hot-toast";
 

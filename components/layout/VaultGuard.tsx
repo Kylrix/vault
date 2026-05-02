@@ -6,7 +6,8 @@ import { useAppwriteVault } from "@/context/appwrite-context";
 
 /**
  * VaultGuard: Wrap protected pages/components with this to enforce
- * that the vault (crypto module) is unlocked. If not, redirect to /masterpass.
+ * that the vault (crypto module) is unlocked. If not, the drawer in
+ * the dashboard will automatically show the master password modal.
  *
  * Usage:
  *   <VaultGuard>
@@ -27,7 +28,7 @@ export default function VaultGuard({
       : false;
 
   useEffect(() => {
-    if (!isAuthReady) return; // wait for hydration/auth
+    if (!isAuthReady) return;
 
     const locked = needsMasterPassword || !isVaultUnlocked();
     if (verbose)
@@ -39,7 +40,8 @@ export default function VaultGuard({
           sessionStorage.setItem("masterpass_return_to", pathname);
         } catch {}
       }
-      router.replace("/masterpass");
+      // Note: The master password drawer is now handled by the dashboard
+      // No redirect needed; the drawer will show automatically
     }
   }, [
     isAuthReady,
@@ -55,7 +57,9 @@ export default function VaultGuard({
   }
 
   if (needsMasterPassword || !isVaultUnlocked()) {
-    return null;
+    // Still render children, but let the drawer handle the unlock flow
+    // in the dashboard context
+    return <>{children}</>;
   }
 
   return <>{children}</>;

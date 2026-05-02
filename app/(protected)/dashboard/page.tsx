@@ -20,6 +20,7 @@ import SearchBar from "@/components/app/dashboard/SearchBar";
 import CredentialDialog from "@/components/app/dashboard/CredentialDialog";
 import VaultGuard from "@/components/layout/VaultGuard";
 import CredentialDetail from "@/components/app/dashboard/CredentialDetail";
+import { MasterPassModal } from "@/components/overlays/MasterPassModal";
 import { useAI } from "@/app/context/AIContext";
 import { useSudo } from "@/app/context/SudoContext";
 import { 
@@ -65,12 +66,15 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 }
 
 export default function DashboardPage() {
-  const { user } = useAppwriteVault();
+  const { user, needsMasterPassword } = useAppwriteVault();
   const searchParams = useSearchParams();
   const router = useRouter();
   const { analyze, registerCreateModal } = useAI();
   const theme = useTheme();
   const isMobileView = useMediaQuery(theme.breakpoints.down('md'));
+  
+  // Master password modal state
+  const [showMasterPassDrawer, setShowMasterPassDrawer] = useState(needsMasterPassword || false);
   
   // State for all credentials, fetched once
   const [allCredentials, setAllCredentials] = useState<Credentials[]>([]);
@@ -99,6 +103,13 @@ export default function DashboardPage() {
       router.replace(newPath);
     }
   }, [searchParams, router]);
+
+  // Update master password drawer state when auth state changes
+  useEffect(() => {
+    if (needsMasterPassword) {
+      setShowMasterPassDrawer(true);
+    }
+  }, [needsMasterPassword]);
 
   const [selectedCredential, setSelectedCredential] =
     useState<Credentials | null>(null);
@@ -658,6 +669,12 @@ export default function DashboardPage() {
             isMobile={isMobileView}
           />
         )}
+
+        {/* Master Password Modal Drawer */}
+        <MasterPassModal 
+          isOpen={showMasterPassDrawer}
+          onClose={() => setShowMasterPassDrawer(false)}
+        />
       </Box>
     </VaultGuard>
   );

@@ -37,7 +37,7 @@ import {
 } from "@/lib/appwrite";
 import type { Folders, Credentials, TotpSecrets } from "@/lib/appwrite/types";
 import { generateRandomPassword } from "@/utils/password";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import toast from "react-hot-toast";
 import VaultGuard from "@/components/layout/VaultGuard";
 

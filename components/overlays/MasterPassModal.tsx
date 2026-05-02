@@ -4,6 +4,10 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Drawer,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
   Button,
   TextField,
   InputAdornment,
@@ -25,7 +29,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import AppsIcon from "@mui/icons-material/Apps";
 import Logo from "../common/Logo";
 import { useAppwriteVault } from "@/context/appwrite-context";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { useFinalizeAuth } from "@/lib/finalizeAuth";
 import {
   setMasterpassFlag,
@@ -687,7 +691,7 @@ export function MasterPassModal({ isOpen, onClose }: MasterPassModalProps) {
                 fullWidth
                 variant="text"
                 size="small"
-                onClick={() => router.push("/masterpass/reset")}
+                onClick={() => router.push("/reset")}
                 sx={{
                   color: '#ef4444',
                   fontSize: '0.75rem',

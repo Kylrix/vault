@@ -21,7 +21,7 @@ function GlobalEcosystemHandler() {
   useEcosystemNode('vault');
 
   useEffect(() => {
-    const mood = pathname?.startsWith('/masterpass') || pathname?.startsWith('/totp') || pathname?.startsWith('/settings')
+    const mood = pathname?.startsWith('/totp') || pathname?.startsWith('/settings')
       ? 'serious'
       : 'ambient';
     document.body.dataset.uiMood = mood;

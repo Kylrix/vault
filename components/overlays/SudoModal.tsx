@@ -27,7 +27,7 @@ import { ecosystemSecurity } from "@/lib/ecosystem/security";
 import { PasskeySetup } from "./passkeySetup";
 import { useAppwriteVault } from "@/context/appwrite-context";
 import toast from "react-hot-toast";
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import React from "react";
 import { unlockWithPasskey } from "@/lib/passkey";
 import { useRouter } from "next/navigation";
@@ -695,7 +695,7 @@ export function SudoModal({
                                 fullWidth
                                 variant="text"
                                 size="small"
-                                onClick={() => router.push('/masterpass/reset')}
+                                onClick={() => router.push('/reset')}
                                 sx={{ color: '#ef4444', '&:hover': { bgcolor: alpha('#ef4444', 0.1) }, mt: 2, fontWeight: 700 }}
                             >
                                 Reset Master Password

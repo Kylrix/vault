@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useRef, useCallback, ReactNode, useEffect } from 'react';
-import { masterPassCrypto } from "@/app/(protected)/masterpass/logic";
+import { masterPassCrypto } from "@/lib/masterpass-crypto";
 
 /**
  * KYLRIX VAULT DATA NEXUS

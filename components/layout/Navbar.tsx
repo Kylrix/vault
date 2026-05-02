@@ -306,10 +306,10 @@ export function Navbar() {
                 <MenuItem
                   sx={{ py: 1.8, px: 2.5, gap: 2, borderRadius: '14px', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
                   onClick={() => {
-                    import("@/app/(protected)/masterpass/logic").then(({ masterPassCrypto }) => {
+                    import("@/lib/masterpass-crypto").then(({ masterPassCrypto }) => {
                       masterPassCrypto.lockNow();
                       sessionStorage.setItem("masterpass_return_to", window.location.pathname);
-                      window.location.replace("/masterpass");
+                      window.location.replace("/dashboard");
                     });
                     handleCloseMenu();
                   }}

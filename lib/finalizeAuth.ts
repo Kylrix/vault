@@ -38,14 +38,14 @@ export function useFinalizeAuth() {
           await refresh();
           return null;
         })());
-      // If no user after refresh, go to fallback/masterpass
+      // If no user after refresh, go to fallback/dashboard
       if (!u) {
-        router.replace(options.fallback || "/masterpass");
+        router.replace(options.fallback || "/dashboard");
         return;
       }
       // The vault crypto lock is the source of truth for local access.
       if (!isVaultUnlocked()) {
-        router.replace("/masterpass");
+        router.replace("/dashboard");
       } else {
         router.replace("/dashboard");
       }
