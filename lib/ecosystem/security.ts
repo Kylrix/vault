@@ -88,13 +88,13 @@ export class EcosystemSecurity {
   async ensureIdentityKeyPair(): Promise<CryptoKeyPair> {
     if (this.identityKeyPair) return this.identityKeyPair;
 
-    this.identityKeyPair = await crypto.subtle.generateKey(
+    this.identityKeyPair = (await crypto.subtle.generateKey(
       {
         name: "X25519",
       },
       false,
       ["deriveKey", "deriveBits"],
-    );
+    )) as CryptoKeyPair;
 
     return this.identityKeyPair;
   }

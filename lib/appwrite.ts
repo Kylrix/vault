@@ -299,7 +299,7 @@ function readShareMetadata(metadata: string | null | undefined): Record<string, 
 async function importX25519PublicKey(publicKeyBase64: string): Promise<CryptoKey> {
   return await crypto.subtle.importKey(
     "raw",
-    base64ToBytes(publicKeyBase64),
+    base64ToBytes(publicKeyBase64) as unknown as BufferSource,
     { name: "X25519" },
     false,
     [],
