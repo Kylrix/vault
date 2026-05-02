@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { useLastActiveApp } from "@/lib/sdk/ecosystem";
 import { AppwriteProvider } from "./appwrite-provider";
 import { BackgroundTaskProvider } from "./context/BackgroundTaskContext";
 import { AIProvider } from "./context/AIContext";
@@ -45,6 +46,8 @@ function GlobalEcosystemHandler() {
 }
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  useLastActiveApp();
+  
   return (
     <SubscriptionProvider>
       <MuiThemeProvider theme={darkTheme}>

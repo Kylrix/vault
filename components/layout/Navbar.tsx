@@ -33,7 +33,7 @@ import Logo from "../common/Logo";
 import { getUserProfilePicId } from "@/lib/user-utils";
 import { fetchProfilePreview, getCachedProfilePreview } from "@/lib/profile-preview";
 import { IdentityAvatar, computeIdentityFlags } from "../common/IdentityBadge";
-import { searchGlobalUsers } from "@/lib/ecosystem/identity";
+import { searchGlobalUsers, getEcosystemUrl } from "@/lib/ecosystem/identity";
 
 const PasswordGenerator = dynamic(() => import("@/components/ui/PasswordGenerator"), { 
   loading: () => <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}><CircularProgress size={24} /></Box>,
@@ -293,6 +293,18 @@ export function Navbar() {
                   </Typography>
                 </Box>
                 <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.05)', my: 1 }} />
+                <MenuItem 
+                  onClick={() => {
+                    if (profileUsername) {
+                      window.location.href = `${getEcosystemUrl('connect')}/u/${encodeURIComponent(profileUsername)}?transition=profile`;
+                    }
+                    handleCloseMenu();
+                  }} 
+                  sx={{ py: 1.8, px: 2.5, gap: 2, borderRadius: '14px', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.03)' } }}
+                >
+                  <SettingsIcon sx={{ fontSize: 18, color: "rgba(255, 255, 255, 0.6)" }} />
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>Profile</Typography>
+                </MenuItem>
                 <MenuItem 
                   onClick={() => {
                     window.location.href = `https://accounts.kylrix.space/settings?source=${encodeURIComponent(window.location.origin)}`;
