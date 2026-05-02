@@ -13,7 +13,6 @@ import {
   FormControlLabel,
   Paper,
   alpha,
-  CircularProgress,
   List,
   ListItem,
   Tooltip,
@@ -22,11 +21,8 @@ import {
   ContentCopy as ContentCopyIcon,
   Refresh as RefreshIcon,
   History as HistoryIcon,
-  AutoAwesome as AutoAwesomeIcon,
-  Shield as ShieldIcon,
 } from "@mui/icons-material";
 import { generateRandomPassword } from "@/utils/password";
-import { useAI } from "@/app/context/AIContext";
 import toast from "react-hot-toast";
 
 export default function PasswordGenerator() {
@@ -36,38 +32,6 @@ export default function PasswordGenerator() {
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<{ value: string; ts: number }[]>([]);
   
-  const { analyze, isLoading: isAnalyzing } = useAI();
-
-  const handleAnalyze = async () => {
-    if (!password) return;
-    const toastId = toast.loading("Analyzing password strength...");
-    try {
-        const result = (await analyze('PASSWORD_AUDIT', password)) as { score: number; timeToCrack: string; feedback: string };
-        if (result) {
-            toast.dismiss(toastId);
-            toast(() => (
-                <Box sx={{ color: 'white' }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 0.5 }}>Security Score: {result.score}/10</Typography>
-                    <Typography variant="body2">Crack Time: {result.timeToCrack}</Typography>
-                    <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.5)', mt: 0.5, display: 'block' }}>{result.feedback}</Typography>
-                </Box>
-            ), { 
-              duration: 5000, 
-              icon: <ShieldIcon sx={{ fontSize: 20, color: "#6366F1" }} />,
-              style: {
-                background: 'rgba(10, 10, 10, 0.95)',
-                backdropFilter: 'blur(25px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '16px',
-                color: 'white'
-              }
-            });
-        }
-    } catch {
-        toast.error("Analysis failed", { id: toastId });
-    }
-  };
-
   useEffect(() => {
     const newPassword = generateRandomPassword(length);
     setPassword(newPassword);
@@ -208,24 +172,6 @@ export default function PasswordGenerator() {
             }}
           >
             Generate Password
-          </Button>
-          
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={handleAnalyze}
-            disabled={isAnalyzing}
-            startIcon={isAnalyzing ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon sx={{ fontSize: 16 }} />}
-            sx={{
-              borderColor: alpha('#6366F1', 0.2),
-              color: '#6366F1',
-              fontWeight: 700,
-              borderRadius: '14px',
-              py: 1.2,
-              '&:hover': { borderColor: '#6366F1', bgcolor: alpha('#6366F1', 0.05) }
-            }}
-          >
-            {isAnalyzing ? "Analyzing..." : "Check Strength with AI"}
           </Button>
         </Stack>
 
