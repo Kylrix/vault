@@ -316,11 +316,11 @@ async function encryptShareEnvelope<T extends Record<string, unknown>>(
   recipientPublicKeyBase64: string,
 ): Promise<{ wrappedKey: string; senderPublicKey: string }> {
   const recipientPublicKey = await importX25519PublicKey(recipientPublicKeyBase64);
-  const ephemeralKeyPair = await crypto.subtle.generateKey(
+  const ephemeralKeyPair = (await crypto.subtle.generateKey(
     { name: "X25519" },
     true,
     ["deriveKey", "deriveBits"],
-  );
+  )) as CryptoKeyPair;
 
   const sharedKey = await crypto.subtle.deriveKey(
     { name: "X25519", public: recipientPublicKey },
