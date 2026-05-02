@@ -29,6 +29,7 @@ import { useAppwriteVault } from "@/context/appwrite-context";
 import { masterPassCrypto } from "@/lib/masterpass-crypto";
 import { Navbar } from "./Navbar";
 import BottomNav from "./BottomNav";
+import { VaultFAB } from "./VaultFAB";
 import dynamic from "next/dynamic";
 import type { Models } from "appwrite";
 

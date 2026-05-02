@@ -143,32 +143,55 @@ export function MasterPassDrawer({ isOpen, onClose }: MasterPassDrawerProps) {
   useEffect(() => {
     if (!user || !isOpen) return;
 
-    const initializeMode = async () => {
-      try {
-        const needsInitialization = await AppwriteService.needsMasterPasswordSetup(user.$id);
-        setIsFirstTime(needsInitialization);
+    // Auto-success if already unlocked
+    if (masterPassCrypto.isVaultUnlocked()) {
+      onSuccess();
+      return;
+    }
 
-        if (needsInitialization) {
+    setLoading(true);
+
+    const isKylrixDomain = typeof window !== 'undefined' && 
+      (window.location.hostname === 'kylrix.space' || window.location.hostname.endsWith('.kylrix.space'));
+
+    const pinSet = ecosystemSecurity.isPinSet();
+    setHasPin(pinSet);
+
+    // Check for keychain entries to determine mode
+    AppwriteService.listKeychainEntries(user.$id)
+      .then((entries) => {
+        const passkeyPresent = entries.some((e: any) => e.type === 'passkey');
+        const passwordPresent = entries.some((e: any) => e.type === 'password');
+
+        // Disable passkey if not on kylrix.space domain
+        const effectivePasskeyPresent = passkeyPresent && isKylrixDomain;
+
+        setHasPasskey(effectivePasskeyPresent);
+        setIsFirstTime(!passwordPresent);
+
+        if (!passwordPresent) {
           setMode("initialize");
+        } else if (effectivePasskeyPresent) {
+          setMode("passkey");
+          handlePasskeyUnlock();
+        } else if (pinSet) {
+          setMode("pin");
         } else {
           setMode("password");
         }
+      })
+      .catch(() => {
+        setIsFirstTime(true);
+        setMode("initialize");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-        const hasPasskeyStored = !!user.prefs?.passkeys;
-        setHasPasskey(hasPasskeyStored);
-
-        const hasPinStored = await ecosystemSecurity.hasPinSession(user.$id);
-        setHasPin(hasPinStored);
-
-        if (hasPinStored) {
-          setMode("pin");
-        }
-      } catch (_e: unknown) {
-        setMode("password");
-      }
-    };
-
-    initializeMode();
+    // Reset state on open
+    setMasterPassword("");
+    setConfirmPassword("");
+    setPin("");
   }, [user, isOpen, handlePasskeyUnlock, onSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -339,8 +362,10 @@ export function MasterPassDrawer({ isOpen, onClose }: MasterPassDrawerProps) {
                 value={pin}
                 onChange={handlePinChange}
                 disabled={loading}
-                maxLength={4}
                 slotProps={{
+                  htmlInput: {
+                    maxLength: 4,
+                  },
                   input: {
                     sx: {
                       fontFamily: 'monospace',

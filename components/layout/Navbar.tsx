@@ -297,7 +297,7 @@ export function Navbar() {
                 <MenuItem 
                   onClick={() => {
                     if (profileUsername) {
-                      window.location.href = `${getEcosystemUrl('connect')}/u/${encodeURIComponent(profileUsername)}?transition=profile`;
+                      window.location.href = `${getEcosystemUrl('CONNECT')}/u/${encodeURIComponent(profileUsername)}?transition=profile`;
                     }
                     handleCloseMenu();
                   }} 
