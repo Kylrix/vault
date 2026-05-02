@@ -552,24 +552,7 @@ export function MasterPassDrawer({ isOpen, onClose }: MasterPassDrawerProps) {
                 </Button>
               )}
 
-              {mode === "password" && !isFirstTime && (
-                <Button
-                  fullWidth
-                  variant="text"
-                  size="small"
-                  onClick={() => router.push("/reset")}
-                  sx={{
-                    color: '#ef4444',
-                    fontSize: '0.75rem',
-                    mt: 1,
-                    '&:hover': { bgcolor: alpha('#ef4444', 0.1) },
-                    textTransform: 'none',
-                    fontWeight: 700
-                  }}
-                >
-                  Reset Master Password
-                </Button>
-              )}
+
             </>
           )}
         </Stack>
